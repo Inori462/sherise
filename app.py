@@ -122,15 +122,14 @@ def _get_db_pool():
         with _db_pool_lock:
             if _db_pool is None:
                 _db_pool = MySQLConnectionPool(
-                    pool_name="sherise_pool",
-                    pool_size=MYSQL_POOL_SIZE,
-                    pool_reset_session=True,
-                    host=MYSQL_HOST,
-                    port=MYSQL_PORT
-                    user=MYSQL_USER,
-                    password=MYSQL_PASSWORD,
-                    database=MYSQL_DB
-                )
+                            pool_name="sherise_pool",
+                            pool_size=MYSQL_POOL_SIZE,
+                            pool_reset_session=True,
+                            host=MYSQL_HOST,
+                            port=MYSQL_PORT,
+                            user=MYSQL_USER,
+                            password=MYSQL_PASSWORD,
+                            database=MYSQL_DB)
     return _db_pool
 
 
