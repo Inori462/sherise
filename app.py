@@ -102,11 +102,16 @@ GOOGLE_OAUTH_ENABLED = bool(GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET)
 # MYSQL CONNECTION
 # =========================================================
 
-MYSQL_HOST = os.getenv("MYSQLHOST", "localhost")
+MYSQL_HOST = os.getenv("MYSQLHOST")
 MYSQL_PORT = int(os.getenv("MYSQLPORT", "3306"))
 MYSQL_USER = os.getenv("MYSQLUSER", "root")
-MYSQL_PASSWORD = os.getenv("MYSQLPASSWORD", "")
-MYSQL_DB = os.getenv("MYSQLDATABASE", "women_empowerment")
+MYSQL_PASSWORD = os.getenv("MYSQLPASSWORD")
+MYSQL_DB = os.getenv("MYSQLDATABASE", "railway")
+
+if not MYSQL_HOST or MYSQL_HOST == "localhost":
+    raise RuntimeError(
+        "MYSQLHOST is missing or incorrectly configured in Render."
+    )
 
 
 MYSQL_POOL_SIZE = int(os.getenv("MYSQL_POOL_SIZE", "5"))
@@ -121,15 +126,16 @@ def _get_db_pool():
     if _db_pool is None:
         with _db_pool_lock:
             if _db_pool is None:
-                _db_pool = MySQLConnectionPool(
-                            pool_name="sherise_pool",
-                            pool_size=MYSQL_POOL_SIZE,
-                            pool_reset_session=True,
-                            host=MYSQL_HOST,
-                            port=MYSQL_PORT,
-                            user=MYSQL_USER,
-                            password=MYSQL_PASSWORD,
-                            database=MYSQL_DB)
+                                 _db_pool = MySQLConnectionPool(
+                                pool_name="sherise_pool",
+                                pool_size=MYSQL_POOL_SIZE,
+                                pool_reset_session=True,
+                                host=MYSQL_HOST,
+                                port=MYSQL_PORT,
+                                user=MYSQL_USER,
+                                password=MYSQL_PASSWORD,
+                                database=MYSQL_DB
+                            )
     return _db_pool
 
 
