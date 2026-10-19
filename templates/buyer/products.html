@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        SheRise | Marketplace
+    </title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+
+<body class="buyer-page">
+
+
+<div class="buyer-layout">
+
+
+    <!-- =========================================================
+         SIDEBAR
+    ========================================================== -->
+
+    <aside class="buyer-sidebar">
+
+
+        <!-- BRAND -->
+
+        <div class="sidebar-brand">
+
+            <div class="sidebar-brand-icon">
+                ♀
+            </div>
+
+            <div class="sidebar-brand-text">
+
+                <strong>
+                    SheRise
+                </strong>
+
+                <span>
+                    Empower • Connect • Grow
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- BUYER PROFILE -->
+
+        <div class="buyer-sidebar-profile">
+
+            <div class="buyer-profile-avatar">
+
+                {{ session.get('full_name', 'B')[0]|upper }}
+
+            </div>
+
+
+            <div class="buyer-profile-info">
+
+                <strong>
+                    {{ session.get('full_name', 'Buyer') }}
+                </strong>
+
+                <span>
+                    Buyer
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             NAVIGATION
+        ====================================================== -->
+
+        <nav class="buyer-nav">
+
+
+            <!-- MAIN -->
+
+            <div class="buyer-nav-group">
+
+                <div class="buyer-nav-title">
+                    MAIN
+                </div>
+
+
+                <a href="{{ url_for('buyer_dashboard') }}"
+                   class="buyer-nav-link">
+
+                    <span class="buyer-nav-icon">
+                        ⌂
+                    </span>
+
+                    <span>
+                        Dashboard
+                    </span>
+
+                </a>
+
+            </div>
+
+
+
+            <!-- SHOPPING -->
+
+            <div class="buyer-nav-group">
+
+                <div class="buyer-nav-title">
+                    SHOPPING
+                </div>
+
+
+                <a href="{{ url_for('buyer_products') }}"
+                   class="buyer-nav-link active">
+
+                    <span class="buyer-nav-icon">
+                        🛍
+                    </span>
+
+                    <span>
+                        Marketplace
+                    </span>
+
+                </a>
+
+
+                <a href="{{ url_for('buyer_wishlist') }}"
+                   class="buyer-nav-link">
+
+                    <span class="buyer-nav-icon">
+                        ♡
+                    </span>
+
+                    <span>
+                        Wishlist
+                    </span>
+
+                </a>
+
+
+                <a href="{{ url_for('buyer_cart') }}"
+                   class="buyer-nav-link">
+
+                    <span class="buyer-nav-icon">
+                        🛒
+                    </span>
+
+                    <span>
+                        My Cart
+                    </span>
+
+                </a>
+
+
+                <a href="{{ url_for('buyer_orders') }}"
+                   class="buyer-nav-link">
+
+                    <span class="buyer-nav-icon">
+                        📦
+                    </span>
+
+                    <span>
+                        My Orders
+                    </span>
+
+                </a>
+
+            </div>
+
+
+
+            <!-- REQUESTS -->
+
+            <div class="buyer-nav-group">
+
+                <div class="buyer-nav-title">
+                    REQUESTS
+                </div>
+
+
+                <a href="{{ url_for('buyer_custom_request') }}"
+                   class="buyer-nav-link">
+
+                    <span class="buyer-nav-icon">
+                        ✦
+                    </span>
+
+                    <span>
+                        Custom Product Request
+                    </span>
+
+                </a>
+
+            </div>
+
+
+
+            <!-- ACCOUNT -->
+
+            <div class="buyer-nav-group">
+
+                <div class="buyer-nav-title">
+                    ACCOUNT
+                </div>
+
+
+                <a href="{{ url_for('buyer_profile') }}"
+                   class="buyer-nav-link">
+
+                    <span class="buyer-nav-icon">
+                        ◯
+                    </span>
+
+                    <span>
+                        Profile
+                    </span>
+
+                </a>
+
+            </div>
+
+        </nav>
+
+
+
+        <!-- LOGOUT -->
+
+        <div class="buyer-sidebar-bottom">
+
+            <a href="{{ url_for('logout') }}"
+               class="buyer-logout-link">
+
+                <span class="buyer-nav-icon">
+                    ↪
+                </span>
+
+                <span>
+                    Logout
+                </span>
+
+            </a>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- =========================================================
+         MAIN
+    ========================================================== -->
+
+    <main class="buyer-main">
+
+
+        <!-- TOP BAR -->
+
+        <header class="buyer-topbar">
+
+
+            <div>
+
+                <h1>
+                    Marketplace
+                </h1>
+
+                <p>
+                    Discover products created by women entrepreneurs.
+                </p>
+
+            </div>
+
+
+            <div class="buyer-topbar-actions">
+
+
+                <a href="{{ url_for('buyer_cart') }}"
+                   class="buyer-topbar-btn">
+
+                    🛒 Cart
+
+                </a>
+
+
+                <a href="{{ url_for('buyer_wishlist') }}"
+                   class="buyer-topbar-btn">
+
+                    ♡ Wishlist
+
+                </a>
+
+            </div>
+
+        </header>
+
+
+
+        <!-- =====================================================
+             PAGE CONTENT
+        ====================================================== -->
+
+        <div class="buyer-page-content">
+
+
+            <!-- =================================================
+                 PAGE INTRO
+            ================================================== -->
+
+            <section class="buyer-section">
+
+                <div class="buyer-section-header">
+
+                    <div>
+
+                        <span class="buyer-section-label">
+                            SHOP
+                        </span>
+
+                        <h2>
+                            Explore the Marketplace
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <p style="
+                    color:#777;
+                    margin-top:-10px;
+                    margin-bottom:25px;
+                ">
+
+                    Find handmade products, clothing, food,
+                    handicrafts and other products created by
+                    women entrepreneurs.
+
+                </p>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 SEARCH + FILTER
+            ================================================== -->
+
+            <section class="buyer-search-card">
+
+
+                <form method="GET"
+                      action="{{ url_for('buyer_products') }}">
+
+
+                    <div style="
+                        display:grid;
+                        grid-template-columns:minmax(0,1fr) 220px auto;
+                        gap:12px;
+                        align-items:center;
+                    ">
+
+
+                        <!-- SEARCH -->
+
+                        <div class="buyer-search-wrapper">
+
+                            <span class="buyer-search-icon"
+                                  aria-hidden="true">
+
+                                🔍
+
+                            </span>
+
+
+                            <input
+                                type="text"
+                                name="search"
+                                class="buyer-search-input"
+                                placeholder="Search products..."
+                                value="{{ search or '' }}"
+                                autocomplete="off"
+                            >
+
+                        </div>
+
+
+
+                        <!-- CATEGORY -->
+
+                        <select
+                            name="category"
+                            style="
+                                width:100%;
+                                box-sizing:border-box;
+                                padding:13px 14px;
+                                border:1px solid #ddd;
+                                border-radius:8px;
+                                background:#fff;
+                                color:#555;
+                                font-size:14px;
+                                outline:none;
+                            "
+                        >
+
+                            <option value="">
+                                All Categories
+                            </option>
+
+
+                            {% for category in categories %}
+
+                                <option
+                                    value="{{ category.name }}"
+                                    {% if selected_category == category.name %}
+                                        selected
+                                    {% endif %}
+                                >
+
+                                    {{ category.name }}
+
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+
+
+                        <!-- SEARCH BUTTON -->
+
+                        <button
+                            type="submit"
+                            class="buyer-search-btn"
+                        >
+
+                            Search
+
+                        </button>
+
+
+                    </div>
+
+
+                    <!-- CLEAR FILTER -->
+
+                    {% if search or selected_category %}
+
+                        <div style="margin-top:12px;">
+
+                            <a
+                                href="{{ url_for('buyer_products') }}"
+                                style="
+                                    color:#b45f9b;
+                                    text-decoration:none;
+                                    font-size:13px;
+                                "
+                            >
+
+                                Clear Search & Filters
+
+                            </a>
+
+                        </div>
+
+                    {% endif %}
+
+
+                </form>
+
+            </section>
+
+
+
+            <!-- =================================================
+                 RESULT HEADER
+            ================================================== -->
+
+            <section class="buyer-section">
+
+
+                <div class="buyer-section-header">
+
+
+                    <div>
+
+                        <span class="buyer-section-label">
+                            MARKETPLACE
+                        </span>
+
+                        <h2>
+                            Available Products
+                        </h2>
+
+                    </div>
+
+
+                    <span style="
+                        color:#888;
+                        font-size:13px;
+                    ">
+
+                        {{ products|length }}
+
+                        product{% if products|length != 1 %}s{% endif %}
+
+                    </span>
+
+
+                </div>
+
+
+
+                <!-- =================================================
+                     PRODUCTS
+                ================================================== -->
+
+                {% if products %}
+
+
+                    <div class="buyer-products-grid">
+
+
+                        {% for product in products %}
+
+
+                            <div class="buyer-product-card">
+
+
+                                <!-- PRODUCT IMAGE -->
+
+                                {% if product.image_url %}
+
+                                    <img
+                                        src="{{ product.image_url }}"
+                                        alt="{{ product.name }}"
+                                        class="buyer-product-image"
+                                    >
+
+                                {% else %}
+
+                                    <div class="
+                                        buyer-product-image
+                                        buyer-no-image
+                                    ">
+
+                                        <span>
+                                            No Image Available
+                                        </span>
+
+                                    </div>
+
+                                {% endif %}
+
+
+
+                                <!-- PRODUCT CONTENT -->
+
+                                <div class="buyer-product-content">
+
+
+                                    <!-- CATEGORY -->
+
+                                    {% if product.category_name %}
+
+                                        <span class="
+                                            buyer-product-category
+                                        ">
+
+                                            {{ product.category_name }}
+
+                                        </span>
+
+                                    {% endif %}
+
+
+
+                                    <!-- PRODUCT NAME -->
+
+                                    <h3>
+                                        {{ product.name }}
+                                    </h3>
+
+
+
+                                    <!-- DESCRIPTION -->
+
+                                    <p class="
+                                        buyer-product-description
+                                    ">
+
+                                        {% if product.description %}
+
+                                            {{ product.description[:100] }}
+
+                                            {% if product.description|length > 100 %}
+                                                ...
+                                            {% endif %}
+
+                                        {% else %}
+
+                                            No description available.
+
+                                        {% endif %}
+
+                                    </p>
+
+
+
+                                    <!-- SELLER -->
+
+                                    {% if product.seller_name %}
+
+                                        <div class="
+                                            buyer-seller-name
+                                        ">
+
+                                            <span>
+                                                Sold by:
+                                            </span>
+
+                                            {{ product.seller_name }}
+
+                                        </div>
+
+                                    {% endif %}
+
+
+
+                                    <!-- PRICE / STOCK -->
+
+                                    <div class="
+                                        buyer-product-bottom
+                                    ">
+
+
+                                        <span class="
+                                            buyer-product-price
+                                        ">
+
+                                            ₹{{ "%.2f"|format(product.price) }}
+
+                                        </span>
+
+
+
+                                        {% if product.stock <= 0 %}
+
+                                            <span style="
+                                                color:#b33a3a;
+                                                font-size:12px;
+                                            ">
+
+                                                Out of stock
+
+                                            </span>
+
+
+                                        {% elif product.stock <= 5 %}
+
+                                            <span style="
+                                                color:#a87900;
+                                                font-size:12px;
+                                            ">
+
+                                                {{ product.stock }}
+                                                left
+
+                                            </span>
+
+
+                                        {% else %}
+
+                                            <span style="
+                                                color:#38824e;
+                                                font-size:12px;
+                                            ">
+
+                                                {{ product.stock }}
+                                                available
+
+                                            </span>
+
+                                        {% endif %}
+
+                                    </div>
+
+
+
+                                    <!-- =================================================
+                                         ACTIONS
+                                    ================================================== -->
+
+                                    <div class="
+                                        buyer-product-actions
+                                    ">
+
+
+                                        <!-- VIEW DETAILS -->
+
+                                        <a
+                                            href="{{ url_for(
+                                                'buyer_product_details',
+                                                product_id=product.id
+                                            ) }}"
+                                            class="
+                                                buyer-action-btn
+                                                buyer-view-btn
+                                            "
+                                        >
+
+                                            View Details
+
+                                        </a>
+
+
+
+                                        <!-- ADD TO CART -->
+
+                                        {% if product.stock > 0 %}
+
+
+                                            <form
+                                                method="POST"
+                                                action="{{ url_for(
+                                                    'add_to_cart',
+                                                    product_id=product.id
+                                                ) }}"
+                                            >
+{% include "_csrf_field.html" %}
+
+                                                <button
+                                                    type="submit"
+                                                    class="
+                                                        buyer-action-btn
+                                                        buyer-cart-btn
+                                                    "
+                                                >
+
+                                                    🛒 Add to Cart
+
+                                                </button>
+
+                                            </form>
+
+
+                                        {% else %}
+
+
+                                            <button
+                                                type="button"
+                                                disabled
+                                                class="
+                                                    buyer-action-btn
+                                                "
+                                                style="
+                                                    background:#eee;
+                                                    color:#999;
+                                                    border:1px solid #ddd;
+                                                    cursor:not-allowed;
+                                                "
+                                            >
+
+                                                Out of Stock
+
+                                            </button>
+
+
+                                        {% endif %}
+
+
+
+                                        <!-- ADD TO WISHLIST -->
+
+                                        <form
+                                            method="POST"
+                                            action="{{ url_for(
+                                                'add_to_wishlist',
+                                                product_id=product.id
+                                            ) }}"
+                                        >
+{% include "_csrf_field.html" %}
+
+                                            <button
+                                                type="submit"
+                                                class="
+                                                    buyer-action-btn
+                                                    buyer-wishlist-btn
+                                                "
+                                                title="Add to Wishlist"
+                                            >
+
+                                                ♥ Add to Wishlist
+
+                                            </button>
+
+                                        </form>
+
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                        {% endfor %}
+
+
+                    </div>
+
+
+                {% else %}
+
+
+                    <!-- =================================================
+                         EMPTY STATE
+                    ================================================== -->
+
+                    <div class="buyer-empty-state">
+
+
+                        <div class="buyer-empty-icon">
+                            🛍️
+                        </div>
+
+
+                        <h3>
+                            No Products Found
+                        </h3>
+
+
+                        {% if search or selected_category %}
+
+                            <p>
+
+                                We couldn't find any products
+                                matching your search or selected
+                                category.
+
+                            </p>
+
+
+                            <a
+                                href="{{ url_for('buyer_products') }}"
+                                class="buyer-primary-btn"
+                            >
+
+                                View All Products
+
+                            </a>
+
+
+                        {% else %}
+
+                            <p>
+
+                                There are currently no active
+                                products available for purchase.
+
+                            </p>
+
+
+                            <a
+                                href="{{ url_for('buyer_dashboard') }}"
+                                class="buyer-primary-btn"
+                            >
+
+                                Back to Dashboard
+
+                            </a>
+
+                        {% endif %}
+
+
+                    </div>
+
+
+                {% endif %}
+
+            </section>
+
+
+
+            <!-- =================================================
+                 CUSTOM REQUEST PROMOTION
+            ================================================== -->
+
+            <section class="buyer-custom-request">
+
+
+                <div class="buyer-custom-icon">
+                    ✦
+                </div>
+
+
+                <div class="buyer-custom-content">
+
+
+                    <span class="buyer-section-label">
+                        CUSTOM PRODUCT
+                    </span>
+
+
+                    <h2>
+                        Can't Find What You're Looking For?
+                    </h2>
+
+
+                    <p>
+                        Submit a custom product request and let
+                        women entrepreneurs know what you need.
+                    </p>
+
+
+                </div>
+
+
+                <a
+                    href="{{ url_for('buyer_custom_request') }}"
+                    class="buyer-primary-btn"
+                >
+
+                    Create Custom Request
+
+                </a>
+
+
+            </section>
+
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<!-- =============================================================
+     RESPONSIVE STYLES SPECIFIC TO MARKETPLACE
+     ============================================================= -->
+
+<style>
+
+    @media (max-width: 900px) {
+
+        .buyer-search-card form > div:first-child {
+            grid-template-columns: 1fr 1fr !important;
+        }
+
+        .buyer-search-card button {
+            grid-column: 1 / -1;
+        }
+
+    }
+
+
+    @media (max-width: 600px) {
+
+        .buyer-search-card form > div:first-child {
+            grid-template-columns: 1fr !important;
+        }
+
+        .buyer-search-card button {
+            grid-column: auto;
+        }
+
+    }
+
+</style>
+
+
+</body>
+</html>

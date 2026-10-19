@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Wishlist | SheRise</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+
+        /* =========================================================
+           BUYER WISHLIST
+           Existing filename: wishlist.html
+           Seller-side files are not affected.
+           ========================================================= */
+
+        .buyer-page {
+            margin: 0;
+            min-height: 100vh;
+            background: #faf7fa;
+        }
+
+        .buyer-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+
+        /* ================= SIDEBAR ================= */
+
+        .buyer-sidebar {
+            width: 250px;
+            min-width: 250px;
+            background: #ffffff;
+            border-right: 1px solid #eee5ed;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 100;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 22px 20px;
+            text-decoration: none;
+            border-bottom: 1px solid #f1e9ef;
+        }
+
+        .sidebar-brand-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: #b45f9b;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 19px;
+            font-weight: 700;
+        }
+
+        .sidebar-brand-text {
+            color: #a14f8b;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .buyer-sidebar-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 18px 20px;
+            border-bottom: 1px solid #f1e9ef;
+        }
+
+        .buyer-profile-avatar {
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0;
+            border-radius: 50%;
+            background: #f3e2ef;
+            color: #a14f8b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .buyer-profile-info {
+            min-width: 0;
+        }
+
+        .buyer-profile-info strong {
+            display: block;
+            color: #333;
+            font-size: 13px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .buyer-profile-info span {
+            display: block;
+            color: #999;
+            font-size: 11px;
+            margin-top: 2px;
+        }
+
+        .buyer-nav {
+            flex: 1;
+            padding: 18px 12px;
+            overflow-y: auto;
+        }
+
+        .buyer-nav-group {
+            margin-bottom: 20px;
+        }
+
+        .buyer-nav-title {
+            color: #aaa;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 12px 8px;
+        }
+
+        .buyer-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 11px 12px;
+            margin: 2px 0;
+            border-radius: 8px;
+            color: #666;
+            text-decoration: none;
+            font-size: 13px;
+            transition: 0.2s;
+        }
+
+        .buyer-nav-link:hover {
+            background: #faf1f8;
+            color: #a14f8b;
+        }
+
+        .buyer-nav-link.active {
+            background: #f5e8f2;
+            color: #a14f8b;
+            font-weight: 600;
+        }
+
+        .buyer-nav-icon {
+            width: 20px;
+            text-align: center;
+            font-size: 15px;
+            flex-shrink: 0;
+        }
+
+        .buyer-sidebar-bottom {
+            padding: 12px;
+            border-top: 1px solid #f1e9ef;
+        }
+
+        .buyer-logout-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 11px 12px;
+            border-radius: 8px;
+            color: #777;
+            text-decoration: none;
+            font-size: 13px;
+        }
+
+        .buyer-logout-link:hover {
+            background: #fff0f0;
+            color: #b33a3a;
+        }
+
+
+        /* ================= MAIN ================= */
+
+        .buyer-main {
+            flex: 1;
+            margin-left: 250px;
+            min-width: 0;
+        }
+
+        .buyer-topbar {
+            height: 70px;
+            background: #ffffff;
+            border-bottom: 1px solid #eee5ed;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+        }
+
+        .buyer-topbar-title {
+            color: #333;
+            font-size: 20px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .buyer-topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .buyer-topbar-btn {
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            background: #faf4f9;
+            color: #a14f8b;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        .buyer-topbar-btn:hover {
+            background: #f3e4f0;
+        }
+
+        .buyer-page-content {
+            padding: 30px;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+
+        /* ================= PAGE HEADER ================= */
+
+        .wishlist-header {
+            margin-bottom: 25px;
+        }
+
+        .wishlist-header h1 {
+            margin: 0 0 7px;
+            color: #292529;
+            font-size: 28px;
+        }
+
+        .wishlist-header p {
+            margin: 0;
+            color: #888;
+            font-size: 13px;
+        }
+
+
+        /* ================= WISHLIST GRID ================= */
+
+        .wishlist-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 22px;
+        }
+
+        .wishlist-card {
+            background: #ffffff;
+            border: 1px solid #eee5ed;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 3px 15px rgba(60, 35, 55, 0.04);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .wishlist-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 22px rgba(60, 35, 55, 0.08);
+        }
+
+
+        /* ================= IMAGE ================= */
+
+        .wishlist-image {
+            width: 100%;
+            height: 230px;
+            background: #f7f0f5;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .wishlist-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .no-image {
+            color: #999;
+            font-size: 12px;
+        }
+
+
+        /* ================= CARD CONTENT ================= */
+
+        .wishlist-content {
+            padding: 18px;
+        }
+
+        .wishlist-category {
+            display: inline-flex;
+            background: #f5e8f2;
+            color: #a14f8b;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .wishlist-name {
+            margin: 0 0 8px;
+            color: #333;
+            font-size: 17px;
+            line-height: 1.35;
+        }
+
+        .wishlist-description {
+            color: #777;
+            font-size: 12px;
+            line-height: 1.55;
+            min-height: 38px;
+            margin: 0 0 10px;
+        }
+
+        .wishlist-seller {
+            color: #888;
+            font-size: 11px;
+            margin: 0 0 11px;
+        }
+
+        .wishlist-seller strong {
+            color: #555;
+        }
+
+
+        /* ================= PRICE ================= */
+
+        .wishlist-price {
+            color: #a14f8b;
+            font-size: 21px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+
+        /* ================= STOCK ================= */
+
+        .wishlist-stock {
+            display: inline-flex;
+            padding: 5px 9px;
+            border-radius: 14px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .in-stock {
+            background: #eaf7ee;
+            color: #277544;
+        }
+
+        .out-of-stock {
+            background: #fdeaea;
+            color: #b33a3a;
+        }
+
+
+        /* ================= ACTIONS ================= */
+
+        .wishlist-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 7px;
+        }
+
+        .wishlist-actions form {
+            margin: 0;
+        }
+
+        .wishlist-btn {
+            width: 100%;
+            min-height: 38px;
+            padding: 8px 10px;
+            border-radius: 7px;
+            font-family: inherit;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            transition: 0.2s;
+        }
+
+        .view-btn {
+            border: 1px solid #ddd5dc;
+            background: white;
+            color: #666;
+        }
+
+        .view-btn:hover {
+            border-color: #b45f9b;
+            color: #a14f8b;
+            background: #faf5f9;
+        }
+
+        .cart-btn {
+            border: 1px solid #b45f9b;
+            background: #b45f9b;
+            color: white;
+        }
+
+        .cart-btn:hover {
+            background: #a14f8b;
+        }
+
+        .remove-btn {
+            grid-column: 1 / -1;
+            border: 1px solid #ead4d4;
+            background: #fff8f8;
+            color: #b44d4d;
+        }
+
+        .remove-btn:hover {
+            background: #fdeeee;
+        }
+
+        .disabled-btn {
+            border: 1px solid #ddd;
+            background: #eee;
+            color: #999;
+            cursor: not-allowed;
+        }
+
+
+        /* ================= EMPTY WISHLIST ================= */
+
+        .empty-wishlist {
+            background: #ffffff;
+            border: 1px solid #eee5ed;
+            border-radius: 15px;
+            padding: 65px 25px;
+            text-align: center;
+            box-shadow: 0 3px 15px rgba(60, 35, 55, 0.04);
+        }
+
+        .empty-wishlist-icon {
+            width: 65px;
+            height: 65px;
+            margin: 0 auto 16px;
+            border-radius: 50%;
+            background: #f5e8f2;
+            color: #a14f8b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .empty-wishlist h2 {
+            margin: 0 0 8px;
+            color: #333;
+            font-size: 21px;
+        }
+
+        .empty-wishlist p {
+            margin: 0 0 22px;
+            color: #888;
+            font-size: 13px;
+        }
+
+        .browse-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #b45f9b;
+            color: white;
+            text-decoration: none;
+            padding: 11px 20px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .browse-btn:hover {
+            background: #a14f8b;
+        }
+
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 1100px) {
+
+            .wishlist-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+        }
+
+
+        @media (max-width: 750px) {
+
+            .buyer-sidebar {
+                width: 72px;
+                min-width: 72px;
+            }
+
+            .buyer-main {
+                margin-left: 72px;
+            }
+
+            .sidebar-brand {
+                justify-content: center;
+                padding: 18px 10px;
+            }
+
+            .sidebar-brand-text,
+            .buyer-profile-info,
+            .buyer-nav-title,
+            .buyer-nav-link span:not(.buyer-nav-icon) {
+                display: none;
+            }
+
+            .buyer-sidebar-profile {
+                justify-content: center;
+                padding: 15px 8px;
+            }
+
+            .buyer-nav {
+                padding: 15px 8px;
+            }
+
+            .buyer-nav-link {
+                justify-content: center;
+                padding: 12px 8px;
+            }
+
+            .buyer-nav-icon {
+                width: auto;
+            }
+
+            .buyer-sidebar-bottom {
+                padding: 8px;
+            }
+
+            .buyer-logout-link {
+                justify-content: center;
+            }
+
+            .buyer-page-content {
+                padding: 20px;
+            }
+
+            .buyer-topbar {
+                padding: 0 20px;
+            }
+
+        }
+
+
+        @media (max-width: 560px) {
+
+            .wishlist-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .buyer-page-content {
+                padding: 15px;
+            }
+
+            .buyer-topbar {
+                height: 62px;
+            }
+
+            .buyer-topbar-title {
+                font-size: 17px;
+            }
+
+            .buyer-topbar-btn {
+                width: 34px;
+                height: 34px;
+            }
+
+            .wishlist-header h1 {
+                font-size: 24px;
+            }
+
+            .wishlist-image {
+                height: 240px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body class="buyer-page">
+
+<div class="buyer-layout">
+
+
+    <!-- =========================================================
+         SIDEBAR
+         ========================================================= -->
+
+    <aside class="buyer-sidebar">
+
+        <a href="{{ url_for('buyer_dashboard') }}"
+           class="sidebar-brand">
+
+            <div class="sidebar-brand-icon">
+                S
+            </div>
+
+            <div class="sidebar-brand-text">
+                SheRise
+            </div>
+
+        </a>
+
+
+        <div class="buyer-sidebar-profile">
+
+            <div class="buyer-profile-avatar">
+
+                {% if session.get('full_name') %}
+
+                    {{ session.get('full_name')[0]|upper }}
+
+                {% elif session.get('user_name') %}
+
+                    {{ session.get('user_name')[0]|upper }}
+
+                {% else %}
+
+                    B
+
+                {% endif %}
+
+            </div>
+
+
+            <div class="buyer-profile-info">
+
+                <strong>
+                    {{ session.get('full_name', session.get('user_name', 'Buyer')) }}
+                </strong>
+
+                <span>
+                    Buyer Account
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <nav class="buyer-nav">
+
+
+            <div class="buyer-nav-group">
+
+                <div class="buyer-nav-title">
+                    Main
+                </div>
+
+                <a href="{{ url_for('buyer_dashboard') }}"
+                   class="buyer-nav-link">
+
+                    <span class="buyer-nav-icon">⌂</span>
+                    <span>Dashboard</span>
+
+                </a>
+
+            </div>
+
+
+            <div class="buyer-nav-group">
+
+                <div class="buyer-nav-title">
+                    Shopping
+                </div>
+
+                <a href="{{ url_for('buyer_products') }}"
+                   class="buyer-nav-link">
+
+                    <span class="buyer-nav-icon">🛍</span>
+                    <span>Marketplace</span>
+
+                </a>
+
+
+                <a href="{{ url_for('buyer_wishlist') }}"
+                   class="buyer-nav-link active">
+
+                    <span class="buyer-nav-icon">♥</span>
+                    <span>Wishlist</span>
+
+                </a>
+
+
+                <a href="{{ url_for('buyer_cart') }}"
+                   class="buyer-nav-link">
+
+                    <span class="buyer-nav-icon">🛒</span>
+                    <span>Cart</span>
+
+                </a>
+
+            </div>
+
+
+            <div class="buyer-nav-group">
+
+                <div class="buyer-nav-title">
+                    Orders
+                </div>
+
+                <a href="{{ url_for('buyer_orders') }}"
+                   class="buyer-nav-link">
+
+                    <span class="buyer-nav-icon">▣</span>
+                    <span>My Orders</span>
+
+                </a>
+
+
+                <a href="{{ url_for('buyer_custom_request') }}"
+                   class="buyer-nav-link">
+
+                    <span class="buyer-nav-icon">✦</span>
+                    <span>Custom Request</span>
+
+                </a>
+
+            </div>
+
+
+            <div class="buyer-nav-group">
+
+                <div class="buyer-nav-title">
+                    Account
+                </div>
+
+                <a href="{{ url_for('buyer_profile') }}"
+                   class="buyer-nav-link">
+
+                    <span class="buyer-nav-icon">◉</span>
+                    <span>Profile</span>
+
+                </a>
+
+            </div>
+
+        </nav>
+
+
+        <div class="buyer-sidebar-bottom">
+
+            <a href="{{ url_for('logout') }}"
+               class="buyer-logout-link">
+
+                <span class="buyer-nav-icon">↪</span>
+                <span>Logout</span>
+
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =========================================================
+         MAIN CONTENT
+         ========================================================= -->
+
+    <main class="buyer-main">
+
+
+        <header class="buyer-topbar">
+
+            <h1 class="buyer-topbar-title">
+                My Wishlist
+            </h1>
+
+
+            <div class="buyer-topbar-actions">
+
+                <a href="{{ url_for('buyer_wishlist') }}"
+                   class="buyer-topbar-btn"
+                   title="Wishlist">
+
+                    ♥
+
+                </a>
+
+
+                <a href="{{ url_for('buyer_cart') }}"
+                   class="buyer-topbar-btn"
+                   title="Cart">
+
+                    🛒
+
+                </a>
+
+            </div>
+
+        </header>
+
+
+        <div class="buyer-page-content">
+
+
+            <!-- ================= HEADER ================= -->
+
+            <section class="wishlist-header">
+
+                <h1>
+                    My Wishlist
+                </h1>
+
+                <p>
+                    Products you have saved for later.
+                </p>
+
+            </section>
+
+
+            {% if products %}
+
+
+            <!-- ================= WISHLIST PRODUCTS ================= -->
+
+            <div class="wishlist-grid">
+
+
+                {% for product in products %}
+
+
+                <article class="wishlist-card">
+
+
+                    <!-- Product Image -->
+
+                    <div class="wishlist-image">
+
+                        {% if product.image_url %}
+
+                            <img
+                                src="{{ product.image_url }}"
+                                alt="{{ product.name }}"
+                            >
+
+                        {% else %}
+
+                            <div class="no-image">
+                                No Image Available
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- Product Content -->
+
+                    <div class="wishlist-content">
+
+
+                        {% if product.category_name %}
+
+                            <span class="wishlist-category">
+                                {{ product.category_name }}
+                            </span>
+
+                        {% endif %}
+
+
+                        <h2 class="wishlist-name">
+                            {{ product.name }}
+                        </h2>
+
+
+                        {% if product.description %}
+
+                            <p class="wishlist-description">
+
+                                {{ product.description[:100] }}
+
+                                {% if product.description|length > 100 %}
+                                    ...
+                                {% endif %}
+
+                            </p>
+
+                        {% else %}
+
+                            <p class="wishlist-description">
+                                No description available.
+                            </p>
+
+                        {% endif %}
+
+
+                        <p class="wishlist-seller">
+
+                            Seller:
+
+                            <strong>
+                                {{ product.seller_name }}
+                            </strong>
+
+                        </p>
+
+
+                        <div class="wishlist-price">
+
+                            ₹{{ "%.2f"|format(product.price) }}
+
+                        </div>
+
+
+                        <!-- Stock -->
+
+                        {% if product.stock > 0 %}
+
+                            <span class="wishlist-stock in-stock">
+
+                                {{ product.stock }}
+                                available
+
+                            </span>
+
+                        {% else %}
+
+                            <span class="wishlist-stock out-of-stock">
+
+                                Out of stock
+
+                            </span>
+
+                        {% endif %}
+
+
+                        <!-- ================= ACTIONS ================= -->
+
+                        <div class="wishlist-actions">
+
+
+                            <!-- View -->
+
+                            <a
+                                href="{{ url_for(
+                                    'buyer_product_details',
+                                    product_id=product.product_id
+                                ) }}"
+                                class="wishlist-btn view-btn"
+                            >
+
+                                View Product
+
+                            </a>
+
+
+                            <!-- Add To Cart -->
+
+                            {% if product.stock > 0 %}
+
+                                <form
+                                    action="{{ url_for(
+                                        'add_to_cart',
+                                        product_id=product.product_id
+                                    ) }}"
+                                    method="POST"
+                                >
+{% include "_csrf_field.html" %}
+
+                                    <button
+                                        type="submit"
+                                        class="wishlist-btn cart-btn"
+                                    >
+
+                                        🛒 Add to Cart
+
+                                    </button>
+
+                                </form>
+
+                            {% else %}
+
+                                <button
+                                    type="button"
+                                    class="wishlist-btn disabled-btn"
+                                    disabled
+                                >
+
+                                    Out of Stock
+
+                                </button>
+
+                            {% endif %}
+
+
+                            <!-- Remove From Wishlist -->
+
+                            <form
+                                action="{{ url_for(
+                                    'remove_from_wishlist',
+                                    wishlist_id=product.wishlist_id
+                                ) }}"
+                                method="POST"
+                            >
+{% include "_csrf_field.html" %}
+
+                                <button
+                                    type="submit"
+                                    class="wishlist-btn remove-btn"
+                                    onclick="return confirm('Remove this product from your wishlist?');"
+                                >
+
+                                    ♥ Remove from Wishlist
+
+                                </button>
+
+                            </form>
+
+
+                        </div>
+
+
+                    </div>
+
+
+                </article>
+
+
+                {% endfor %}
+
+
+            </div>
+
+
+            {% else %}
+
+
+            <!-- ================= EMPTY WISHLIST ================= -->
+
+            <section class="empty-wishlist">
+
+
+                <div class="empty-wishlist-icon">
+                    ♥
+                </div>
+
+
+                <h2>
+                    Your wishlist is empty
+                </h2>
+
+
+                <p>
+                    Save products you love here so you can easily
+                    find them later.
+                </p>
+
+
+                <a
+                    href="{{ url_for('buyer_products') }}"
+                    class="browse-btn"
+                >
+
+                    Browse Marketplace
+
+                </a>
+
+
+            </section>
+
+
+            {% endif %}
+
+
+        </div>
+
+
+    </main>
+
+</div>
+
+</body>
+
+</html>

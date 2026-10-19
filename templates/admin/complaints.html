@@ -1,0 +1,1518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Complaints Management | SheRise Admin</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f7f4f8;
+            color: #29222b;
+        }
+
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ================= SIDEBAR ================= */
+
+        .admin-sidebar {
+            width: 250px;
+            background: #ffffff;
+            border-right: 1px solid #e7e1e8;
+            padding: 24px 16px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .brand {
+            padding: 0 12px 25px;
+            border-bottom: 1px solid #eee7ef;
+            margin-bottom: 20px;
+        }
+
+        .brand h2 {
+            margin: 0;
+            color: #8b3d74;
+            font-size: 25px;
+        }
+
+        .brand p {
+            margin: 5px 0 0;
+            color: #777;
+            font-size: 13px;
+        }
+
+        .admin-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .admin-nav a {
+            text-decoration: none;
+            color: #4d454e;
+            padding: 12px 14px;
+            border-radius: 9px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .admin-nav a:hover {
+            background: #f5eaf3;
+            color: #8b3d74;
+        }
+
+        .admin-nav a.active {
+            background: #8b3d74;
+            color: #ffffff;
+        }
+
+        .admin-nav .logout-link {
+            margin-top: 15px;
+            color: #a94442;
+        }
+
+        .admin-nav .logout-link:hover {
+            background: #fff0f0;
+            color: #a94442;
+        }
+
+        /* ================= MAIN ================= */
+
+        .admin-main {
+            margin-left: 250px;
+            width: calc(100% - 250px);
+            padding: 30px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .page-header h1 {
+            margin: 0;
+            font-size: 29px;
+            color: #302832;
+        }
+
+        .page-header p {
+            margin: 6px 0 0;
+            color: #777;
+            font-size: 14px;
+        }
+
+        .header-badge {
+            background: #ffffff;
+            border: 1px solid #e6dfe7;
+            border-radius: 10px;
+            padding: 10px 15px;
+            color: #6d636d;
+            font-size: 13px;
+        }
+
+        /* ================= FLASH ================= */
+
+        .flash-container {
+            margin-bottom: 20px;
+        }
+
+        .flash-message {
+            padding: 13px 16px;
+            border-radius: 9px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            border: 1px solid transparent;
+        }
+
+        .flash-success {
+            background: #edf8f0;
+            color: #246b35;
+            border-color: #ccebd3;
+        }
+
+        .flash-error,
+        .flash-danger {
+            background: #fff0f0;
+            color: #9b2c2c;
+            border-color: #f0caca;
+        }
+
+        .flash-warning {
+            background: #fff8e8;
+            color: #805d00;
+            border-color: #f0dfad;
+        }
+
+        .flash-info {
+            background: #eef6ff;
+            color: #275b8c;
+            border-color: #cfe3f7;
+        }
+
+        /* ================= SUMMARY ================= */
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .summary-card {
+            background: #ffffff;
+            border: 1px solid #e6dfe7;
+            border-radius: 13px;
+            padding: 20px;
+            box-shadow: 0 3px 12px rgba(50, 30, 50, 0.04);
+        }
+
+        .summary-label {
+            color: #777;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .summary-value {
+            color: #312a32;
+            font-size: 27px;
+            font-weight: 700;
+        }
+
+        .summary-description {
+            margin-top: 7px;
+            color: #999;
+            font-size: 12px;
+        }
+
+        /* ================= FILTER ================= */
+
+        .filter-card {
+            background: #ffffff;
+            border: 1px solid #e6dfe7;
+            border-radius: 13px;
+            padding: 20px;
+            margin-bottom: 22px;
+        }
+
+        .filter-card h3 {
+            margin: 0 0 16px;
+            font-size: 17px;
+            color: #352d36;
+        }
+
+        .filter-form {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr auto;
+            gap: 12px;
+            align-items: end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #625962;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 11px 12px;
+            border: 1px solid #dcd4de;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #302832;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .form-control:focus {
+            border-color: #8b3d74;
+            box-shadow: 0 0 0 2px rgba(139, 61, 116, 0.08);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            border-radius: 8px;
+            padding: 11px 16px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            min-height: 42px;
+        }
+
+        .btn-primary {
+            background: #8b3d74;
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            background: #73305f;
+        }
+
+        .btn-secondary {
+            background: #f1edf2;
+            color: #514951;
+        }
+
+        .btn-secondary:hover {
+            background: #e8e0e9;
+        }
+
+        /* ================= TABLE ================= */
+
+        .table-card {
+            background: #ffffff;
+            border: 1px solid #e6dfe7;
+            border-radius: 13px;
+            overflow: hidden;
+            box-shadow: 0 3px 12px rgba(50, 30, 50, 0.04);
+        }
+
+        .table-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee7ef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .table-header h3 {
+            margin: 0;
+            font-size: 17px;
+            color: #352d36;
+        }
+
+        .table-header span {
+            color: #888;
+            font-size: 13px;
+        }
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1050px;
+        }
+
+        th,
+        td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid #f0ebf1;
+            vertical-align: middle;
+        }
+
+        th {
+            background: #faf8fb;
+            color: #655c66;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            white-space: nowrap;
+        }
+
+        td {
+            font-size: 13px;
+            color: #413941;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* ================= COMPLAINT ================= */
+
+        .complaint-id {
+            color: #8b3d74;
+            font-weight: 700;
+        }
+
+        .complaint-title {
+            font-weight: 700;
+            color: #322a34;
+            max-width: 260px;
+        }
+
+        .complaint-description {
+            margin-top: 4px;
+            color: #888;
+            font-size: 11px;
+            max-width: 300px;
+            line-height: 1.4;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #443b45;
+        }
+
+        .user-email {
+            color: #888;
+            font-size: 11px;
+            margin-top: 3px;
+        }
+
+        /* ================= BADGES ================= */
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px 9px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .badge-open {
+            background: #fdecec;
+            color: #a52c2c;
+        }
+
+        .badge-progress {
+            background: #fff5dc;
+            color: #8a6200;
+        }
+
+        .badge-resolved {
+            background: #e9f7ed;
+            color: #26723a;
+        }
+
+        .badge-closed {
+            background: #eee9f7;
+            color: #62478c;
+        }
+
+        .badge-low {
+            background: #eef6ff;
+            color: #275b8c;
+        }
+
+        .badge-medium {
+            background: #fff5dc;
+            color: #8a6200;
+        }
+
+        .badge-high {
+            background: #fdecec;
+            color: #a52c2c;
+        }
+
+        .badge-critical {
+            background: #f1e5ed;
+            color: #7b174f;
+        }
+
+        /* ================= ACTIONS ================= */
+
+        .action-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+        }
+
+        .action-btn {
+            border: none;
+            border-radius: 7px;
+            padding: 7px 10px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-view {
+            background: #eeeaf5;
+            color: #614a84;
+        }
+
+        .action-progress {
+            background: #fff5dc;
+            color: #8a6200;
+        }
+
+        .action-resolve {
+            background: #e9f7ed;
+            color: #26723a;
+        }
+
+        .action-close {
+            background: #eee9f7;
+            color: #62478c;
+        }
+
+        .action-btn:hover {
+            opacity: 0.82;
+        }
+
+        /* ================= EMPTY ================= */
+
+        .empty-state {
+            text-align: center;
+            padding: 55px 20px;
+            color: #777;
+        }
+
+        .empty-icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+        }
+
+        .empty-state h3 {
+            margin: 0 0 7px;
+            color: #443b45;
+            font-size: 18px;
+        }
+
+        .empty-state p {
+            margin: 0;
+            font-size: 13px;
+        }
+
+        /* ================= PAGINATION ================= */
+
+        .pagination {
+            padding: 18px 20px;
+            border-top: 1px solid #eee7ef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .pagination-info {
+            color: #777;
+            font-size: 12px;
+        }
+
+        .pagination-links {
+            display: flex;
+            gap: 6px;
+        }
+
+        .pagination-links a,
+        .pagination-links span {
+            min-width: 34px;
+            height: 34px;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid #ddd5df;
+            border-radius: 7px;
+            text-decoration: none;
+            font-size: 12px;
+            color: #554c55;
+            background: #ffffff;
+        }
+
+        .pagination-links .active {
+            background: #8b3d74;
+            border-color: #8b3d74;
+            color: #ffffff;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 1200px) {
+            .summary-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .filter-form {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 800px) {
+            .admin-sidebar {
+                width: 210px;
+            }
+
+            .admin-main {
+                margin-left: 210px;
+                width: calc(100% - 210px);
+                padding: 20px;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        @media (max-width: 620px) {
+            .admin-layout {
+                display: block;
+            }
+
+            .admin-sidebar {
+                position: static;
+                width: 100%;
+                min-height: auto;
+            }
+
+            .admin-main {
+                margin-left: 0;
+                width: 100%;
+                padding: 15px;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-form {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="admin-layout">
+
+    <!-- ================= SIDEBAR ================= -->
+
+    <aside class="admin-sidebar">
+
+        <div class="admin-role-header">
+            <div class="admin-role-avatar">A</div>
+            <div class="admin-role-info">
+                <strong>Administrator</strong>
+                <span>Admin</span>
+            </div>
+        </div>
+
+        <nav class="admin-nav">
+
+            <a href="{{ url_for('admin_dashboard') }}">
+                Dashboard
+            </a>
+
+            <a href="{{ url_for('admin_users') }}">
+                User Management
+            </a>
+
+            <a href="{{ url_for('admin_sellers') }}">
+                Seller Management
+            </a>
+
+            <a href="{{ url_for('admin_products') }}">
+                Product Management
+            </a>
+
+            <a href="{{ url_for('admin_complaints') }}"
+               class="active">
+                Complaints
+            </a>
+
+            <a href="{{ url_for('admin_analytics') }}">
+                Analytics
+            </a>
+
+            <a href="{{ url_for('admin_ai_usage') }}">
+                AI Usage
+            </a>
+
+            <a href="{{ url_for('logout') }}"
+               class="logout-link">
+                Logout
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main class="admin-main">
+
+        <!-- PAGE HEADER -->
+
+        <div class="page-header">
+
+            <div>
+                <h1>Complaints Management</h1>
+
+                <p>
+                    Review customer complaints and manage their resolution status.
+                </p>
+            </div>
+
+            <div class="header-badge">
+                Admin Control Panel
+            </div>
+
+        </div>
+
+
+        <!-- ================= FLASH MESSAGES ================= -->
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+
+            {% if messages %}
+
+                <div class="flash-container">
+
+                    {% for category, message in messages %}
+
+                        <div class="flash-message flash-{{ category }}">
+                            {{ message }}
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% endif %}
+
+        {% endwith %}
+
+
+        <!-- ================= SUMMARY ================= -->
+
+        <section class="summary-grid">
+
+            <div class="summary-card">
+
+                <div class="summary-label">
+                    Total Complaints
+                </div>
+
+                <div class="summary-value">
+                    {{ total_complaints|default(0) }}
+                </div>
+
+                <div class="summary-description">
+                    All recorded complaints
+                </div>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <div class="summary-label">
+                    Open
+                </div>
+
+                <div class="summary-value">
+                    {{ open_complaints|default(0) }}
+                </div>
+
+                <div class="summary-description">
+                    Complaints awaiting action
+                </div>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <div class="summary-label">
+                    In Progress
+                </div>
+
+                <div class="summary-value">
+                    {{ in_progress_complaints|default(0) }}
+                </div>
+
+                <div class="summary-description">
+                    Complaints currently being handled
+                </div>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <div class="summary-label">
+                    Resolved
+                </div>
+
+                <div class="summary-value">
+                    {{ resolved_complaints|default(0) }}
+                </div>
+
+                <div class="summary-description">
+                    Complaints successfully resolved
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= FILTER ================= -->
+
+        <section class="filter-card">
+
+            <h3>
+                Search & Filter Complaints
+            </h3>
+
+            <form method="GET"
+                  action="{{ url_for('admin_complaints') }}"
+                  class="filter-form">
+
+                <!-- SEARCH -->
+
+                <div class="form-group">
+
+                    <label for="search">
+                        Search
+                    </label>
+
+                    <input
+                        type="text"
+                        id="search"
+                        name="search"
+                        class="form-control"
+                        placeholder="Complaint, user, order ID..."
+                        value="{{ search|default('') }}"
+                    >
+
+                </div>
+
+
+                <!-- STATUS -->
+
+                <div class="form-group">
+
+                    <label for="status">
+                        Status
+                    </label>
+
+                    <select
+                        id="status"
+                        name="status"
+                        class="form-control"
+                    >
+
+                        <option value="">
+                            All Statuses
+                        </option>
+
+                        <option value="open"
+                            {% if selected_status|default('') == 'open' %}
+                                selected
+                            {% endif %}
+                        >
+                            Open
+                        </option>
+
+                        <option value="in_progress"
+                            {% if selected_status|default('') == 'in_progress' %}
+                                selected
+                            {% endif %}
+                        >
+                            In Progress
+                        </option>
+
+                        <option value="resolved"
+                            {% if selected_status|default('') == 'resolved' %}
+                                selected
+                            {% endif %}
+                        >
+                            Resolved
+                        </option>
+
+                        <option value="closed"
+                            {% if selected_status|default('') == 'closed' %}
+                                selected
+                            {% endif %}
+                        >
+                            Closed
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- PRIORITY -->
+
+                <div class="form-group">
+
+                    <label for="priority">
+                        Priority
+                    </label>
+
+                    <select
+                        id="priority"
+                        name="priority"
+                        class="form-control"
+                    >
+
+                        <option value="">
+                            All Priorities
+                        </option>
+
+                        <option value="low"
+                            {% if selected_priority|default('') == 'low' %}
+                                selected
+                            {% endif %}
+                        >
+                            Low
+                        </option>
+
+                        <option value="medium"
+                            {% if selected_priority|default('') == 'medium' %}
+                                selected
+                            {% endif %}
+                        >
+                            Medium
+                        </option>
+
+                        <option value="high"
+                            {% if selected_priority|default('') == 'high' %}
+                                selected
+                            {% endif %}
+                        >
+                            High
+                        </option>
+
+                        <option value="critical"
+                            {% if selected_priority|default('') == 'critical' %}
+                                selected
+                            {% endif %}
+                        >
+                            Critical
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- TYPE -->
+
+                <div class="form-group">
+
+                    <label for="type">
+                        Complaint Type
+                    </label>
+
+                    <select
+                        id="type"
+                        name="type"
+                        class="form-control"
+                    >
+
+                        <option value="">
+                            All Types
+                        </option>
+
+                        {% if complaint_types %}
+
+                            {% for complaint_type in complaint_types %}
+
+                                <option
+                                    value="{{ complaint_type }}"
+                                    {% if selected_type|default('') == complaint_type %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    {{ complaint_type|replace('_', ' ')|title }}
+                                </option>
+
+                            {% endfor %}
+
+                        {% else %}
+
+                            <option value="order">
+                                Order
+                            </option>
+
+                            <option value="product">
+                                Product
+                            </option>
+
+                            <option value="seller">
+                                Seller
+                            </option>
+
+                            <option value="payment">
+                                Payment
+                            </option>
+
+                            <option value="other">
+                                Other
+                            </option>
+
+                        {% endif %}
+
+                    </select>
+
+                </div>
+
+
+                <!-- BUTTONS -->
+
+                <div class="action-group">
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                    >
+                        Search
+                    </button>
+
+                    <a
+                        href="{{ url_for('admin_complaints') }}"
+                        class="btn btn-secondary"
+                    >
+                        Reset
+                    </a>
+
+                </div>
+
+            </form>
+
+        </section>
+
+
+        <!-- ================= COMPLAINT TABLE ================= -->
+
+        <section class="table-card">
+
+            <div class="table-header">
+
+                <h3>
+                    Complaint Records
+                </h3>
+
+                <span>
+                    {{ complaints|length if complaints is defined else 0 }}
+                    complaint(s) shown
+                </span>
+
+            </div>
+
+
+            {% if complaints %}
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>ID</th>
+
+                                <th>Complaint</th>
+
+                                <th>User</th>
+
+                                <th>Order</th>
+
+                                <th>Type</th>
+
+                                <th>Priority</th>
+
+                                <th>Status</th>
+
+                                <th>Created</th>
+
+                                <th>Actions</th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                        {% for complaint in complaints %}
+
+                            <tr>
+
+                                <!-- ID -->
+
+                                <td>
+
+                                    <span class="complaint-id">
+                                        #{{ complaint.id }}
+                                    </span>
+
+                                </td>
+
+
+                                <!-- COMPLAINT -->
+
+                                <td>
+
+                                    <div class="complaint-title">
+                                        {{ complaint.title|default('Complaint') }}
+                                    </div>
+
+                                    {% if complaint.description %}
+
+                                        <div class="complaint-description">
+
+                                            {{ complaint.description[:120] }}
+
+                                            {% if complaint.description|length > 120 %}
+                                                ...
+                                            {% endif %}
+
+                                        </div>
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <!-- USER -->
+
+                                <td>
+
+                                    <div class="user-name">
+                                        {{ complaint.user_name|default('Unknown User') }}
+                                    </div>
+
+                                    {% if complaint.user_email %}
+
+                                        <div class="user-email">
+                                            {{ complaint.user_email }}
+                                        </div>
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <!-- ORDER -->
+
+                                <td>
+
+                                    {% if complaint.order_id %}
+
+                                        <span class="complaint-id">
+                                            #{{ complaint.order_id }}
+                                        </span>
+
+                                    {% else %}
+
+                                        —
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <!-- TYPE -->
+
+                                <td>
+
+                                    {% if complaint.complaint_type %}
+
+                                        {{ complaint.complaint_type
+                                            |replace('_', ' ')
+                                            |title
+                                        }}
+
+                                    {% else %}
+
+                                        Other
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <!-- PRIORITY -->
+
+                                <td>
+
+                                    {% set priority =
+                                        complaint.priority|default('medium')|lower
+                                    %}
+
+                                    {% if priority == 'low' %}
+
+                                        <span class="badge badge-low">
+                                            Low
+                                        </span>
+
+                                    {% elif priority == 'high' %}
+
+                                        <span class="badge badge-high">
+                                            High
+                                        </span>
+
+                                    {% elif priority == 'critical' %}
+
+                                        <span class="badge badge-critical">
+                                            Critical
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="badge badge-medium">
+                                            Medium
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <!-- STATUS -->
+
+                                <td>
+
+                                    {% set complaint_status =
+                                        complaint.status|default('open')|lower
+                                    %}
+
+                                    {% if complaint_status == 'open' %}
+
+                                        <span class="badge badge-open">
+                                            Open
+                                        </span>
+
+                                    {% elif complaint_status == 'in_progress' %}
+
+                                        <span class="badge badge-progress">
+                                            In Progress
+                                        </span>
+
+                                    {% elif complaint_status == 'resolved' %}
+
+                                        <span class="badge badge-resolved">
+                                            Resolved
+                                        </span>
+
+                                    {% elif complaint_status == 'closed' %}
+
+                                        <span class="badge badge-closed">
+                                            Closed
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="badge badge-open">
+                                            {{ complaint_status|title }}
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <!-- CREATED -->
+
+                                <td>
+
+                                    {% if complaint.created_at %}
+
+                                        {{ complaint.created_at.strftime('%d %b %Y') }}
+
+                                    {% else %}
+
+                                        —
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <!-- ACTIONS -->
+
+                                <td>
+
+                                    <div class="action-group">
+
+                                        <!-- VIEW -->
+
+                                        <a
+                                            href="{{ url_for(
+                                                'admin_complaint_details',
+                                                complaint_id=complaint.id
+                                            ) }}"
+                                            class="action-btn action-view"
+                                        >
+                                            View
+                                        </a>
+
+
+                                        <!-- IN PROGRESS -->
+
+                                        {% if complaint_status == 'open' %}
+
+                                            <form
+                                                method="POST"
+                                                action="{{ url_for(
+                                                    'admin_complaint_status',
+                                                    complaint_id=complaint.id
+                                                ) }}"
+                                                style="display:inline;"
+                                                onsubmit="return confirm('Move this complaint to in-progress?');"
+                                            >
+{% include "_csrf_field.html" %}
+
+                                                <input
+                                                    type="hidden"
+                                                    name="status"
+                                                    value="in_progress"
+                                                >
+
+                                                <button
+                                                    type="submit"
+                                                    class="action-btn action-progress"
+                                                >
+                                                    Process
+                                                </button>
+
+                                            </form>
+
+                                        {% endif %}
+
+
+                                        <!-- RESOLVE -->
+
+                                        {% if complaint_status in ['open', 'in_progress'] %}
+
+                                            <form
+                                                method="POST"
+                                                action="{{ url_for(
+                                                    'admin_complaint_status',
+                                                    complaint_id=complaint.id
+                                                ) }}"
+                                                style="display:inline;"
+                                                onsubmit="return confirm('Mark this complaint as resolved?');"
+                                            >
+{% include "_csrf_field.html" %}
+
+                                                <input
+                                                    type="hidden"
+                                                    name="status"
+                                                    value="resolved"
+                                                >
+
+                                                <button
+                                                    type="submit"
+                                                    class="action-btn action-resolve"
+                                                >
+                                                    Resolve
+                                                </button>
+
+                                            </form>
+
+                                        {% endif %}
+
+
+                                        <!-- CLOSE -->
+
+                                        {% if complaint_status == 'resolved' %}
+
+                                            <form
+                                                method="POST"
+                                                action="{{ url_for(
+                                                    'admin_complaint_status',
+                                                    complaint_id=complaint.id
+                                                ) }}"
+                                                style="display:inline;"
+                                                onsubmit="return confirm('Close this complaint?');"
+                                            >
+{% include "_csrf_field.html" %}
+
+                                                <input
+                                                    type="hidden"
+                                                    name="status"
+                                                    value="closed"
+                                                >
+
+                                                <button
+                                                    type="submit"
+                                                    class="action-btn action-close"
+                                                >
+                                                    Close
+                                                </button>
+
+                                            </form>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                <!-- ================= PAGINATION ================= -->
+
+                {% if pagination is defined and pagination.pages > 1 %}
+
+                    <div class="pagination">
+
+                        <div class="pagination-info">
+
+                            Page {{ pagination.page }}
+                            of {{ pagination.pages }}
+
+                        </div>
+
+
+                        <div class="pagination-links">
+
+                            {% if pagination.has_prev %}
+
+                                <a href="{{ url_for(
+                                    'admin_complaints',
+                                    page=pagination.prev_num,
+                                    search=search|default(''),
+                                    status=selected_status|default(''),
+                                    priority=selected_priority|default(''),
+                                    type=selected_type|default('')
+                                ) }}">
+                                    Previous
+                                </a>
+
+                            {% endif %}
+
+
+                            {% for page_num in pagination.iter_pages() %}
+
+                                {% if page_num %}
+
+                                    {% if page_num == pagination.page %}
+
+                                        <span class="active">
+                                            {{ page_num }}
+                                        </span>
+
+                                    {% else %}
+
+                                        <a href="{{ url_for(
+                                            'admin_complaints',
+                                            page=page_num,
+                                            search=search|default(''),
+                                            status=selected_status|default(''),
+                                            priority=selected_priority|default(''),
+                                            type=selected_type|default('')
+                                        ) }}">
+                                            {{ page_num }}
+                                        </a>
+
+                                    {% endif %}
+
+                                {% else %}
+
+                                    <span>
+                                        ...
+                                    </span>
+
+                                {% endif %}
+
+                            {% endfor %}
+
+
+                            {% if pagination.has_next %}
+
+                                <a href="{{ url_for(
+                                    'admin_complaints',
+                                    page=pagination.next_num,
+                                    search=search|default(''),
+                                    status=selected_status|default(''),
+                                    priority=selected_priority|default(''),
+                                    type=selected_type|default('')
+                                ) }}">
+                                    Next
+                                </a>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                {% endif %}
+
+
+            {% else %}
+
+                <!-- ================= EMPTY STATE ================= -->
+
+                <div class="empty-state">
+
+                    <div class="empty-icon">
+                        💬
+                    </div>
+
+                    <h3>
+                        No complaints found
+                    </h3>
+
+                    <p>
+                        No complaints match the selected search or filters.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+</html>

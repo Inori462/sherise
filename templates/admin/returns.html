@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Return Requests | SheRise Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        body { margin: 0; font-family: Arial, sans-serif; background: #f7f5fa; color: #333; }
+        main { max-width: 1100px; margin: 32px auto; padding: 0 20px; }
+        nav { display: flex; gap: 16px; flex-wrap: wrap; padding: 18px 24px; background: white; }
+        nav a { color: #7b2cbf; text-decoration: none; }
+        .notice, .return-card { background: white; border: 1px solid #e6e1eb; border-radius: 10px; padding: 20px; margin: 16px 0; }
+        .return-card h2 { margin-top: 0; }
+        .meta { color: #666; font-size: 14px; }
+        textarea { width: 100%; min-height: 70px; margin: 8px 0; box-sizing: border-box; }
+        button { border: 0; border-radius: 6px; padding: 9px 13px; margin-right: 8px; cursor: pointer; }
+        .approve { color: white; background: #287a4b; }
+        .reject { color: white; background: #b33b3b; }
+        .decision { color: #555; }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('admin_sellers') }}">Seller Approvals</a>
+        <a href="{{ url_for('admin_complaints') }}">Complaints</a>
+        <a href="{{ url_for('admin_returns') }}">Return Requests</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </nav>
+    <main>
+        <h1>Return Requests</h1>
+        <p class="notice">
+            Approval records the platform decision only. Cash-on-delivery refunds must be arranged manually; no payment provider or automatic refund service is used.
+        </p>
+        {% for item in return_requests %}
+            <article class="return-card">
+                <h2>Return #{{ item.id }} · Order #{{ item.order_id }}</h2>
+                <p class="meta">
+                    {{ item.buyer_name }} ({{ item.buyer_email }}) ·
+                    ₹{{ "%.2f"|format(item.total_amount|float) }} ·
+                    Payment: {{ item.payment_status or "Pending" }} ·
+                    Status: {{ item.status|replace("_", " ")|title }}
+                </p>
+                <p><strong>Reason:</strong> {{ item.reason }}</p>
+                {% if item.status == "requested" %}
+                    <form method="post" action="{{ url_for('admin_return_status', return_id=item.id) }}">
+                        {% include "_csrf_field.html" %}
+                        <label for="decision-note-{{ item.id }}">Decision note (optional)</label>
+                        <textarea id="decision-note-{{ item.id }}" name="decision_note" maxlength="1000"></textarea>
+                        <button class="approve" type="submit" name="status" value="approved">Approve</button>
+                        <button class="reject" type="submit" name="status" value="rejected">Reject</button>
+                    </form>
+                {% elif item.decision_note %}
+                    <p class="decision"><strong>Decision note:</strong> {{ item.decision_note }}</p>
+                {% endif %}
+            </article>
+        {% else %}
+            <p class="return-card">No return requests have been submitted.</p>
+        {% endfor %}
+    </main>
+</body>
+</html>

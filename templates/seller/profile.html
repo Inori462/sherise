@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Seller Profile | SheRise</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/seller-workspace.css') }}">
+</head>
+<body>
+<div class="seller-layout">
+    <aside class="sidebar">
+        <div class="brand"><h2>SheRise</h2><p>Seller workspace</p></div>
+        <div class="nav-title">Workspace</div>
+        <a class="nav-link" href="{{ url_for('seller_dashboard') }}">Dashboard</a>
+        <a class="nav-link" href="{{ url_for('seller_products') }}">Products</a>
+        <a class="nav-link" href="{{ url_for('seller_orders') }}">Orders</a>
+        <a class="nav-link" href="{{ url_for('seller_custom_requests') }}">Custom Requests</a>
+        <a class="nav-link" href="{{ url_for('seller_ai_assistant') }}">Business Assistant</a>
+        <a class="nav-link" href="{{ url_for('seller_marketing') }}">Marketing Tool</a>
+        <div class="nav-title">Account</div>
+        <a class="nav-link active" href="{{ url_for('seller_profile') }}" aria-current="page">Profile</a>
+        <a class="nav-link" href="{{ url_for('seller_mentor') }}">Mentorship</a>
+        <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+    </aside>
+    <main class="main-content">
+        <div class="page">
+            <h1>Seller profile</h1>
+            <p>Manage the name and contact information shown on your account.</p>
+            <section class="card">
+                <p>{{ user.email }}</p>
+                <form method="post" action="{{ url_for('seller_profile') }}">
+                    {% include "_csrf_field.html" %}
+                    <label for="full_name">Full name</label>
+                    <input id="full_name" name="full_name" value="{{ user.full_name }}" maxlength="150" required>
+                    <label for="mobile">Mobile number</label>
+                    <input id="mobile" name="mobile" value="{{ user.mobile }}" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" required>
+                    <button type="submit">Save profile</button>
+                </form>
+            </section>
+        </div>
+    </main>
+</div>
+</body>
+</html>

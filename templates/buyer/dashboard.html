@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SheRise | Buyer Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="buyer-page">
+
+<div class="buyer-layout">
+
+    <aside class="buyer-sidebar">
+        <div class="buyer-role-header">
+            <div class="buyer-profile-avatar">
+                {{ session.get('user_name', 'B')[0]|upper }}
+            </div>
+            <div class="buyer-profile-info">
+                <strong>{{ session.get('user_name', 'Buyer') }}</strong>
+                <span>Buyer</span>
+            </div>
+        </div>
+
+        <nav class="buyer-nav">
+            <div class="buyer-nav-group">
+                <div class="buyer-nav-title">MAIN</div>
+                <a href="{{ url_for('buyer_dashboard') }}" class="buyer-nav-link active">
+                    <span class="buyer-nav-icon">⌂</span>
+                    <span>Dashboard</span>
+                </a>
+            </div>
+
+            <div class="buyer-nav-group">
+                <div class="buyer-nav-title">SHOPPING</div>
+                <a href="{{ url_for('buyer_products') }}" class="buyer-nav-link">
+                    <span class="buyer-nav-icon">🛍</span>
+                    <span>Marketplace</span>
+                </a>
+                <a href="{{ url_for('buyer_wishlist') }}" class="buyer-nav-link">
+                    <span class="buyer-nav-icon">♡</span>
+                    <span>Wishlist</span>
+                </a>
+                <a href="{{ url_for('buyer_cart') }}" class="buyer-nav-link">
+                    <span class="buyer-nav-icon">🛒</span>
+                    <span>My Cart</span>
+                </a>
+                <a href="{{ url_for('buyer_orders') }}" class="buyer-nav-link">
+                    <span class="buyer-nav-icon">📦</span>
+                    <span>My Orders</span>
+                </a>
+            </div>
+
+            <div class="buyer-nav-group">
+                <div class="buyer-nav-title">REQUESTS</div>
+                <a href="{{ url_for('buyer_custom_request') }}" class="buyer-nav-link">
+                    <span class="buyer-nav-icon">✦</span>
+                    <span>Custom Product Request</span>
+                </a>
+                <a href="{{ url_for('buyer_complaints') }}" class="buyer-nav-link">
+                    <span class="buyer-nav-icon">?</span>
+                    <span>Help & Complaints</span>
+                </a>
+            </div>
+
+            <div class="buyer-nav-group">
+                <div class="buyer-nav-title">SUPPORT</div>
+                <a href="{{ url_for('buyer_reviews') }}" class="buyer-nav-link">
+                    <span class="buyer-nav-icon">★</span>
+                    <span>Reviews</span>
+                </a>
+                <a href="{{ url_for('buyer_ai_support') }}" class="buyer-nav-link">
+                    <span class="buyer-nav-icon">✦</span>
+                    <span>AI Support</span>
+                </a>
+            </div>
+
+            <div class="buyer-nav-group">
+                <div class="buyer-nav-title">ACCOUNT</div>
+                <a href="{{ url_for('buyer_profile') }}" class="buyer-nav-link">
+                    <span class="buyer-nav-icon">◯</span>
+                    <span>Profile</span>
+                </a>
+            </div>
+        </nav>
+
+        <div class="buyer-sidebar-bottom">
+            <a href="{{ url_for('logout') }}" class="buyer-logout-link">
+                <span class="buyer-nav-icon">↪</span>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <main class="buyer-main">
+        <header class="buyer-topbar">
+            <div>
+                <h1>Buyer Dashboard</h1>
+                <p>Discover products and support women entrepreneurs.</p>
+            </div>
+            <div class="buyer-topbar-actions">
+                <a href="{{ url_for('buyer_cart') }}" class="buyer-topbar-btn">🛒 Cart</a>
+                <a href="{{ url_for('buyer_wishlist') }}" class="buyer-topbar-btn">♡ Wishlist</a>
+            </div>
+        </header>
+
+        <div class="buyer-page-content">
+
+            <section class="buyer-welcome">
+                <div>
+                    <span class="buyer-welcome-label">WELCOME BACK</span>
+                    <h2>Welcome to Your Dashboard</h2>
+                    <p>Discover products created by women entrepreneurs and support their businesses.</p>
+                </div>
+                <div class="buyer-welcome-actions">
+                    <a href="{{ url_for('buyer_products') }}" class="buyer-primary-btn">🛍 Browse Marketplace</a>
+                    <a href="{{ url_for('buyer_custom_request') }}" class="buyer-secondary-btn">✦ Custom Request</a>
+                </div>
+            </section>
+
+            <section class="buyer-search-card">
+                <form method="GET" action="{{ url_for('buyer_products') }}">
+                    <div class="buyer-search-wrapper">
+                        <span class="buyer-search-icon" aria-hidden="true">🔍</span>
+                        <input type="text" name="search" class="buyer-search-input" placeholder="Search for products...">
+                    </div>
+                    <button type="submit" class="buyer-search-btn">Search</button>
+                </form>
+            </section>
+
+            <section class="buyer-section">
+                <div class="buyer-section-header">
+                    <div>
+                        <span class="buyer-section-label">QUICK ACCESS</span>
+                        <h2>Shopping</h2>
+                    </div>
+                </div>
+
+                <div class="buyer-quick-grid">
+                    <a href="{{ url_for('buyer_products') }}" class="buyer-quick-card">
+                        <div class="buyer-quick-icon">🛍</div>
+                        <div>
+                            <h3>Marketplace</h3>
+                            <p>Explore products from women entrepreneurs.</p>
+                        </div>
+                        <span class="buyer-card-arrow">→</span>
+                    </a>
+                    <a href="{{ url_for('buyer_cart') }}" class="buyer-quick-card">
+                        <div class="buyer-quick-icon">🛒</div>
+                        <div>
+                            <h3>My Cart</h3>
+                            <p>View products you have added to your cart.</p>
+                        </div>
+                        <span class="buyer-card-arrow">→</span>
+                    </a>
+                    <a href="{{ url_for('buyer_wishlist') }}" class="buyer-quick-card">
+                        <div class="buyer-quick-icon">♡</div>
+                        <div>
+                            <h3>Wishlist</h3>
+                            <p>Save products you may want to buy later.</p>
+                        </div>
+                        <span class="buyer-card-arrow">→</span>
+                    </a>
+                    <a href="{{ url_for('buyer_orders') }}" class="buyer-quick-card">
+                        <div class="buyer-quick-icon">📦</div>
+                        <div>
+                            <h3>My Orders</h3>
+                            <p>Track your purchases and order status.</p>
+                        </div>
+                        <span class="buyer-card-arrow">→</span>
+                    </a>
+                </div>
+            </section>
+
+            <section class="buyer-section">
+                <div class="buyer-section-header">
+                    <div>
+                        <span class="buyer-section-label">MARKETPLACE</span>
+                        <h2>Featured Products</h2>
+                    </div>
+                    <a href="{{ url_for('buyer_products') }}" class="buyer-view-all">View All Products →</a>
+                </div>
+
+                {% if products %}
+                <div class="buyer-products-grid">
+                    {% for product in products %}
+                    <div class="buyer-product-card">
+                        {% if product.image_url %}
+                        <img src="{{ product.image_url }}" alt="{{ product.name }}" class="buyer-product-image">
+                        {% else %}
+                        <div class="buyer-product-image buyer-no-image"><span>No Image Available</span></div>
+                        {% endif %}
+
+                        <div class="buyer-product-content">
+                            {% if product.category_name %}
+                            <span class="buyer-product-category">{{ product.category_name }}</span>
+                            {% endif %}
+
+                            <h3>{{ product.name }}</h3>
+
+                            <p class="buyer-product-description">
+                                {% if product.description %}
+                                    {{ product.description[:100] }}{% if product.description|length > 100 %}...{% endif %}
+                                {% else %}
+                                    No description available.
+                                {% endif %}
+                            </p>
+
+                            {% if product.seller_name %}
+                            <div class="buyer-seller-name">
+                                <span>Sold by:</span> {{ product.seller_name }}
+                            </div>
+                            {% endif %}
+
+                            <div class="buyer-product-bottom">
+                                <span class="buyer-product-price">₹{{ "%.2f"|format(product.price) }}</span>
+                                <span class="buyer-stock-info">{{ product.stock }} available</span>
+                            </div>
+
+                            <div class="buyer-product-actions">
+                                <a href="{{ url_for('buyer_product_details', product_id=product.id) }}" class="buyer-action-btn buyer-view-btn">View</a>
+                                <form method="POST" action="{{ url_for('add_to_cart', product_id=product.id) }}">
+{% include "_csrf_field.html" %}
+                                    <button type="submit" class="buyer-action-btn buyer-cart-btn">Add to Cart</button>
+                                </form>
+                                <form method="POST" action="{{ url_for('add_to_wishlist', product_id=product.id) }}">
+{% include "_csrf_field.html" %}
+                                    <button type="submit" class="buyer-action-btn buyer-wishlist-btn" title="Add to Wishlist">♥</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="buyer-empty-state">
+                    <div class="buyer-empty-icon">🛍</div>
+                    <h3>No Products Available</h3>
+                    <p>There are currently no active products available for purchase.</p>
+                    <a href="{{ url_for('buyer_products') }}" class="buyer-primary-btn">Browse Marketplace</a>
+                </div>
+                {% endif %}
+            </section>
+
+            <section class="buyer-custom-request">
+                <div class="buyer-custom-icon">✦</div>
+                <div class="buyer-custom-content">
+                    <span class="buyer-section-label">CUSTOM PRODUCT</span>
+                    <h2>Can't Find What You're Looking For?</h2>
+                    <p>Submit a custom product request and let women entrepreneurs know what you are looking for.</p>
+                </div>
+                <a href="{{ url_for('buyer_custom_request') }}" class="buyer-primary-btn">Create Custom Request</a>
+            </section>
+
+        </div>
+    </main>
+</div>
+
+</body>
+</html>

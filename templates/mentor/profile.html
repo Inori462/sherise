@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Mentor Profile | SheRise</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap"
+          rel="stylesheet">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+
+<body class="mentor-page">
+
+<div class="mentor-layout">
+
+    <!-- =========================================================
+         SIDEBAR
+         ========================================================= -->
+    <aside class="mentor-sidebar">
+
+        <div class="mentor-role-header">
+            <div class="mentor-mini-avatar">M</div>
+            <div class="mentor-role-info">
+                <strong>Mentor</strong>
+                <span>Mentor Portal</span>
+            </div>
+        </div>
+
+
+        <nav class="mentor-nav">
+
+            <a href="{{ url_for('mentor_dashboard') }}"
+               class="mentor-nav-link">
+
+                <i class="fa-solid fa-house"></i>
+
+                <span>
+                    Dashboard
+                </span>
+
+            </a>
+
+
+            <a href="{{ url_for('mentor_requests') }}"
+               class="mentor-nav-link">
+
+                <i class="fa-solid fa-user-clock"></i>
+
+                <span>
+                    Requests
+                </span>
+
+                {% if pending_requests is defined and pending_requests > 0 %}
+
+                    <span class="mentor-nav-badge">
+                        {{ pending_requests }}
+                    </span>
+
+                {% endif %}
+
+            </a>
+
+
+            <a href="{{ url_for('mentor_sessions') }}"
+               class="mentor-nav-link">
+
+                <i class="fa-solid fa-calendar-check"></i>
+
+                <span>
+                    Sessions
+                </span>
+
+            </a>
+
+
+            <a href="{{ url_for('mentor_feedback') }}"
+               class="mentor-nav-link">
+
+                <i class="fa-solid fa-star"></i>
+
+                <span>
+                    Feedback
+                </span>
+
+            </a>
+
+
+            <a href="{{ url_for('mentor_profile') }}"
+               class="mentor-nav-link active">
+
+                <i class="fa-solid fa-user"></i>
+
+                <span>
+                    Profile
+                </span>
+
+            </a>
+
+        </nav>
+
+
+        <div class="mentor-sidebar-bottom">
+
+            <div class="mentor-sidebar-help">
+
+                <div class="mentor-help-icon">
+                    <i class="fa-solid fa-heart"></i>
+                </div>
+
+                <div>
+
+                    <strong>
+                        Support Women
+                    </strong>
+
+                    <span>
+                        Guide. Inspire. Empower.
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <a href="{{ url_for('logout') }}"
+               class="mentor-logout-link">
+
+                <i class="fa-solid fa-right-from-bracket"></i>
+
+                <span>
+                    Logout
+                </span>
+
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =========================================================
+         MAIN
+         ========================================================= -->
+    <main class="mentor-main">
+
+        <!-- TOP BAR -->
+        <header class="mentor-topbar">
+
+            <div class="mentor-topbar-left">
+
+                <button type="button"
+                        class="mentor-mobile-toggle"
+                        onclick="toggleMentorSidebar()"
+                        aria-label="Open menu">
+
+                    <i class="fa-solid fa-bars"></i>
+
+                </button>
+
+
+                <div>
+
+                    <p class="mentor-topbar-label">
+                        Mentor Portal
+                    </p>
+
+                    <h1>
+                        My Profile
+                    </h1>
+
+                </div>
+
+            </div>
+
+
+            <div class="mentor-topbar-right">
+
+                <div class="mentor-welcome-profile">
+
+                    <div class="mentor-avatar">
+
+                        {% if mentor is defined and mentor.name %}
+
+                            {{ mentor.name[:1]|upper }}
+
+                        {% else %}
+
+                            M
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="mentor-profile-mini">
+
+                        <strong>
+
+                            {% if mentor is defined and mentor.name %}
+
+                                {{ mentor.name }}
+
+                            {% else %}
+
+                                {{ session.get('name', 'Mentor') }}
+
+                            {% endif %}
+
+                        </strong>
+
+                        <span>
+                            Mentor
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- =========================================================
+             CONTENT
+             ========================================================= -->
+        <section class="mentor-content">
+
+
+            <!-- PAGE HEADER -->
+            <div class="mentor-page-header">
+
+                <div>
+
+                    <span class="mentor-section-label">
+                        MENTOR ACCOUNT
+                    </span>
+
+                    <h2>
+                        My Profile
+                    </h2>
+
+                    <p>
+                        Manage your mentor information and keep your
+                        professional profile up to date.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- =====================================================
+                 FLASH MESSAGES
+                 ===================================================== -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+
+                {% if messages %}
+
+                    <div class="mentor-flash-messages">
+
+                        {% for category, message in messages %}
+
+                            <div class="mentor-alert
+                                {% if category == 'success' %}
+                                    mentor-alert-success
+                                {% elif category == 'danger' or category == 'error' %}
+                                    mentor-alert-danger
+                                {% elif category == 'warning' %}
+                                    mentor-alert-warning
+                                {% else %}
+                                    mentor-alert-info
+                                {% endif %}">
+
+                                <div class="mentor-alert-icon">
+
+                                    {% if category == 'success' %}
+
+                                        <i class="fa-solid fa-circle-check"></i>
+
+                                    {% elif category == 'warning' %}
+
+                                        <i class="fa-solid fa-triangle-exclamation"></i>
+
+                                    {% elif category == 'danger' or category == 'error' %}
+
+                                        <i class="fa-solid fa-circle-exclamation"></i>
+
+                                    {% else %}
+
+                                        <i class="fa-solid fa-circle-info"></i>
+
+                                    {% endif %}
+
+                                </div>
+
+                                <div>
+                                    {{ message }}
+                                </div>
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% endif %}
+
+            {% endwith %}
+
+
+            <!-- =====================================================
+                 PROFILE OVERVIEW
+                 ===================================================== -->
+            <div class="mentor-profile-grid">
+
+
+                <!-- =================================================
+                     PROFILE CARD
+                     ================================================= -->
+                <div class="mentor-panel mentor-profile-card">
+
+                    <div class="mentor-profile-cover">
+
+                        <div class="mentor-profile-large-avatar">
+
+                            {% if mentor is defined and mentor.name %}
+
+                                {{ mentor.name[:1]|upper }}
+
+                            {% else %}
+
+                                M
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="mentor-profile-summary">
+
+                        <h2>
+
+                            {% if mentor is defined and mentor.name %}
+
+                                {{ mentor.name }}
+
+                            {% else %}
+
+                                {{ session.get('name', 'Mentor') }}
+
+                            {% endif %}
+
+                        </h2>
+
+
+                        <span class="mentor-profile-role">
+                            Mentor
+                        </span>
+
+
+                        {% if mentor is defined and mentor.expertise %}
+
+                            <div class="mentor-profile-expertise">
+
+                                <i class="fa-solid fa-briefcase"></i>
+
+                                <span>
+                                    {{ mentor.expertise }}
+                                </span>
+
+                            </div>
+
+                        {% endif %}
+
+
+                        <!-- APPROVAL STATUS -->
+                        <div class="mentor-profile-status">
+
+                            {% if mentor_approved is defined and mentor_approved %}
+
+                                <span class="mentor-status mentor-status-approved">
+
+                                    <i class="fa-solid fa-circle-check"></i>
+
+                                    Approved Mentor
+
+                                </span>
+
+                            {% elif mentor_pending is defined and mentor_pending %}
+
+                                <span class="mentor-status mentor-status-pending">
+
+                                    <i class="fa-solid fa-clock"></i>
+
+                                    Approval Pending
+
+                                </span>
+
+                            {% elif mentor is defined and mentor.status == 'rejected' %}
+
+                                <span class="mentor-status mentor-status-rejected">
+
+                                    <i class="fa-solid fa-circle-xmark"></i>
+
+                                    Profile Rejected
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="mentor-status">
+
+                                    Profile Status
+
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- PROFILE INFORMATION -->
+                    <div class="mentor-profile-details">
+
+
+                        <div class="mentor-info-item">
+
+                            <div class="mentor-info-icon">
+                                <i class="fa-solid fa-envelope"></i>
+                            </div>
+
+                            <div>
+
+                                <span>
+                                    Email
+                                </span>
+
+                                <strong>
+
+                                    {% if mentor is defined and mentor.email %}
+
+                                        {{ mentor.email }}
+
+                                    {% else %}
+
+                                        {{ session.get('email', 'Not available') }}
+
+                                    {% endif %}
+
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="mentor-info-item">
+
+                            <div class="mentor-info-icon">
+                                <i class="fa-solid fa-calendar-plus"></i>
+                            </div>
+
+                            <div>
+
+                                <span>
+                                    Mentor Since
+                                </span>
+
+                                <strong>
+
+                                    {% if mentor is defined and mentor.created_at %}
+
+                                        {{ mentor.created_at.strftime('%d %b %Y') }}
+
+                                    {% else %}
+
+                                        Not available
+
+                                    {% endif %}
+
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="mentor-info-item">
+
+                            <div class="mentor-info-icon">
+                                <i class="fa-solid fa-clock"></i>
+                            </div>
+
+                            <div>
+
+                                <span>
+                                    Availability
+                                </span>
+
+                                <strong>
+
+                                    {% if mentor is defined and mentor.availability %}
+
+                                        {{ mentor.availability }}
+
+                                    {% else %}
+
+                                        Not specified
+
+                                    {% endif %}
+
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="mentor-info-item">
+
+                            <div class="mentor-info-icon">
+                                <i class="fa-solid fa-briefcase"></i>
+                            </div>
+
+                            <div>
+
+                                <span>
+                                    Experience
+                                </span>
+
+                                <strong>
+
+                                    {% if mentor is defined and mentor.experience_years is not none %}
+
+                                        {{ mentor.experience_years }}
+                                        {% if mentor.experience_years == 1 %}
+                                            year
+                                        {% else %}
+                                            years
+                                        {% endif %}
+
+                                    {% else %}
+
+                                        Not specified
+
+                                    {% endif %}
+
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     PROFILE FORM
+                     ================================================= -->
+                <div class="mentor-panel">
+
+                    <div class="mentor-panel-header">
+
+                        <div>
+
+                            <span class="mentor-section-label">
+                                PROFESSIONAL INFORMATION
+                            </span>
+
+                            <h3>
+                                Mentor Details
+                            </h3>
+
+                        </div>
+
+                    </div>
+
+
+                    <form method="POST"
+                          action="{{ url_for('mentor_profile') }}"
+                          class="mentor-profile-form">
+{% include "_csrf_field.html" %}
+
+                        <!-- =================================================
+                             NAME
+                             ================================================= -->
+                        <div class="mentor-form-group">
+
+                            <label for="name">
+                                Full Name
+                            </label>
+
+                            <div class="mentor-input-wrapper">
+
+                                <i class="fa-solid fa-user"></i>
+
+                                <input
+                                    type="text"
+                                    id="name"
+                                    name="name"
+                                    value="{% if mentor is defined and mentor.name %}{{ mentor.name }}{% else %}{{ session.get('name', '') }}{% endif %}"
+                                    placeholder="Enter your full name"
+                                    autocomplete="name"
+                                    required>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- =================================================
+                             EMAIL
+                             ================================================= -->
+                        <div class="mentor-form-group">
+
+                            <label for="email">
+                                Email Address
+                            </label>
+
+                            <div class="mentor-input-wrapper">
+
+                                <i class="fa-solid fa-envelope"></i>
+
+                                <input
+                                    type="email"
+                                    id="email"
+                                    name="email"
+                                    value="{% if mentor is defined and mentor.email %}{{ mentor.email }}{% else %}{{ session.get('email', '') }}{% endif %}"
+                                    placeholder="Enter your email address"
+                                    autocomplete="email"
+                                    required>
+
+                            </div>
+
+                            <small class="mentor-form-help">
+                                This email is used for your mentor account.
+                            </small>
+
+                        </div>
+
+
+                        <!-- =================================================
+                             EXPERTISE
+                             ================================================= -->
+                        <div class="mentor-form-group">
+
+                            <label for="expertise">
+                                Area of Expertise
+                                <span class="mentor-required">*</span>
+                            </label>
+
+                            <div class="mentor-input-wrapper">
+
+                                <i class="fa-solid fa-briefcase"></i>
+
+                                <input
+                                    type="text"
+                                    id="expertise"
+                                    name="expertise"
+                                    value="{% if mentor is defined %}{{ mentor.expertise|default('') }}{% endif %}"
+                                    placeholder="e.g. Marketing, Finance, Handmade Business"
+                                    required>
+
+                            </div>
+
+                            <small class="mentor-form-help">
+                                Mention the main business areas where you
+                                can guide women entrepreneurs.
+                            </small>
+
+                        </div>
+
+
+                        <!-- =================================================
+                             EXPERIENCE
+                             ================================================= -->
+                        <div class="mentor-form-group">
+
+                            <label for="experience_years">
+                                Experience
+                            </label>
+
+                            <div class="mentor-input-wrapper">
+
+                                <i class="fa-solid fa-award"></i>
+
+                                <input
+                                    type="number"
+                                    id="experience_years"
+                                    name="experience_years"
+                                    value="{% if mentor is defined and mentor.experience_years is not none %}{{ mentor.experience_years }}{% endif %}"
+                                    placeholder="Years of experience"
+                                    min="0"
+                                    max="100">
+
+                                <span class="mentor-input-suffix">
+                                    Years
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- =================================================
+                             AVAILABILITY
+                             ================================================= -->
+                        <div class="mentor-form-group">
+
+                            <label for="availability">
+                                Availability
+                            </label>
+
+                            <div class="mentor-input-wrapper">
+
+                                <i class="fa-solid fa-clock"></i>
+
+                                <select id="availability"
+                                        name="availability">
+
+                                    <option value="">
+                                        Select availability
+                                    </option>
+
+                                    <option value="Weekdays"
+                                        {% if mentor is defined and mentor.availability == 'Weekdays' %}
+                                            selected
+                                        {% endif %}>
+                                        Weekdays
+                                    </option>
+
+                                    <option value="Weekends"
+                                        {% if mentor is defined and mentor.availability == 'Weekends' %}
+                                            selected
+                                        {% endif %}>
+                                        Weekends
+                                    </option>
+
+                                    <option value="Weekday Evenings"
+                                        {% if mentor is defined and mentor.availability == 'Weekday Evenings' %}
+                                            selected
+                                        {% endif %}>
+                                        Weekday Evenings
+                                    </option>
+
+                                    <option value="Flexible"
+                                        {% if mentor is defined and mentor.availability == 'Flexible' %}
+                                            selected
+                                        {% endif %}>
+                                        Flexible
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- =================================================
+                             BIO
+                             ================================================= -->
+                        <div class="mentor-form-group mentor-form-group-full">
+
+                            <label for="bio">
+                                About You
+                            </label>
+
+                            <textarea
+                                id="bio"
+                                name="bio"
+                                rows="6"
+                                maxlength="1000"
+                                placeholder="Tell sellers about your experience, knowledge and how you can help them...">{% if mentor is defined %}{{ mentor.bio|default('') }}{% endif %}</textarea>
+
+                            <div class="mentor-textarea-footer">
+
+                                <small class="mentor-form-help">
+                                    Share your experience and the type of
+                                    guidance you can provide.
+                                </small>
+
+                                <span id="bioCounter">
+                                    0 / 1000
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- =================================================
+                             SAVE BUTTON
+                             ================================================= -->
+                        <div class="mentor-form-actions">
+
+                            <button type="submit"
+                                    class="mentor-btn mentor-btn-primary">
+
+                                <i class="fa-solid fa-floppy-disk"></i>
+
+                                Save Profile
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+
+            <!-- =====================================================
+                 BIO PREVIEW
+                 ===================================================== -->
+            <div class="mentor-panel">
+
+                <div class="mentor-panel-header">
+
+                    <div>
+
+                        <span class="mentor-section-label">
+                            PROFILE PREVIEW
+                        </span>
+
+                        <h3>
+                            About Me
+                        </h3>
+
+                    </div>
+
+                </div>
+
+
+                <div class="mentor-profile-bio">
+
+                    <div class="mentor-profile-bio-icon">
+
+                        <i class="fa-solid fa-quote-left"></i>
+
+                    </div>
+
+
+                    <div class="mentor-profile-bio-content">
+
+                        {% if mentor is defined and mentor.bio %}
+
+                            <p>
+                                {{ mentor.bio }}
+                            </p>
+
+                        {% else %}
+
+                            <p class="mentor-muted-text">
+
+                                Your mentor introduction has not been added
+                                yet. Add a short description above so sellers
+                                can understand your experience and how you can
+                                help them.
+
+                            </p>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =====================================================
+                 MENTOR PROFILE GUIDELINES
+                 ===================================================== -->
+            <div class="mentor-panel mentor-profile-tips">
+
+                <div class="mentor-panel-header">
+
+                    <div>
+
+                        <span class="mentor-section-label">
+                            PROFILE GUIDELINES
+                        </span>
+
+                        <h3>
+                            Make Your Profile Helpful
+                        </h3>
+
+                    </div>
+
+                </div>
+
+
+                <div class="mentor-tips-grid">
+
+
+                    <div class="mentor-tip-card">
+
+                        <div class="mentor-tip-icon">
+                            <i class="fa-solid fa-briefcase"></i>
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                Highlight Your Expertise
+                            </strong>
+
+                            <p>
+                                Mention the business areas where you have
+                                practical experience.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="mentor-tip-card">
+
+                        <div class="mentor-tip-icon">
+                            <i class="fa-solid fa-clock"></i>
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                Keep Availability Updated
+                            </strong>
+
+                            <p>
+                                Let sellers know when you are generally
+                                available for mentorship.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="mentor-tip-card">
+
+                        <div class="mentor-tip-icon">
+                            <i class="fa-solid fa-heart"></i>
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                Share Your Experience
+                            </strong>
+
+                            <p>
+                                Tell entrepreneurs how your experience can
+                                help them grow their businesses.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- =============================================================
+     MOBILE SIDEBAR OVERLAY
+     ============================================================= -->
+<div class="mentor-sidebar-overlay"
+     id="mentorSidebarOverlay"
+     onclick="toggleMentorSidebar()">
+</div>
+
+
+<!-- =============================================================
+     JAVASCRIPT
+     ============================================================= -->
+<script>
+
+function toggleMentorSidebar() {
+
+    const sidebar =
+        document.querySelector('.mentor-sidebar');
+
+    const overlay =
+        document.getElementById('mentorSidebarOverlay');
+
+
+    if (!sidebar) {
+        return;
+    }
+
+
+    sidebar.classList.toggle(
+        'mentor-sidebar-open'
+    );
+
+
+    if (overlay) {
+
+        overlay.classList.toggle(
+            'mentor-overlay-visible'
+        );
+
+    }
+
+}
+
+
+/* =============================================================
+   BIO CHARACTER COUNTER
+   ============================================================= */
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    const bio =
+        document.getElementById('bio');
+
+    const counter =
+        document.getElementById('bioCounter');
+
+
+    if (!bio || !counter) {
+        return;
+    }
+
+
+    function updateBioCounter() {
+
+        counter.textContent =
+            bio.value.length + ' / 1000';
+
+    }
+
+
+    updateBioCounter();
+
+
+    bio.addEventListener(
+        'input',
+        updateBioCounter
+    );
+
+
+    /* =========================================================
+       CLOSE MOBILE SIDEBAR AFTER NAVIGATION
+       ========================================================= */
+
+    const sidebarLinks =
+        document.querySelectorAll(
+            '.mentor-nav-link'
+        );
+
+
+    sidebarLinks.forEach(function (link) {
+
+        link.addEventListener(
+            'click',
+            function () {
+
+                if (window.innerWidth <= 768) {
+
+                    const sidebar =
+                        document.querySelector(
+                            '.mentor-sidebar'
+                        );
+
+                    const overlay =
+                        document.getElementById(
+                            'mentorSidebarOverlay'
+                        );
+
+
+                    if (sidebar) {
+
+                        sidebar.classList.remove(
+                            'mentor-sidebar-open'
+                        );
+
+                    }
+
+
+                    if (overlay) {
+
+                        overlay.classList.remove(
+                            'mentor-overlay-visible'
+                        );
+
+                    }
+
+                }
+
+            }
+        );
+
+    });
+
+});
+
+</script>
+
+</body>
+</html>

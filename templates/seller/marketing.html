@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Marketing Tool | SheRise</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/seller-workspace.css') }}">
+    <style>
+        .field { min-width: 0; }
+        #result { white-space: pre-wrap; line-height: 1.65; overflow-wrap: anywhere; }
+        #status.error { color: #a33; }
+        #status { min-height: 1.5em; }
+        .output-actions { display: flex; justify-content: flex-end; gap: 10px; margin: 12px 0; }
+        .secondary { background: #f4e5ef; color: #7b356b; }
+        [readonly] { background: #f7f5f7; }
+    </style>
+</head>
+<body>
+<div class="seller-layout">
+    <aside class="sidebar">
+        <div class="brand"><h2>SheRise</h2><p>Seller workspace</p></div>
+        <div class="nav-title">Workspace</div>
+        <a class="nav-link" href="{{ url_for('seller_dashboard') }}">Dashboard</a>
+        <a class="nav-link" href="{{ url_for('seller_products') }}">Products</a>
+        <a class="nav-link" href="{{ url_for('seller_orders') }}">Orders</a>
+        <a class="nav-link" href="{{ url_for('seller_custom_requests') }}">Custom Requests</a>
+        <a class="nav-link" href="{{ url_for('seller_ai_assistant') }}">Business Assistant</a>
+        <a class="nav-link active" href="{{ url_for('seller_marketing') }}" aria-current="page">Marketing Tool</a>
+        <div class="nav-title">Account</div>
+        <a class="nav-link" href="{{ url_for('seller_profile') }}">Profile</a>
+        <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+    </aside>
+    <main class="main-content">
+        <div class="page">
+            <h1>Marketing Tool</h1>
+            <p>Create format-specific promotional copy using your product information. Posters and banners include copy and layout guidance; no image is generated.</p>
+            <section class="card">
+                <form id="marketing-form">
+                    <div class="grid">
+                        <div class="field">
+                            <label for="product_id">Choose one of your products (optional)</label>
+                            <select id="product_id">
+                                <option value="">Enter product details manually</option>
+                                {% for product in products %}
+                                    <option value="{{ product.id }}"
+                                            data-name="{{ product.name|e }}"
+                                            data-description="{{ product.description|e }}"
+                                            data-price="{{ product.price }}">{{ product.name }} — ₹{{ product.price }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="output_type">Marketing output</label>
+                            <select id="output_type" required>
+                                <option value="festival_poster" {% if latest_output_type == 'festival_poster' %}selected{% endif %}>Festival offer poster</option>
+                                <option value="social_caption" {% if latest_output_type == 'social_caption' %}selected{% endif %}>Social media caption</option>
+                                <option value="instagram_post" {% if latest_output_type == 'instagram_post' %}selected{% endif %}>Instagram post</option>
+                                <option value="whatsapp_message" {% if latest_output_type == 'whatsapp_message' %}selected{% endif %}>WhatsApp message</option>
+                                <option value="facebook_ad" {% if latest_output_type == 'facebook_ad' %}selected{% endif %}>Facebook advertisement</option>
+                                <option value="product_description" {% if latest_output_type == 'product_description' %}selected{% endif %}>Product description</option>
+                                <option value="hashtags" {% if latest_output_type == 'hashtags' %}selected{% endif %}>Relevant hashtags</option>
+                                <option value="promotional_poster" {% if latest_output_type == 'promotional_poster' %}selected{% endif %}>Promotional poster</option>
+                                <option value="product_banner" {% if latest_output_type == 'product_banner' %}selected{% endif %}>Product banner</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid">
+                        <div class="field">
+                            <label for="product_name">Product name</label>
+                            <input id="product_name" maxlength="150" required>
+                        </div>
+                        <div class="field">
+                            <label for="price">Price (optional)</label>
+                            <input id="price" maxlength="50" placeholder="Only include a price you provide">
+                        </div>
+                    </div>
+                    <label for="description">Product details</label>
+                    <textarea id="description" maxlength="3000" required placeholder="Add accurate materials, size, features, use, and other details you want included."></textarea>
+                    <div class="grid">
+                        <div class="field">
+                            <label for="target_audience">Target audience (optional)</label>
+                            <input id="target_audience" maxlength="500">
+                        </div>
+                        <div class="field">
+                            <label for="offer">Offer details (optional)</label>
+                            <input id="offer" maxlength="500" placeholder="Leave blank if there is no offer">
+                        </div>
+                    </div>
+                    <div class="grid">
+                        <div class="field">
+                            <label for="festival" id="festival-label">Festival or event</label>
+                            <input id="festival" maxlength="150">
+                        </div>
+                        <div class="field">
+                            <label for="platform">Platform</label>
+                            <select id="platform">
+                                <option>Instagram</option>
+                                <option>WhatsApp</option>
+                                <option>Facebook</option>
+                                <option>Marketplace</option>
+                                <option>Print</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid">
+                        <div class="field">
+                            <label for="tone">Tone</label>
+                            <select id="tone">
+                                <option>Friendly</option>
+                                <option>Elegant</option>
+                                <option>Playful</option>
+                                <option>Professional</option>
+                                <option>Festive</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="language">Language</label>
+                            <input id="language" maxlength="100" value="English" required>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label for="placement">Placement or campaign goal (optional)</label>
+                        <input id="placement" maxlength="150" placeholder="e.g., story, feed, shop banner, launch">
+                    </div>
+                    <p id="status" role="status" aria-live="polite"></p>
+                    <button id="generate-button" type="submit">Generate marketing content</button>
+                </form>
+            </section>
+            <section class="card" aria-labelledby="result-heading">
+                <h2 id="result-heading">Generated content</h2>
+                <div class="output-actions">
+                    <button id="copy-button" class="secondary" type="button" disabled>Copy content</button>
+                    <button id="regenerate-button" class="secondary" type="button" disabled>Regenerate</button>
+                </div>
+                <div id="result" aria-live="polite">{% if latest_content %}{{ latest_content }}{% else %}Choose an output type and add product details to begin.{% endif %}</div>
+                {% if latest_content %}<p>Showing your latest successful marketing result from your account history.</p>{% endif %}
+            </section>
+        </div>
+    </main>
+</div>
+<script>
+const form = document.getElementById("marketing-form");
+const productSelect = document.getElementById("product_id");
+const outputTypeInput = document.getElementById("output_type");
+const festivalInput = document.getElementById("festival");
+const festivalLabel = document.getElementById("festival-label");
+const productName = document.getElementById("product_name");
+const description = document.getElementById("description");
+const price = document.getElementById("price");
+const result = document.getElementById("result");
+const statusMessage = document.getElementById("status");
+const generateButton = document.getElementById("generate-button");
+const copyButton = document.getElementById("copy-button");
+const regenerateButton = document.getElementById("regenerate-button");
+const csrfToken = {{ csrf_token()|tojson }};
+const latestOutputType = {{ latest_output_type|default('', true)|tojson }};
+let lastPayload = null;
+let generatedContent = "";
+if (latestOutputType && result.textContent.trim()) {
+    generatedContent = result.textContent.trim();
+    copyButton.disabled = false;
+}
+
+function lockProductDetails(locked) {
+    productName.readOnly = locked;
+    description.readOnly = locked;
+    price.readOnly = locked;
+}
+
+function updateFestivalRequirement() {
+    const required = outputTypeInput.value === "festival_poster";
+    festivalInput.required = required;
+    festivalLabel.textContent = required
+        ? "Festival or event (required for this format)"
+        : "Festival or event (optional)";
+}
+
+outputTypeInput.addEventListener("change", updateFestivalRequirement);
+updateFestivalRequirement();
+
+productSelect.addEventListener("change", () => {
+    const selected = productSelect.selectedOptions[0];
+    if (!productSelect.value) {
+        productName.value = "";
+        description.value = "";
+        price.value = "";
+        lockProductDetails(false);
+        return;
+    }
+    productName.value = selected.dataset.name || "";
+    lockProductDetails(true);
+    description.value = selected.dataset.description || "";
+    price.value = selected.dataset.price || "";
+    statusMessage.className = "";
+    statusMessage.textContent = "The server will use the selected product's current saved details.";
+});
+
+function readPayload() {
+    return {
+        product_id: productSelect.value,
+        output_type: outputTypeInput.value,
+        product_name: productName.value.trim(),
+        description: description.value.trim(),
+        price: price.value.trim(),
+        target_audience: document.getElementById("target_audience").value.trim(),
+        offer: document.getElementById("offer").value.trim(),
+        festival: document.getElementById("festival").value.trim(),
+        platform: document.getElementById("platform").value,
+        tone: document.getElementById("tone").value,
+        language: document.getElementById("language").value.trim(),
+        placement: document.getElementById("placement").value.trim()
+    };
+}
+
+async function generate(payload) {
+    lastPayload = payload;
+    generateButton.disabled = true;
+    regenerateButton.disabled = true;
+    copyButton.disabled = true;
+    statusMessage.className = "";
+    statusMessage.textContent = "Generating with the local AI model…";
+    try {
+        const response = await fetch("{{ url_for('seller_marketing_generate') }}", {
+            method: "POST",
+            credentials: "same-origin",
+            headers: { "Content-Type": "application/json", "X-CSRF-Token": csrfToken },
+            body: JSON.stringify(payload)
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Marketing content could not be generated.");
+        generatedContent = data.content;
+        result.textContent = generatedContent;
+        statusMessage.textContent = "Content generated by the local model.";
+        regenerateButton.disabled = false;
+        copyButton.disabled = false;
+    } catch (error) {
+        statusMessage.className = "error";
+        statusMessage.textContent = error.message || "Marketing service unavailable.";
+        regenerateButton.disabled = !lastPayload;
+    } finally {
+        generateButton.disabled = false;
+    }
+}
+
+form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    if (!form.reportValidity()) return;
+    const payload = readPayload();
+    if (!payload.product_name || !payload.description) {
+        statusMessage.className = "error";
+        statusMessage.textContent = "Add a product name and accurate product details, or choose a saved product.";
+        return;
+    }
+    generate(payload);
+});
+
+regenerateButton.addEventListener("click", () => {
+    if (lastPayload) generate(lastPayload);
+});
+
+copyButton.addEventListener("click", async () => {
+    try {
+        await navigator.clipboard.writeText(generatedContent);
+        statusMessage.className = "";
+        statusMessage.textContent = "Content copied.";
+    } catch (error) {
+        statusMessage.className = "error";
+        statusMessage.textContent = "Clipboard access is unavailable. Select and copy the generated text manually.";
+    }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Feedback | Mentor Portal | SheRise</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap"
+          rel="stylesheet">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+
+<body class="mentor-page">
+
+<div class="mentor-layout">
+
+    <!-- =========================================================
+         SIDEBAR
+         ========================================================= -->
+    <aside class="mentor-sidebar">
+
+        <div class="mentor-role-header">
+            <div class="mentor-mini-avatar">M</div>
+            <div class="mentor-role-info">
+                <strong>Mentor</strong>
+                <span>Mentor Portal</span>
+            </div>
+        </div>
+
+
+        <nav class="mentor-nav">
+
+            <a href="{{ url_for('mentor_dashboard') }}"
+               class="mentor-nav-link">
+
+                <i class="fa-solid fa-house"></i>
+
+                <span>Dashboard</span>
+
+            </a>
+
+
+            <a href="{{ url_for('mentor_requests') }}"
+               class="mentor-nav-link">
+
+                <i class="fa-solid fa-user-clock"></i>
+
+                <span>Requests</span>
+
+                {% if pending_requests is defined and pending_requests > 0 %}
+                    <span class="mentor-nav-badge">
+                        {{ pending_requests }}
+                    </span>
+                {% endif %}
+
+            </a>
+
+
+            <a href="{{ url_for('mentor_sessions') }}"
+               class="mentor-nav-link">
+
+                <i class="fa-solid fa-calendar-check"></i>
+
+                <span>Sessions</span>
+
+            </a>
+
+
+            <a href="{{ url_for('mentor_feedback') }}"
+               class="mentor-nav-link active">
+
+                <i class="fa-solid fa-star"></i>
+
+                <span>Feedback</span>
+
+            </a>
+
+
+                        <a href="{{ url_for('mentor_profile') }}"
+               class="mentor-nav-link">
+
+                <i class="fa-solid fa-user"></i>
+
+                <span>Profile</span>
+
+            </a>
+
+        </nav>
+
+
+        <div class="mentor-sidebar-bottom">
+
+            <div class="mentor-sidebar-help">
+
+                <div class="mentor-help-icon">
+                    <i class="fa-solid fa-heart"></i>
+                </div>
+
+                <div>
+                    <strong>Support Women</strong>
+
+                    <span>
+                        Guide. Inspire. Empower.
+                    </span>
+                </div>
+
+            </div>
+
+
+            <a href="{{ url_for('logout') }}"
+               class="mentor-logout-link">
+
+                <i class="fa-solid fa-right-from-bracket"></i>
+
+                <span>Logout</span>
+
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =========================================================
+         MAIN CONTENT
+         ========================================================= -->
+    <main class="mentor-main">
+
+        <!-- TOP BAR -->
+        <header class="mentor-topbar">
+
+            <div class="mentor-topbar-left">
+
+                <button type="button"
+                        class="mentor-mobile-toggle"
+                        onclick="toggleMentorSidebar()"
+                        aria-label="Open menu">
+
+                    <i class="fa-solid fa-bars"></i>
+
+                </button>
+
+
+                <div>
+
+                    <p class="mentor-topbar-label">
+                        Mentor Portal
+                    </p>
+
+                    <h1>
+                        Feedback
+                    </h1>
+
+                </div>
+
+            </div>
+
+
+            <div class="mentor-topbar-right">
+
+                <div class="mentor-welcome-profile">
+
+                    <div class="mentor-avatar">
+
+                        {% if mentor is defined and mentor.name %}
+                            {{ mentor.name[:1]|upper }}
+                        {% else %}
+                            M
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="mentor-profile-mini">
+
+                        <strong>
+                            {% if mentor is defined and mentor.name %}
+                                {{ mentor.name }}
+                            {% else %}
+                                {{ session.get('name', 'Mentor') }}
+                            {% endif %}
+                        </strong>
+
+                        <span>
+                            Mentor
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- =========================================================
+             PAGE CONTENT
+             ========================================================= -->
+        <section class="mentor-content">
+
+
+            <!-- PAGE HEADER -->
+            <div class="mentor-page-header">
+
+                <div>
+
+                    <span class="mentor-section-label">
+                        SELLER FEEDBACK
+                    </span>
+
+                    <h2>
+                        Feedback from Sellers
+                    </h2>
+
+                    <p>
+                        Read feedback shared by sellers after completing
+                        their mentorship sessions with you.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- =====================================================
+                 FLASH MESSAGES
+                 ===================================================== -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+
+                {% if messages %}
+
+                    <div class="mentor-flash-messages">
+
+                        {% for category, message in messages %}
+
+                            <div class="mentor-alert
+                                {% if category == 'success' %}
+                                    mentor-alert-success
+                                {% elif category == 'danger' or category == 'error' %}
+                                    mentor-alert-danger
+                                {% elif category == 'warning' %}
+                                    mentor-alert-warning
+                                {% else %}
+                                    mentor-alert-info
+                                {% endif %}">
+
+                                <div class="mentor-alert-icon">
+
+                                    {% if category == 'success' %}
+                                        <i class="fa-solid fa-circle-check"></i>
+                                    {% elif category == 'warning' %}
+                                        <i class="fa-solid fa-triangle-exclamation"></i>
+                                    {% elif category == 'danger' or category == 'error' %}
+                                        <i class="fa-solid fa-circle-exclamation"></i>
+                                    {% else %}
+                                        <i class="fa-solid fa-circle-info"></i>
+                                    {% endif %}
+
+                                </div>
+
+                                <div>
+                                    {{ message }}
+                                </div>
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% endif %}
+
+            {% endwith %}
+
+
+            <!-- =====================================================
+                 FEEDBACK SUMMARY
+                 ===================================================== -->
+            <div class="mentor-stat-grid">
+
+
+                <!-- TOTAL FEEDBACK -->
+                <div class="mentor-stat-card">
+
+                    <div class="mentor-stat-icon">
+                        <i class="fa-solid fa-comments"></i>
+                    </div>
+
+                    <div class="mentor-stat-content">
+
+                        <span class="mentor-stat-label">
+                            Total Feedback
+                        </span>
+
+                        <strong>
+                            {{ total_feedback|default(0) }}
+                        </strong>
+
+                        <small>
+                            Feedback received from sellers
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <!-- AVERAGE RATING -->
+                <div class="mentor-stat-card">
+
+                    <div class="mentor-stat-icon">
+                        <i class="fa-solid fa-star"></i>
+                    </div>
+
+                    <div class="mentor-stat-content">
+
+                        <span class="mentor-stat-label">
+                            Average Rating
+                        </span>
+
+                        <strong>
+                            {{ average_rating|default(0)|float|round(1) }}
+                        </strong>
+
+                        <small>
+                            Out of 5 stars
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <!-- FIVE STAR -->
+                <div class="mentor-stat-card">
+
+                    <div class="mentor-stat-icon">
+                        <i class="fa-solid fa-heart"></i>
+                    </div>
+
+                    <div class="mentor-stat-content">
+
+                        <span class="mentor-stat-label">
+                            5 Star Feedback
+                        </span>
+
+                        <strong>
+                            {{ five_star_count|default(0) }}
+                        </strong>
+
+                        <small>
+                            Highly rated sessions
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <!-- COMPLETED SESSIONS -->
+                <div class="mentor-stat-card">
+
+                    <div class="mentor-stat-icon">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+
+                    <div class="mentor-stat-content">
+
+                        <span class="mentor-stat-label">
+                            Completed Sessions
+                        </span>
+
+                        <strong>
+                            {{ completed_sessions|default(0) }}
+                        </strong>
+
+                        <small>
+                            Sessions available for feedback
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =====================================================
+                 RATING OVERVIEW
+                 ===================================================== -->
+            <div class="mentor-panel">
+
+                <div class="mentor-panel-header">
+
+                    <div>
+
+                        <span class="mentor-section-label">
+                            RATING OVERVIEW
+                        </span>
+
+                        <h3>
+                            Seller Ratings
+                        </h3>
+
+                    </div>
+
+                </div>
+
+
+                <div class="mentor-rating-summary">
+
+
+                    <!-- OVERALL RATING -->
+                    <div class="mentor-rating-overall">
+
+                        <div class="mentor-rating-number">
+                            {{ average_rating|default(0)|float|round(1) }}
+                        </div>
+
+
+                        <div class="mentor-rating-stars">
+
+                            {% set current_rating =
+                                average_rating|default(0)|float
+                            %}
+
+                            {% for i in range(1, 6) %}
+
+                                {% if current_rating >= i %}
+
+                                    <i class="fa-solid fa-star"></i>
+
+                                {% elif current_rating >= i - 0.5 %}
+
+                                    <i class="fa-solid fa-star-half-stroke"></i>
+
+                                {% else %}
+
+                                    <i class="fa-regular fa-star"></i>
+
+                                {% endif %}
+
+                            {% endfor %}
+
+                        </div>
+
+
+                        <span class="mentor-rating-caption">
+                            Based on
+                            {{ total_feedback|default(0) }}
+                            seller
+                            {% if total_feedback|default(0) == 1 %}
+                                review
+                            {% else %}
+                                reviews
+                            {% endif %}
+                        </span>
+
+                    </div>
+
+
+                    <!-- RATING BREAKDOWN -->
+                    <div class="mentor-rating-breakdown">
+
+
+                        <!-- 5 STAR -->
+                        <div class="mentor-rating-row">
+
+                            <span class="mentor-rating-label">
+                                5
+                                <i class="fa-solid fa-star"></i>
+                            </span>
+
+                            <div class="mentor-rating-bar">
+
+                                {% if total_feedback|default(0)|int > 0 %}
+
+                                    {% set five_percent =
+                                        ((five_star_count|default(0)|float /
+                                        total_feedback|float) * 100)
+                                        |round(0)
+                                    %}
+
+                                    {% if five_percent <= 0 %}
+                                        <div class="mentor-rating-fill width-0"></div>
+                                    {% elif five_percent <= 20 %}
+                                        <div class="mentor-rating-fill width-20"></div>
+                                    {% elif five_percent <= 40 %}
+                                        <div class="mentor-rating-fill width-40"></div>
+                                    {% elif five_percent <= 60 %}
+                                        <div class="mentor-rating-fill width-60"></div>
+                                    {% elif five_percent <= 80 %}
+                                        <div class="mentor-rating-fill width-80"></div>
+                                    {% else %}
+                                        <div class="mentor-rating-fill width-100"></div>
+                                    {% endif %}
+
+                                {% else %}
+
+                                    <div class="mentor-rating-fill width-0"></div>
+
+                                {% endif %}
+
+                            </div>
+
+                            <span class="mentor-rating-count">
+                                {{ five_star_count|default(0) }}
+                            </span>
+
+                        </div>
+
+
+                        <!-- 4 STAR -->
+                        <div class="mentor-rating-row">
+
+                            <span class="mentor-rating-label">
+                                4
+                                <i class="fa-solid fa-star"></i>
+                            </span>
+
+                            <div class="mentor-rating-bar">
+
+                                {% if total_feedback|default(0)|int > 0 %}
+
+                                    {% set four_percent =
+                                        ((four_star_count|default(0)|float /
+                                        total_feedback|float) * 100)
+                                        |round(0)
+                                    %}
+
+                                    {% if four_percent <= 0 %}
+                                        <div class="mentor-rating-fill width-0"></div>
+                                    {% elif four_percent <= 20 %}
+                                        <div class="mentor-rating-fill width-20"></div>
+                                    {% elif four_percent <= 40 %}
+                                        <div class="mentor-rating-fill width-40"></div>
+                                    {% elif four_percent <= 60 %}
+                                        <div class="mentor-rating-fill width-60"></div>
+                                    {% elif four_percent <= 80 %}
+                                        <div class="mentor-rating-fill width-80"></div>
+                                    {% else %}
+                                        <div class="mentor-rating-fill width-100"></div>
+                                    {% endif %}
+
+                                {% else %}
+
+                                    <div class="mentor-rating-fill width-0"></div>
+
+                                {% endif %}
+
+                            </div>
+
+                            <span class="mentor-rating-count">
+                                {{ four_star_count|default(0) }}
+                            </span>
+
+                        </div>
+
+
+                        <!-- 3 STAR -->
+                        <div class="mentor-rating-row">
+
+                            <span class="mentor-rating-label">
+                                3
+                                <i class="fa-solid fa-star"></i>
+                            </span>
+
+                            <div class="mentor-rating-bar">
+
+                                {% if total_feedback|default(0)|int > 0 %}
+
+                                    {% set three_percent =
+                                        ((three_star_count|default(0)|float /
+                                        total_feedback|float) * 100)
+                                        |round(0)
+                                    %}
+
+                                    {% if three_percent <= 0 %}
+                                        <div class="mentor-rating-fill width-0"></div>
+                                    {% elif three_percent <= 20 %}
+                                        <div class="mentor-rating-fill width-20"></div>
+                                    {% elif three_percent <= 40 %}
+                                        <div class="mentor-rating-fill width-40"></div>
+                                    {% elif three_percent <= 60 %}
+                                        <div class="mentor-rating-fill width-60"></div>
+                                    {% elif three_percent <= 80 %}
+                                        <div class="mentor-rating-fill width-80"></div>
+                                    {% else %}
+                                        <div class="mentor-rating-fill width-100"></div>
+                                    {% endif %}
+
+                                {% else %}
+
+                                    <div class="mentor-rating-fill width-0"></div>
+
+                                {% endif %}
+
+                            </div>
+
+                            <span class="mentor-rating-count">
+                                {{ three_star_count|default(0) }}
+                            </span>
+
+                        </div>
+
+
+                        <!-- 2 STAR -->
+                        <div class="mentor-rating-row">
+
+                            <span class="mentor-rating-label">
+                                2
+                                <i class="fa-solid fa-star"></i>
+                            </span>
+
+                            <div class="mentor-rating-bar">
+
+                                {% if total_feedback|default(0)|int > 0 %}
+
+                                    {% set two_percent =
+                                        ((two_star_count|default(0)|float /
+                                        total_feedback|float) * 100)
+                                        |round(0)
+                                    %}
+
+                                    {% if two_percent <= 0 %}
+                                        <div class="mentor-rating-fill width-0"></div>
+                                    {% elif two_percent <= 20 %}
+                                        <div class="mentor-rating-fill width-20"></div>
+                                    {% elif two_percent <= 40 %}
+                                        <div class="mentor-rating-fill width-40"></div>
+                                    {% elif two_percent <= 60 %}
+                                        <div class="mentor-rating-fill width-60"></div>
+                                    {% elif two_percent <= 80 %}
+                                        <div class="mentor-rating-fill width-80"></div>
+                                    {% else %}
+                                        <div class="mentor-rating-fill width-100"></div>
+                                    {% endif %}
+
+                                {% else %}
+
+                                    <div class="mentor-rating-fill width-0"></div>
+
+                                {% endif %}
+
+                            </div>
+
+                            <span class="mentor-rating-count">
+                                {{ two_star_count|default(0) }}
+                            </span>
+
+                        </div>
+
+
+                        <!-- 1 STAR -->
+                        <div class="mentor-rating-row">
+
+                            <span class="mentor-rating-label">
+                                1
+                                <i class="fa-solid fa-star"></i>
+                            </span>
+
+                            <div class="mentor-rating-bar">
+
+                                {% if total_feedback|default(0)|int > 0 %}
+
+                                    {% set one_percent =
+                                        ((one_star_count|default(0)|float /
+                                        total_feedback|float) * 100)
+                                        |round(0)
+                                    %}
+
+                                    {% if one_percent <= 0 %}
+                                        <div class="mentor-rating-fill width-0"></div>
+                                    {% elif one_percent <= 20 %}
+                                        <div class="mentor-rating-fill width-20"></div>
+                                    {% elif one_percent <= 40 %}
+                                        <div class="mentor-rating-fill width-40"></div>
+                                    {% elif one_percent <= 60 %}
+                                        <div class="mentor-rating-fill width-60"></div>
+                                    {% elif one_percent <= 80 %}
+                                        <div class="mentor-rating-fill width-80"></div>
+                                    {% else %}
+                                        <div class="mentor-rating-fill width-100"></div>
+                                    {% endif %}
+
+                                {% else %}
+
+                                    <div class="mentor-rating-fill width-0"></div>
+
+                                {% endif %}
+
+                            </div>
+
+                            <span class="mentor-rating-count">
+                                {{ one_star_count|default(0) }}
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =====================================================
+                 FILTER / INFORMATION BAR
+                 ===================================================== -->
+            <div class="mentor-panel">
+
+                <div class="mentor-panel-header">
+
+                    <div>
+
+                        <span class="mentor-section-label">
+                            FEEDBACK HISTORY
+                        </span>
+
+                        <h3>
+                            Seller Reviews
+                        </h3>
+
+                    </div>
+
+                </div>
+
+
+                <div class="mentor-feedback-info">
+
+                    <div class="mentor-feedback-info-icon">
+                        <i class="fa-solid fa-circle-info"></i>
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            Feedback is submitted after completed sessions
+                        </strong>
+
+                        <p>
+                            Sellers can submit a rating and written feedback
+                            once their mentorship session has been completed.
+                            Their feedback appears here for you to review.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =====================================================
+                 FEEDBACK LIST
+                 ===================================================== -->
+            <div class="mentor-feedback-list-container">
+
+                {% if feedbacks is defined and feedbacks %}
+
+
+                    {% for feedback in feedbacks %}
+
+                        <article class="mentor-feedback-card">
+
+                            <!-- =====================================
+                                 FEEDBACK HEADER
+                                 ===================================== -->
+                            <div class="mentor-feedback-card-header">
+
+
+                                <div class="mentor-feedback-person">
+
+                                    <div class="mentor-feedback-avatar">
+
+                                        {{
+                                            (
+                                                feedback.seller_name[:1]
+                                                if feedback.seller_name
+                                                else feedback.entrepreneur_name[:1]
+                                                if feedback.entrepreneur_name
+                                                else 'S'
+                                            )|upper
+                                        }}
+
+                                    </div>
+
+
+                                    <div class="mentor-feedback-person-info">
+
+                                        <strong>
+
+                                            {{ feedback.seller_name
+                                               if feedback.seller_name
+                                               else feedback.entrepreneur_name
+                                               if feedback.entrepreneur_name
+                                               else 'Seller' }}
+
+                                        </strong>
+
+
+                                        <span>
+
+                                            {% if feedback.business_name %}
+
+                                                {{ feedback.business_name }}
+
+                                            {% elif feedback.seller_email %}
+
+                                                {{ feedback.seller_email }}
+
+                                            {% elif feedback.email %}
+
+                                                {{ feedback.email }}
+
+                                            {% else %}
+
+                                                Seller / Entrepreneur
+
+                                            {% endif %}
+
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- DATE -->
+                                <div class="mentor-feedback-date">
+
+                                    <i class="fa-regular fa-calendar"></i>
+
+                                    {% if feedback.created_at %}
+
+                                        {{ feedback.created_at.strftime('%d %b %Y') }}
+
+                                    {% else %}
+
+                                        Recently
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- =====================================
+                                 RATING
+                                 ===================================== -->
+                            <div class="mentor-feedback-rating-section">
+
+
+                                <div class="mentor-feedback-stars">
+
+                                    {% set feedback_rating =
+                                        feedback.rating|default(0)|int
+                                    %}
+
+
+                                    {% for i in range(1, 6) %}
+
+                                        {% if feedback_rating >= i %}
+
+                                            <i class="fa-solid fa-star"></i>
+
+                                        {% else %}
+
+                                            <i class="fa-regular fa-star"></i>
+
+                                        {% endif %}
+
+                                    {% endfor %}
+
+                                </div>
+
+
+                                <span class="mentor-feedback-rating-text">
+
+                                    {{ feedback_rating }}/5
+
+                                </span>
+
+                            </div>
+
+
+                            <!-- =====================================
+                                 SESSION DETAILS
+                                 ===================================== -->
+                            <div class="mentor-feedback-session">
+
+                                <div class="mentor-feedback-session-item">
+
+                                    <i class="fa-solid fa-calendar-check"></i>
+
+                                    <div>
+
+                                        <span>
+                                            Session
+                                        </span>
+
+                                        <strong>
+
+                                            {% if feedback.session_date %}
+
+                                                {{ feedback.session_date.strftime('%d %b %Y') }}
+
+                                            {% elif feedback.scheduled_at %}
+
+                                                {{ feedback.scheduled_at.strftime('%d %b %Y') }}
+
+                                            {% else %}
+
+                                                Completed Session
+
+                                            {% endif %}
+
+                                        </strong>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="mentor-feedback-session-item">
+
+                                    <i class="fa-solid fa-clock"></i>
+
+                                    <div>
+
+                                        <span>
+                                            Session Status
+                                        </span>
+
+                                        <strong>
+                                            Completed
+                                        </strong>
+
+                                    </div>
+
+                                </div>
+
+
+                                {% if feedback.subject %}
+
+                                    <div class="mentor-feedback-session-item">
+
+                                        <i class="fa-solid fa-message"></i>
+
+                                        <div>
+
+                                            <span>
+                                                Topic
+                                            </span>
+
+                                            <strong>
+                                                {{ feedback.subject }}
+                                            </strong>
+
+                                        </div>
+
+                                    </div>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            <!-- =====================================
+                                 FEEDBACK TEXT
+                                 ===================================== -->
+                            <div class="mentor-feedback-message-box">
+
+                                <div class="mentor-feedback-message-title">
+
+                                    <i class="fa-solid fa-quote-left"></i>
+
+                                    <span>
+                                        Seller's Feedback
+                                    </span>
+
+                                </div>
+
+
+                                {% if feedback.feedback_text %}
+
+                                    <p>
+                                        {{ feedback.feedback_text }}
+                                    </p>
+
+                                {% else %}
+
+                                    <p class="mentor-no-feedback-text">
+                                        The seller submitted a rating without
+                                        written feedback.
+                                    </p>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            <!-- =====================================
+                                 COMPLETED BADGE
+                                 ===================================== -->
+                            <div class="mentor-feedback-card-footer">
+
+                                <span class="mentor-status mentor-status-completed">
+
+                                    <i class="fa-solid fa-circle-check"></i>
+
+                                    Session Completed
+
+                                </span>
+
+
+                                <span class="mentor-feedback-thankyou">
+
+                                    <i class="fa-solid fa-heart"></i>
+
+                                    Thank you for mentoring
+
+                                </span>
+
+                            </div>
+
+                        </article>
+
+                    {% endfor %}
+
+
+                {% else %}
+
+
+                    <!-- =================================================
+                         EMPTY STATE
+                         ================================================= -->
+                    <div class="mentor-panel">
+
+                        <div class="mentor-empty-state mentor-feedback-empty">
+
+                            <div class="mentor-empty-icon">
+
+                                <i class="fa-regular fa-star"></i>
+
+                            </div>
+
+
+                            <h3>
+                                No feedback yet
+                            </h3>
+
+
+                            <p>
+                                Feedback from sellers will appear here after
+                                they complete a mentorship session with you.
+                            </p>
+
+
+                            <a href="{{ url_for('mentor_sessions') }}"
+                               class="mentor-btn mentor-btn-outline">
+
+                                <i class="fa-solid fa-calendar-check"></i>
+
+                                View Sessions
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- =====================================================
+                 PAGINATION
+                 ===================================================== -->
+            {% if pagination is defined and pagination.pages > 1 %}
+
+                <div class="mentor-pagination">
+
+                    {% if pagination.has_prev %}
+
+                        <a href="{{ url_for('mentor_feedback', page=pagination.prev_num) }}"
+                           class="mentor-pagination-btn">
+
+                            <i class="fa-solid fa-chevron-left"></i>
+
+                            Previous
+
+                        </a>
+
+                    {% else %}
+
+                        <span class="mentor-pagination-btn disabled">
+
+                            <i class="fa-solid fa-chevron-left"></i>
+
+                            Previous
+
+                        </span>
+
+                    {% endif %}
+
+
+                    <div class="mentor-pagination-pages">
+
+                        {% for page_num in pagination.iter_pages(
+                            left_edge=1,
+                            right_edge=1,
+                            left_current=2,
+                            right_current=2
+                        ) %}
+
+                            {% if page_num %}
+
+                                {% if page_num == pagination.page %}
+
+                                    <span class="mentor-pagination-page active">
+                                        {{ page_num }}
+                                    </span>
+
+                                {% else %}
+
+                                    <a href="{{ url_for('mentor_feedback', page=page_num) }}"
+                                       class="mentor-pagination-page">
+
+                                        {{ page_num }}
+
+                                    </a>
+
+                                {% endif %}
+
+                            {% else %}
+
+                                <span class="mentor-pagination-dots">
+                                    ...
+                                </span>
+
+                            {% endif %}
+
+                        {% endfor %}
+
+                    </div>
+
+
+                    {% if pagination.has_next %}
+
+                        <a href="{{ url_for('mentor_feedback', page=pagination.next_num) }}"
+                           class="mentor-pagination-btn">
+
+                            Next
+
+                            <i class="fa-solid fa-chevron-right"></i>
+
+                        </a>
+
+                    {% else %}
+
+                        <span class="mentor-pagination-btn disabled">
+
+                            Next
+
+                            <i class="fa-solid fa-chevron-right"></i>
+
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            {% endif %}
+
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- =============================================================
+     MOBILE OVERLAY
+     ============================================================= -->
+<div class="mentor-sidebar-overlay"
+     id="mentorSidebarOverlay"
+     onclick="toggleMentorSidebar()">
+</div>
+
+
+<!-- =============================================================
+     JAVASCRIPT
+     ============================================================= -->
+<script>
+
+function toggleMentorSidebar() {
+
+    const sidebar =
+        document.querySelector('.mentor-sidebar');
+
+    const overlay =
+        document.getElementById('mentorSidebarOverlay');
+
+
+    if (!sidebar) {
+        return;
+    }
+
+
+    sidebar.classList.toggle('mentor-sidebar-open');
+
+
+    if (overlay) {
+
+        overlay.classList.toggle(
+            'mentor-overlay-visible'
+        );
+
+    }
+
+}
+
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    const sidebarLinks =
+        document.querySelectorAll('.mentor-nav-link');
+
+
+    sidebarLinks.forEach(function (link) {
+
+        link.addEventListener('click', function () {
+
+            if (window.innerWidth <= 768) {
+
+                const sidebar =
+                    document.querySelector('.mentor-sidebar');
+
+                const overlay =
+                    document.getElementById(
+                        'mentorSidebarOverlay'
+                    );
+
+
+                if (sidebar) {
+
+                    sidebar.classList.remove(
+                        'mentor-sidebar-open'
+                    );
+
+                }
+
+
+                if (overlay) {
+
+                    overlay.classList.remove(
+                        'mentor-overlay-visible'
+                    );
+
+                }
+
+            }
+
+        });
+
+    });
+
+});
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI Usage | Admin | SheRise</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        .ai-usage-page {
+            padding: 28px;
+            background: #f8f9fc;
+            min-height: 100vh;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .page-header h1 {
+            margin: 0 0 6px;
+            color: #222;
+            font-size: 30px;
+        }
+
+        .page-header p {
+            margin: 0;
+            color: #777;
+            font-size: 14px;
+        }
+
+        .filter-form {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            background: #fff;
+            padding: 10px 14px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+        }
+
+        .filter-form label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .filter-form select,
+        .filter-form input {
+            border: 1px solid #ddd;
+            border-radius: 7px;
+            padding: 8px 11px;
+            background: #fff;
+            color: #333;
+            outline: none;
+        }
+
+        .filter-form select:focus,
+        .filter-form input:focus {
+            border-color: #999;
+        }
+
+        .filter-btn {
+            border: none;
+            border-radius: 7px;
+            padding: 9px 15px;
+            background: #333;
+            color: #fff;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .filter-btn:hover {
+            opacity: 0.9;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: 0 3px 14px rgba(0, 0, 0, 0.06);
+        }
+
+        .stat-label {
+            color: #777;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            color: #222;
+            font-size: 27px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .stat-description {
+            margin-top: 7px;
+            color: #888;
+            font-size: 13px;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 22px;
+            margin-bottom: 22px;
+        }
+
+        .panel {
+            background: #fff;
+            border-radius: 14px;
+            padding: 22px;
+            box-shadow: 0 3px 14px rgba(0, 0, 0, 0.06);
+        }
+
+        .panel-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+
+        .panel-title h2 {
+            margin: 0;
+            color: #222;
+            font-size: 20px;
+        }
+
+        .panel-title span {
+            color: #888;
+            font-size: 13px;
+        }
+
+        .usage-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .usage-row {
+            display: grid;
+            grid-template-columns: 150px 1fr 65px;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .usage-name {
+            color: #555;
+            font-size: 14px;
+            word-break: break-word;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 9px;
+            background: #eee;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #777;
+            border-radius: 20px;
+        }
+
+        .usage-count {
+            text-align: right;
+            color: #555;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .metric-list {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            padding: 13px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .metric-row:last-child {
+            border-bottom: none;
+        }
+
+        .metric-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .metric-value {
+            color: #222;
+            font-size: 15px;
+            font-weight: 700;
+            text-align: right;
+        }
+
+        .table-panel {
+            background: #fff;
+            border-radius: 14px;
+            padding: 22px;
+            box-shadow: 0 3px 14px rgba(0, 0, 0, 0.06);
+            margin-bottom: 22px;
+        }
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 850px;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 13px 12px;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .data-table th {
+            background: #fafafa;
+            color: #555;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .data-table td {
+            color: #444;
+        }
+
+        .data-table tbody tr:hover {
+            background: #fafafa;
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: capitalize;
+            white-space: nowrap;
+        }
+
+        .badge-success {
+            background: #e9f6ec;
+            color: #26733a;
+        }
+
+        .badge-warning {
+            background: #fff5df;
+            color: #916a00;
+        }
+
+        .badge-danger {
+            background: #fdeaea;
+            color: #a52a2a;
+        }
+
+        .badge-neutral {
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        .empty-state {
+            text-align: center !important;
+            padding: 30px 15px !important;
+            color: #888 !important;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 7px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .pagination a,
+        .pagination span {
+            min-width: 34px;
+            height: 34px;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0 9px;
+            border: 1px solid #ddd;
+            border-radius: 7px;
+            color: #555;
+            text-decoration: none;
+            font-size: 13px;
+            box-sizing: border-box;
+        }
+
+        .pagination a:hover {
+            background: #f5f5f5;
+        }
+
+        .pagination .active {
+            background: #333;
+            border-color: #333;
+            color: #fff;
+        }
+
+        .pagination .disabled {
+            opacity: 0.45;
+            pointer-events: none;
+        }
+
+        @media (max-width: 1100px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .ai-usage-page {
+                padding: 18px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-header {
+                align-items: flex-start;
+            }
+
+            .filter-form {
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            .filter-form input,
+            .filter-form select {
+                flex: 1;
+                min-width: 120px;
+            }
+
+            .usage-row {
+                grid-template-columns: 95px 1fr 50px;
+            }
+
+            .panel,
+            .table-panel {
+                padding: 17px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="dashboard-layout">
+
+    <!-- =========================
+         SIDEBAR
+    ========================== -->
+    <aside class="sidebar">
+
+        <div class="admin-role-header">
+            <div class="admin-role-avatar">A</div>
+            <div class="admin-role-info">
+                <strong>Administrator</strong>
+                <span>Admin</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+
+            <a href="{{ url_for('admin_dashboard') }}">
+                Dashboard
+            </a>
+
+            <a href="{{ url_for('admin_users') }}">
+                Users
+            </a>
+
+            <a href="{{ url_for('admin_sellers') }}">
+                Sellers
+            </a>
+
+            <a href="{{ url_for('admin_products') }}">
+                Products
+            </a>
+
+            <a href="{{ url_for('admin_complaints') }}">
+                Complaints
+            </a>
+
+            <a href="{{ url_for('admin_analytics') }}">
+                Analytics
+            </a>
+
+            <a href="{{ url_for('admin_ai_usage') }}"
+               class="active">
+                AI Usage
+            </a>
+
+            <a href="{{ url_for('logout') }}">
+                Logout
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- =========================
+         MAIN CONTENT
+    ========================== -->
+    <main class="main-content">
+
+        <div class="ai-usage-page">
+
+            <!-- =========================
+                 PAGE HEADER
+            ========================== -->
+            <div class="page-header">
+
+                <div>
+                    <h1>AI Usage Monitoring</h1>
+
+                    <p>
+                        Monitor AI assistant activity and usage
+                        across the SheRise platform.
+                    </p>
+                </div>
+
+
+                <form method="GET"
+                      action="{{ url_for('admin_ai_usage') }}"
+                      class="filter-form">
+
+                    <label for="period">
+                        Period
+                    </label>
+
+                    <select name="period"
+                            id="period">
+
+                        <option value="7d"
+                            {% if period|default('30d') == '7d' %}
+                                selected
+                            {% endif %}>
+                            Last 7 Days
+                        </option>
+
+                        <option value="30d"
+                            {% if period|default('30d') == '30d' %}
+                                selected
+                            {% endif %}>
+                            Last 30 Days
+                        </option>
+
+                        <option value="90d"
+                            {% if period|default('30d') == '90d' %}
+                                selected
+                            {% endif %}>
+                            Last 90 Days
+                        </option>
+
+                        <option value="1y"
+                            {% if period|default('30d') == '1y' %}
+                                selected
+                            {% endif %}>
+                            Last 1 Year
+                        </option>
+
+                    </select>
+
+
+                    <select name="feature"
+                            id="feature">
+
+                        <option value="">
+                            All AI Features
+                        </option>
+
+                        <option value="business_assistant"
+                            {% if feature|default('') == 'business_assistant' %}
+                                selected
+                            {% endif %}>
+                            Business Assistant
+                        </option>
+
+                        <option value="marketing"
+                            {% if feature|default('') == 'marketing' %}
+                                selected
+                            {% endif %}>
+                            AI Marketing
+                        </option>
+
+                        <option value="pricing"
+                            {% if feature|default('') == 'pricing' %}
+                                selected
+                            {% endif %}>
+                            Pricing
+                        </option>
+
+                        <option value="inventory"
+                            {% if feature|default('') == 'inventory' %}
+                                selected
+                            {% endif %}>
+                            Inventory
+                        </option>
+
+                        <option value="customer_handling"
+                            {% if feature|default('') == 'customer_handling' %}
+                                selected
+                            {% endif %}>
+                            Customer Handling
+                        </option>
+
+                        <option value="government_schemes"
+                            {% if feature|default('') == 'government_schemes' %}
+                                selected
+                            {% endif %}>
+                            Government Schemes
+                        </option>
+
+                    </select>
+
+
+                    <button type="submit"
+                            class="filter-btn">
+                        Filter
+                    </button>
+
+                </form>
+
+            </div>
+
+
+            <!-- =========================
+                 STATISTICS
+            ========================== -->
+            <div class="stats-grid">
+
+                <div class="stat-card">
+
+                    <div class="stat-label">
+                        Total AI Requests
+                    </div>
+
+                    <div class="stat-value">
+                        {{ total_requests|default(0) }}
+                    </div>
+
+                    <div class="stat-description">
+                        AI requests in selected period
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-label">
+                        Active AI Users
+                    </div>
+
+                    <div class="stat-value">
+                        {{ active_ai_users|default(0) }}
+                    </div>
+
+                    <div class="stat-description">
+                        Users who used AI features
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-label">
+                        Successful Requests
+                    </div>
+
+                    <div class="stat-value">
+                        {{ successful_requests|default(0) }}
+                    </div>
+
+                    <div class="stat-description">
+                        Successfully completed requests
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-label">
+                        Failed Requests
+                    </div>
+
+                    <div class="stat-value">
+                        {{ failed_requests|default(0) }}
+                    </div>
+
+                    <div class="stat-description">
+                        Requests with errors
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =========================
+                 USAGE BREAKDOWN + PERFORMANCE
+            ========================== -->
+            <div class="content-grid">
+
+                <!-- FEATURE USAGE -->
+                <div class="panel">
+
+                    <div class="panel-title">
+
+                        <h2>
+                            AI Feature Usage
+                        </h2>
+
+                        <span>
+                            Requests by feature
+                        </span>
+
+                    </div>
+
+
+                    <div class="usage-list">
+
+                        {% set feature_counts = [] %}
+
+                        {% for item in feature_usage|default([]) %}
+
+                            {% set ignored = feature_counts.append(
+                                item.count|default(0)|int
+                            ) %}
+
+                        {% endfor %}
+
+
+                        {% if feature_counts %}
+                            {% set max_feature_count = feature_counts|max %}
+                        {% else %}
+                            {% set max_feature_count = 1 %}
+                        {% endif %}
+
+
+                        {% for item in feature_usage|default([]) %}
+
+                        <div class="usage-row">
+
+                            <div class="usage-name">
+                                {{ item.feature|default('Unknown')
+                                    |replace('_', ' ')
+                                    |title }}
+                            </div>
+
+
+                            <div class="progress-track"> 
+                                {% if feature_percentage >= 95 %} 
+                                <div class="progress-fill progress-100"></div> 
+                                {% elif feature_percentage >= 90 %}
+                                <div class="progress-fill progress-90"></div> 
+                                {% elif feature_percentage >= 80 %}
+                                <div class="progress-fill progress-80"></div>
+                                {% elif feature_percentage >= 70 %}
+                                <div class="progress-fill progress-70"></div> 
+                                {% elif feature_percentage >= 60 %} 
+                                <div class="progress-fill progress-60"></div> 
+                                {% elif feature_percentage >= 50 %} 
+                                <div class="progress-fill progress-50"></div> 
+                                {% elif feature_percentage >= 40 %} 
+                                <div class="progress-fill progress-40"></div> 
+                                {% elif feature_percentage >= 30 %} 
+                                <div class="progress-fill progress-30"></div> 
+                                {% elif feature_percentage >= 20 %} <div class="progress-fill progress-20"></div> {% elif feature_percentage >= 10 %} <div class="progress-fill progress-10"></div> {% else %} <div class="progress-fill progress-0"></div> {% endif %} </div>
+
+
+                            <div class="usage-count">
+                                {{ item.count|default(0) }}
+                            </div>
+
+                        </div>
+
+                        {% else %}
+
+                        <div class="empty-state">
+                            No AI feature usage data available.
+                        </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+
+                <!-- PERFORMANCE -->
+                <div class="panel">
+
+                    <div class="panel-title">
+
+                        <h2>
+                            AI Performance
+                        </h2>
+
+                        <span>
+                            System usage metrics
+                        </span>
+
+                    </div>
+
+
+                    <div class="metric-list">
+
+                        <div class="metric-row">
+
+                            <span class="metric-label">
+                                Success rate
+                            </span>
+
+                            <span class="metric-value">
+
+                                {% if total_requests|default(0)|int > 0 %}
+
+                                    {{ (
+                                        (
+                                            successful_requests|default(0)|int
+                                            /
+                                            total_requests|default(1)|int
+                                        ) * 100
+                                    )|round(1) }}%
+
+                                {% else %}
+
+                                    0%
+
+                                {% endif %}
+
+                            </span>
+
+                        </div>
+
+
+                        <div class="metric-row">
+
+                            <span class="metric-label">
+                                Failure rate
+                            </span>
+
+                            <span class="metric-value">
+
+                                {% if total_requests|default(0)|int > 0 %}
+
+                                    {{ (
+                                        (
+                                            failed_requests|default(0)|int
+                                            /
+                                            total_requests|default(1)|int
+                                        ) * 100
+                                    )|round(1) }}%
+
+                                {% else %}
+
+                                    0%
+
+                                {% endif %}
+
+                            </span>
+
+                        </div>
+
+
+                        <div class="metric-row">
+
+                            <span class="metric-label">
+                                Average response time
+                            </span>
+
+                            <span class="metric-value">
+                                {{ average_response_time|default(0) }}
+                                sec
+                            </span>
+
+                        </div>
+
+
+                        <div class="metric-row">
+
+                            <span class="metric-label">
+                                Business Assistant requests
+                            </span>
+
+                            <span class="metric-value">
+                                {{ business_assistant_requests|default(0) }}
+                            </span>
+
+                        </div>
+
+
+                        <div class="metric-row">
+
+                            <span class="metric-label">
+                                Marketing requests
+                            </span>
+
+                            <span class="metric-value">
+                                {{ marketing_requests|default(0) }}
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =========================
+                 DAILY USAGE
+            ========================== -->
+            <div class="table-panel">
+
+                <div class="panel-title">
+
+                    <h2>
+                        Daily AI Usage
+                    </h2>
+
+                    <span>
+                        AI requests by date
+                    </span>
+
+                </div>
+
+
+                <div class="table-wrapper">
+
+                    <table class="data-table">
+
+                        <thead>
+
+                            <tr>
+                                <th>Date</th>
+                                <th>Total Requests</th>
+                                <th>Successful</th>
+                                <th>Failed</th>
+                                <th>Active Users</th>
+                                <th>Average Response Time</th>
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            {% for row in daily_usage|default([]) %}
+
+                            <tr>
+
+                                <td>
+                                    {{ row.date|default('-') }}
+                                </td>
+
+                                <td>
+                                    {{ row.requests|default(0) }}
+                                </td>
+
+                                <td>
+                                    {{ row.successful|default(0) }}
+                                </td>
+
+                                <td>
+                                    {{ row.failed|default(0) }}
+                                </td>
+
+                                <td>
+                                    {{ row.active_users|default(0) }}
+                                </td>
+
+                                <td>
+                                    {{ row.average_response_time|default(0) }}
+                                    sec
+                                </td>
+
+                            </tr>
+
+                            {% else %}
+
+                            <tr>
+
+                                <td colspan="6"
+                                    class="empty-state">
+                                    No daily AI usage data available.
+                                </td>
+
+                            </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+            <!-- =========================
+                 RECENT AI ACTIVITY
+            ========================== -->
+            <div class="table-panel">
+
+                <div class="panel-title">
+
+                    <h2>
+                        Recent AI Activity
+                    </h2>
+
+                    <span>
+                        Latest AI requests
+                    </span>
+
+                </div>
+
+
+                <div class="table-wrapper">
+
+                    <table class="data-table">
+
+                        <thead>
+
+                            <tr>
+                                <th>User</th>
+                                <th>Role</th>
+                                <th>Feature</th>
+                                <th>Request</th>
+                                <th>Status</th>
+                                <th>Response Time</th>
+                                <th>Date</th>
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            {% for activity in recent_activity|default([]) %}
+
+                            <tr>
+
+                                <td>
+                                    {{ activity.user_name|default('-') }}
+                                </td>
+
+                                <td>
+                                    {{ activity.role|default('-')|title }}
+                                </td>
+
+                                <td>
+                                    {{ activity.feature|default('-')
+                                        |replace('_', ' ')
+                                        |title }}
+                                </td>
+
+                                <td>
+                                    {{ activity.request_text|default('-')
+                                        |truncate(70, True, '...') }}
+                                </td>
+
+                                <td>
+
+                                    {% set activity_status =
+                                        activity.status|default('unknown')
+                                        |lower %}
+
+                                    {% if activity_status in [
+                                        'success',
+                                        'successful',
+                                        'completed'
+                                    ] %}
+
+                                        <span class="badge badge-success">
+                                            {{ activity_status|title }}
+                                        </span>
+
+                                    {% elif activity_status in [
+                                        'failed',
+                                        'error'
+                                    ] %}
+
+                                        <span class="badge badge-danger">
+                                            {{ activity_status|title }}
+                                        </span>
+
+                                    {% elif activity_status in [
+                                        'pending',
+                                        'processing'
+                                    ] %}
+
+                                        <span class="badge badge-warning">
+                                            {{ activity_status|title }}
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="badge badge-neutral">
+                                            {{ activity_status|title }}
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+                                <td>
+                                    {{ activity.response_time|default(0) }}
+                                    sec
+                                </td>
+
+                                <td>
+                                    {{ activity.created_at|default('-') }}
+                                </td>
+
+                            </tr>
+
+                            {% else %}
+
+                            <tr>
+
+                                <td colspan="7"
+                                    class="empty-state">
+                                    No recent AI activity available.
+                                </td>
+
+                            </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                <!-- Pagination -->
+                {% if pagination|default(None) %}
+
+                <div class="pagination">
+
+                    {% if pagination.has_prev %}
+
+                        <a href="{{ url_for(
+                            'admin_ai_usage',
+                            page=pagination.prev_num,
+                            period=period|default('30d'),
+                            feature=feature|default('')
+                        ) }}">
+                            Previous
+                        </a>
+
+                    {% else %}
+
+                        <span class="disabled">
+                            Previous
+                        </span>
+
+                    {% endif %}
+
+
+                    {% for page_number in pagination.iter_pages(
+                        left_edge=1,
+                        right_edge=1,
+                        left_current=2,
+                        right_current=2
+                    ) %}
+
+                        {% if page_number %}
+
+                            {% if page_number == pagination.page %}
+
+                                <span class="active">
+                                    {{ page_number }}
+                                </span>
+
+                            {% else %}
+
+                                <a href="{{ url_for(
+                                    'admin_ai_usage',
+                                    page=page_number,
+                                    period=period|default('30d'),
+                                    feature=feature|default('')
+                                ) }}">
+                                    {{ page_number }}
+                                </a>
+
+                            {% endif %}
+
+                        {% else %}
+
+                            <span>...</span>
+
+                        {% endif %}
+
+                    {% endfor %}
+
+
+                    {% if pagination.has_next %}
+
+                        <a href="{{ url_for(
+                            'admin_ai_usage',
+                            page=pagination.next_num,
+                            period=period|default('30d'),
+                            feature=feature|default('')
+                        ) }}">
+                            Next
+                        </a>
+
+                    {% else %}
+
+                        <span class="disabled">
+                            Next
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+</html>

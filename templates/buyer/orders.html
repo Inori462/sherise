@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Orders | SheRise</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #faf7fa;
+            color: #333;
+        }
+
+        /* =========================
+           BUYER SIDEBAR
+        ========================== */
+
+        .buyer-layout {
+            min-height: 100vh;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 245px;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #7b2f6d, #a84d91);
+            color: white;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            padding: 28px 18px;
+            z-index: 1000;
+        }
+
+        .sidebar-brand {
+            display: block;
+            color: white;
+            text-decoration: none;
+            font-size: 25px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .sidebar-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .sidebar-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 12px 15px;
+            border-radius: 9px;
+            font-size: 14px;
+            transition: 0.2s ease;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.18);
+        }
+
+        .sidebar-menu .logout {
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.10);
+        }
+
+        /* =========================
+           MAIN CONTENT
+        ========================== */
+
+        .main-content {
+            margin-left: 245px;
+            width: calc(100% - 245px);
+            min-height: 100vh;
+            padding: 35px 45px;
+        }
+
+        .page-header {
+            margin-bottom: 28px;
+        }
+
+        .page-header h1 {
+            margin: 0 0 8px;
+            color: #333;
+            font-size: 32px;
+        }
+
+        .page-header p {
+            margin: 0;
+            color: #777;
+            font-size: 15px;
+        }
+
+        .orders-container {
+            max-width: 1050px;
+            margin: auto;
+        }
+
+        /* =========================
+           ORDER CARD
+        ========================== */
+
+        .order-card {
+            background: white;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            padding: 25px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid #eee;
+            flex-wrap: wrap;
+        }
+
+        .order-number {
+            margin: 0 0 6px;
+            color: #333;
+            font-size: 19px;
+        }
+
+        .order-date {
+            color: #888;
+            font-size: 13px;
+        }
+
+        /* =========================
+           STATUS
+        ========================== */
+
+        .status {
+            display: inline-block;
+            padding: 7px 13px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+
+        .status-pending {
+            background: #fff4d6;
+            color: #9a7200;
+        }
+
+        .status-confirmed {
+            background: #e7f2ff;
+            color: #276cae;
+        }
+
+        .status-processing {
+            background: #eee9ff;
+            color: #6c4bb6;
+        }
+
+        .status-shipped {
+            background: #e5f5ee;
+            color: #27744e;
+        }
+
+        .status-delivered {
+            background: #e4f5e7;
+            color: #28733c;
+        }
+
+        .status-cancelled {
+            background: #fde8e8;
+            color: #b33a3a;
+        }
+
+        .status-returned {
+            background: #fbe9f7;
+            color: #9b397e;
+        }
+
+        .status-default {
+            background: #eeeeee;
+            color: #666;
+        }
+
+        /* =========================
+           ORDER ITEMS
+        ========================== */
+
+        .items-title {
+            margin: 22px 0 12px;
+            font-size: 16px;
+            color: #444;
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            padding: 14px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .item-info {
+            flex: 1;
+        }
+
+        .item-name {
+            margin: 0 0 5px;
+            color: #333;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .item-details {
+            color: #888;
+            font-size: 13px;
+        }
+
+        .item-subtotal {
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        /* =========================
+           SUMMARY
+        ========================== */
+
+        .order-summary {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-top: 22px;
+        }
+
+        .summary-box {
+            background: #faf8fa;
+            padding: 18px;
+            border-radius: 10px;
+        }
+
+        .summary-box h3 {
+            margin: 0 0 12px;
+            font-size: 15px;
+            color: #444;
+        }
+
+        .summary-box p {
+            margin: 6px 0;
+            color: #666;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        /* =========================
+           PAYMENT STATUS
+        ========================== */
+
+        .payment-status {
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+
+        .payment-paid {
+            color: #2c874b;
+        }
+
+        .payment-pending {
+            color: #a87900;
+        }
+
+        .payment-failed {
+            color: #bd3e3e;
+        }
+
+        /* =========================
+           TOTAL
+        ========================== */
+
+        .order-total {
+            margin-top: 20px;
+            padding-top: 18px;
+            border-top: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .order-total-label {
+            color: #555;
+            font-size: 15px;
+        }
+
+        .total-price {
+            color: #a84d91;
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        /* =========================
+           EMPTY ORDERS
+        ========================== */
+
+        .empty-orders {
+            background: white;
+            padding: 65px 25px;
+            text-align: center;
+            border-radius: 14px;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.06);
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .empty-orders h2 {
+            margin: 0 0 8px;
+            color: #444;
+        }
+
+        .empty-orders p {
+            color: #777;
+            margin-bottom: 22px;
+            line-height: 1.6;
+        }
+
+        .shop-btn {
+            display: inline-block;
+            background: #a84d91;
+            color: white;
+            text-decoration: none;
+            padding: 12px 22px;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: 0.2s ease;
+        }
+
+        .shop-btn:hover {
+            opacity: 0.9;
+        }
+
+        .order-toast {
+            position: fixed;
+            top: 18px;
+            right: 18px;
+            z-index: 1100;
+            max-width: calc(100vw - 36px);
+            padding: 13px 18px;
+            border: 1px solid #ccebd7;
+            border-radius: 9px;
+            background: #eaf7ef;
+            color: #246b40;
+            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.12);
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================== */
+
+        @media (max-width: 850px) {
+
+            .sidebar {
+                width: 210px;
+            }
+
+            .main-content {
+                margin-left: 210px;
+                width: calc(100% - 210px);
+                padding: 30px 25px;
+            }
+
+            .order-summary {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+        }
+
+        @media (max-width: 650px) {
+
+            .sidebar {
+                position: relative;
+                width: 100%;
+                min-height: auto;
+                padding: 18px;
+            }
+
+            .buyer-layout {
+                display: block;
+            }
+
+            .sidebar-brand {
+                margin-bottom: 15px;
+            }
+
+            .sidebar-menu {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .sidebar-menu a {
+                padding: 9px 11px;
+                font-size: 13px;
+            }
+
+            .sidebar-menu .logout {
+                margin-top: 0;
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                padding: 25px 15px;
+            }
+
+            .page-header h1 {
+                font-size: 27px;
+            }
+
+            .order-card {
+                padding: 18px;
+            }
+
+            .order-item {
+                align-items: flex-start;
+            }
+
+            .order-total {
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="buyer-layout">
+
+    <!-- =========================
+         SIDEBAR
+    ========================== -->
+
+    <aside class="sidebar">
+
+        <a href="{{ url_for('buyer_dashboard') }}"
+           class="sidebar-brand">
+            SheRise
+        </a>
+
+        <nav class="sidebar-menu">
+
+            <a href="{{ url_for('buyer_dashboard') }}">
+                🏠 Dashboard
+            </a>
+
+            <a href="{{ url_for('buyer_products') }}">
+                🛍️ Marketplace
+            </a>
+
+            <a href="{{ url_for('buyer_wishlist') }}">
+                ❤️ Wishlist
+            </a>
+
+            <a href="{{ url_for('buyer_cart') }}">
+                🛒 Cart
+            </a>
+
+            <a href="{{ url_for('buyer_orders') }}"
+               class="active">
+                📦 Orders
+            </a>
+
+            <a href="{{ url_for('buyer_profile') }}">
+                👤 Profile
+            </a>
+
+            <a href="{{ url_for('buyer_custom_request') }}">
+                ✨ Custom Request
+            </a>
+
+            <a href="{{ url_for('logout') }}"
+               class="logout">
+                🚪 Logout
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- =========================
+         MAIN CONTENT
+    ========================== -->
+
+    <main class="main-content">
+
+        <div class="orders-container">
+
+            {% for category, message in get_flashed_messages(with_categories=true) %}
+                <div class="order-toast" role="status">{{ message }}</div>
+            {% endfor %}
+
+            <!-- Page Header -->
+
+            <section class="page-header">
+
+                <h1>
+                    My Orders
+                </h1>
+
+                <p>
+                    View your purchases, payment status and order details.
+                </p>
+
+            </section>
+
+
+            {% if orders %}
+
+                {% for order in orders %}
+
+                    <div class="order-card">
+
+                        <!-- =========================
+                             ORDER HEADER
+                        ========================== -->
+
+                        <div class="order-header">
+
+                            <div>
+
+                                <h2 class="order-number">
+                                    Order #{{ order.id }}
+                                </h2>
+
+                                {% if order.created_at %}
+
+                                    <div class="order-date">
+                                        Placed on {{ order.created_at }}
+                                    </div>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            {% if order.status == 'pending' %}
+
+                                <span class="status status-pending">
+                                    Pending
+                                </span>
+
+                            {% elif order.status == 'confirmed' %}
+
+                                <span class="status status-confirmed">
+                                    Confirmed
+                                </span>
+
+                            {% elif order.status == 'processing' %}
+
+                                <span class="status status-processing">
+                                    Processing
+                                </span>
+
+                            {% elif order.status == 'shipped' %}
+
+                                <span class="status status-shipped">
+                                    Shipped
+                                </span>
+
+                            {% elif order.status == 'out_for_delivery' %}
+
+                                <span class="status status-shipped">
+                                    Out for delivery
+                                </span>
+
+                            {% elif order.status == 'delivered' %}
+
+                                <span class="status status-delivered">
+                                    Delivered
+                                </span>
+
+                            {% elif order.status == 'cancelled' %}
+
+                                <span class="status status-cancelled">
+                                    Cancelled
+                                </span>
+
+                            {% elif order.status == 'returned' %}
+
+                                <span class="status status-returned">
+                                    Returned
+                                </span>
+
+                            {% else %}
+
+                                <span class="status status-default">
+                                    {{ order.status|replace('_', ' ')|title }}
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <!-- =========================
+                             ORDER ITEMS
+                        ========================== -->
+
+                        <h3 class="items-title">
+                            Order Items
+                        </h3>
+
+
+                        {% if order['items'] %}
+
+                            {% for item in order['items'] %}
+
+                                <div class="order-item">
+
+                                    <div class="item-info">
+
+                                        <p class="item-name">
+                                            {{ item.name }}
+                                        </p>
+
+                                        <div class="item-details">
+
+                                            Quantity:
+                                            {{ item.quantity }}
+
+                                            &nbsp; × &nbsp;
+
+                                            ₹{{ "%.2f"|format(item.unit_price|float) }}
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="item-subtotal">
+
+                                        ₹{{ "%.2f"|format(item.subtotal|float) }}
+
+                                    </div>
+
+                                </div>
+
+                            {% endfor %}
+
+                        {% else %}
+
+                            <p style="color:#888;font-size:14px;">
+                                No items found for this order.
+                            </p>
+
+                        {% endif %}
+
+
+                        <!-- =========================
+                             ORDER SUMMARY
+                        ========================== -->
+
+                        <div class="order-summary">
+
+                            <!-- Shipping Address -->
+
+                            <div class="summary-box">
+
+                                <h3>
+                                    📍 Shipping Address
+                                </h3>
+
+                                {% if order.shipping_address %}
+
+                                    <p>
+                                        {{ order.shipping_address }}
+                                    </p>
+
+                                {% else %}
+
+                                    <p>
+                                        No shipping address available.
+                                    </p>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            <!-- Payment Information -->
+
+                            <div class="summary-box">
+
+                                <h3>
+                                    💳 Payment Information
+                                </h3>
+
+                                {% if order.payment_method %}
+
+                                    <p>
+                                        Method:
+                                        {{ order.payment_method }}
+                                    </p>
+
+                                {% else %}
+
+                                    <p>
+                                        Method: Not specified
+                                    </p>
+
+                                {% endif %}
+
+
+                                <p>
+
+                                    Status:
+
+                                    {% if order.payment_status == 'paid' %}
+
+                                        <span class="payment-status payment-paid">
+                                            Paid
+                                        </span>
+
+                                    {% elif order.payment_status == 'failed' %}
+
+                                        <span class="payment-status payment-failed">
+                                            Failed
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="payment-status payment-pending">
+                                            {{ order.payment_status or 'Pending' }}
+                                        </span>
+
+                                    {% endif %}
+
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- =========================
+                             ORDER TOTAL
+                        ========================== -->
+
+                        <div class="order-total">
+
+                            <span class="order-total-label">
+                                Order Total
+                            </span>
+
+                            <span class="total-price">
+
+                                ₹{{ "%.2f"|format(order.total_amount|float) }}
+
+                            </span>
+
+                        </div>
+
+                        <a href="{{ url_for('buyer_order_details', order_id=order.id) }}"
+                           class="shop-btn">
+                            Track order / manage request
+                        </a>
+
+                    </div>
+
+                {% endfor %}
+
+
+            {% else %}
+
+                <!-- =========================
+                     EMPTY ORDERS
+                ========================== -->
+
+                <section class="empty-orders">
+
+                    <div class="empty-icon">
+                        📦
+                    </div>
+
+                    <h2>
+                        No Orders Yet
+                    </h2>
+
+                    <p>
+                        You haven't placed any orders yet.
+                        Explore the marketplace and discover products
+                        from women entrepreneurs.
+                    </p>
+
+                    <a href="{{ url_for('buyer_products') }}"
+                       class="shop-btn">
+
+                        Start Shopping
+
+                    </a>
+
+                </section>
+
+            {% endif %}
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+</html>

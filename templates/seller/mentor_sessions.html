@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mentorship Sessions | SheRise</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        body { margin: 0; background: #f8f4f7; color: #333; font-family: Arial, sans-serif; }
+        main { max-width: 1100px; margin: 36px auto; padding: 24px; }
+        .card { background: #fff; border: 1px solid #eadde5; border-radius: 14px; padding: 22px; margin-bottom: 16px; }
+        nav { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 20px; }
+        label { display: block; margin: 10px 0 6px; }
+        select, textarea, input { padding: 9px; border: 1px solid #ccc; border-radius: 6px; }
+        button { padding: 9px 14px; border: 0; border-radius: 6px; background: #a84f8d; color: #fff; cursor: pointer; }
+    </style>
+</head>
+<body>
+<main>
+    <nav>
+        <a href="{{ url_for('seller_dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('seller_products') }}">Products</a>
+        <a href="{{ url_for('seller_orders') }}">Orders</a>
+        <a href="{{ url_for('seller_mentor') }}">Mentors</a>
+        <a href="{{ url_for('seller_profile') }}">Profile</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </nav>
+    <h1>Your mentorship sessions</h1>
+    {% for item in sessions %}
+        <article class="card">
+            <h2>{{ item.subject }}</h2>
+            <p>Mentor: {{ item.mentor_name }}{% if item.expertise %} · {{ item.expertise }}{% endif %}</p>
+            <p>Scheduled: {{ item.scheduled_at or "To be arranged" }}</p>
+            <p>Status: {{ item.status|replace('_', ' ')|title }}</p>
+            {% if item.notes %}<p>Notes: {{ item.notes }}</p>{% endif %}
+            {% if item.status in ("completed", "closed") and not item.has_feedback %}
+                <form method="post" action="{{ url_for('seller_mentor_feedback', session_id=item.id) }}">
+                    {% include "_csrf_field.html" %}
+                    <label for="rating-{{ item.id }}">Rating</label>
+                    <select id="rating-{{ item.id }}" name="rating" required>
+                        {% for rating in range(5, 0, -1) %}<option value="{{ rating }}">{{ rating }} / 5</option>{% endfor %}
+                    </select>
+                    <label for="feedback-{{ item.id }}">Feedback</label>
+                    <textarea id="feedback-{{ item.id }}" name="feedback_text" maxlength="5000"></textarea>
+                    <button type="submit">Submit feedback</button>
+                </form>
+            {% elif item.has_feedback %}
+                <p>Feedback submitted.</p>
+            {% endif %}
+        </article>
+    {% else %}
+        <section class="card"><p>No mentorship sessions yet.</p></section>
+    {% endfor %}
+</main>
+</body>
+</html>

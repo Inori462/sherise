@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ product.name if product else 'Product Details' }} | SheRise</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        /* =========================================================
+           BUYER PRODUCT DETAILS
+           Existing filename: product_details.html
+           Seller-side files are not affected.
+           ========================================================= */
+
+        .buyer-page {
+            margin: 0;
+            min-height: 100vh;
+            background: #faf7fa;
+        }
+
+        .buyer-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ================= SIDEBAR ================= */
+
+        .buyer-sidebar {
+            width: 250px;
+            min-width: 250px;
+            background: #ffffff;
+            border-right: 1px solid #eee5ed;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 100;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 24px 20px;
+            text-decoration: none;
+            border-bottom: 1px solid #f1e9ef;
+        }
+
+        .sidebar-brand-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: #b45f9b;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 19px;
+            font-weight: 700;
+        }
+
+        .sidebar-brand-text {
+            color: #a14f8b;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .buyer-sidebar-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 18px 20px;
+            border-bottom: 1px solid #f1e9ef;
+        }
+
+        .buyer-profile-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #f3e2ef;
+            color: #a14f8b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .buyer-profile-info {
+            min-width: 0;
+        }
+
+        .buyer-profile-info strong {
+            display: block;
+            color: #333;
+            font-size: 13px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .buyer-profile-info span {
+            display: block;
+            color: #999;
+            font-size: 11px;
+            margin-top: 2px;
+        }
+
+        .buyer-nav {
+            flex: 1;
+            padding: 18px 12px;
+            overflow-y: auto;
+        }
+
+        .buyer-nav-group {
+            margin-bottom: 20px;
+        }
+
+        .buyer-nav-title {
+            color: #aaa;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 12px 8px;
+        }
+
+        .buyer-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 11px 12px;
+            margin: 2px 0;
+            border-radius: 8px;
+            color: #666;
+            text-decoration: none;
+            font-size: 13px;
+            transition: 0.2s;
+        }
+
+        .buyer-nav-link:hover {
+            background: #faf1f8;
+            color: #a14f8b;
+        }
+
+        .buyer-nav-link.active {
+            background: #f5e8f2;
+            color: #a14f8b;
+            font-weight: 600;
+        }
+
+        .buyer-nav-icon {
+            width: 20px;
+            text-align: center;
+            font-size: 15px;
+        }
+
+        .buyer-sidebar-bottom {
+            padding: 12px;
+            border-top: 1px solid #f1e9ef;
+        }
+
+        .buyer-logout-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 11px 12px;
+            border-radius: 8px;
+            color: #777;
+            text-decoration: none;
+            font-size: 13px;
+        }
+
+        .buyer-logout-link:hover {
+            background: #fff0f0;
+            color: #b33a3a;
+        }
+
+        /* ================= MAIN ================= */
+
+        .buyer-main {
+            flex: 1;
+            margin-left: 250px;
+            min-width: 0;
+        }
+
+        .buyer-topbar {
+            height: 70px;
+            background: #ffffff;
+            border-bottom: 1px solid #eee5ed;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+        }
+
+        .buyer-topbar-title {
+            color: #333;
+            font-size: 20px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .buyer-topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .buyer-topbar-btn {
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            background: #faf4f9;
+            color: #a14f8b;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        .buyer-topbar-btn:hover {
+            background: #f3e4f0;
+        }
+
+        .buyer-page-content {
+            padding: 30px;
+            max-width: 1250px;
+            margin: 0 auto;
+        }
+
+        /* ================= BREADCRUMB ================= */
+
+        .buyer-breadcrumb {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 7px;
+            color: #999;
+            font-size: 13px;
+            margin-bottom: 22px;
+        }
+
+        .buyer-breadcrumb a {
+            color: #a14f8b;
+            text-decoration: none;
+        }
+
+        .buyer-breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        /* ================= PRODUCT CARD ================= */
+
+        .product-details-card {
+            background: #ffffff;
+            border: 1px solid #eee5ed;
+            border-radius: 16px;
+            padding: 28px;
+            display: grid;
+            grid-template-columns: minmax(300px, 1fr) minmax(320px, 1fr);
+            gap: 40px;
+            box-shadow: 0 3px 15px rgba(60, 35, 55, 0.04);
+        }
+
+        .product-image-container {
+            width: 100%;
+        }
+
+        .product-image {
+            display: block;
+            width: 100%;
+            height: 470px;
+            object-fit: cover;
+            border-radius: 13px;
+            background: #f5eef4;
+        }
+
+        .no-image {
+            width: 100%;
+            height: 470px;
+            border-radius: 13px;
+            background: #f5eef4;
+            color: #999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        /* ================= PRODUCT INFO ================= */
+
+        .product-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 0;
+        }
+
+        .category {
+            align-self: flex-start;
+            display: inline-flex;
+            background: #f5e8f2;
+            color: #a14f8b;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 14px;
+        }
+
+        .product-info h1 {
+            margin: 0 0 12px;
+            color: #292529;
+            font-size: 31px;
+            line-height: 1.25;
+        }
+
+        .seller {
+            color: #888;
+            font-size: 13px;
+            margin-bottom: 18px;
+        }
+
+        .seller strong {
+            color: #555;
+        }
+
+        .price {
+            color: #a14f8b;
+            font-size: 30px;
+            font-weight: 700;
+            margin-bottom: 22px;
+        }
+
+        .description-title {
+            margin: 0 0 8px;
+            color: #444;
+            font-size: 16px;
+        }
+
+        .description {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.7;
+            margin: 0 0 20px;
+        }
+
+        /* ================= STOCK ================= */
+
+        .stock-box {
+            padding: 12px 14px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .in-stock {
+            background: #eaf7ee;
+            color: #277544;
+        }
+
+        .low-stock {
+            background: #fff5df;
+            color: #9a7000;
+        }
+
+        .out-of-stock {
+            background: #fdeaea;
+            color: #b33a3a;
+        }
+
+        /* ================= ACTIONS ================= */
+
+        .product-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .action-form {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .action-btn {
+            width: 100%;
+            min-height: 44px;
+            padding: 11px 16px;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .cart-btn {
+            border: 1px solid #b45f9b;
+            background: #b45f9b;
+            color: white;
+        }
+
+        .cart-btn:hover {
+            background: #a14f8b;
+        }
+
+        .wishlist-btn {
+            border: 1px solid #b45f9b;
+            background: white;
+            color: #a14f8b;
+        }
+
+        .wishlist-btn:hover {
+            background: #faf1f8;
+        }
+
+        .disabled-btn {
+            border: 1px solid #ddd;
+            background: #eee;
+            color: #999;
+            cursor: not-allowed;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            align-self: flex-start;
+            margin-top: 18px;
+            color: #a14f8b;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .back-btn:hover {
+            text-decoration: underline;
+        }
+
+        /* ================= EXTRA INFORMATION ================= */
+
+        .product-extra {
+            margin-top: 24px;
+            padding: 18px;
+            background: #faf7fa;
+            border: 1px solid #f0e8ef;
+            border-radius: 10px;
+        }
+
+        .product-extra h3 {
+            margin: 0 0 12px;
+            color: #444;
+            font-size: 15px;
+        }
+
+        .product-extra p {
+            margin: 8px 0;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .product-extra strong {
+            color: #4b4b4b;
+        }
+
+        /* ================= NOT FOUND ================= */
+
+        .not-found {
+            max-width: 650px;
+            margin: 80px auto;
+            text-align: center;
+            background: #ffffff;
+            border: 1px solid #eee5ed;
+            padding: 50px 25px;
+            border-radius: 16px;
+            box-shadow: 0 3px 15px rgba(60, 35, 55, 0.04);
+        }
+
+        .not-found-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 15px;
+            border-radius: 50%;
+            background: #f5e8f2;
+            color: #a14f8b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 25px;
+        }
+
+        .not-found h2 {
+            color: #444;
+            margin: 0 0 10px;
+        }
+
+        .not-found p {
+            color: #777;
+            margin: 0 0 22px;
+            font-size: 14px;
+        }
+
+        .shop-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #b45f9b;
+            color: white;
+            text-decoration: none;
+            padding: 11px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .shop-btn:hover {
+            background: #a14f8b;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 1000px) {
+            .buyer-sidebar {
+                width: 220px;
+                min-width: 220px;
+            }
+
+            .buyer-main {
+                margin-left: 220px;
+            }
+
+            .product-details-card {
+                grid-template-columns: 1fr;
+            }
+
+            .product-image,
+            .no-image {
+                height: 400px;
+            }
+        }
+
+        @media (max-width: 750px) {
+            .buyer-sidebar {
+                width: 72px;
+                min-width: 72px;
+            }
+
+            .buyer-main {
+                margin-left: 72px;
+            }
+
+            .sidebar-brand {
+                justify-content: center;
+                padding: 18px 10px;
+            }
+
+            .sidebar-brand-text,
+            .buyer-profile-info,
+            .buyer-nav-title,
+            .buyer-nav-link span:not(.buyer-nav-icon) {
+                display: none;
+            }
+
+            .buyer-sidebar-profile {
+                justify-content: center;
+                padding: 15px 8px;
+            }
+
+            .buyer-nav {
+                padding: 15px 8px;
+            }
+
+            .buyer-nav-link {
+                justify-content: center;
+                padding: 12px 8px;
+            }
+
+            .buyer-nav-icon {
+                width: auto;
+            }
+
+            .buyer-sidebar-bottom {
+                padding: 8px;
+            }
+
+            .buyer-logout-link {
+                justify-content: center;
+            }
+
+            .buyer-page-content {
+                padding: 20px;
+            }
+
+            .buyer-topbar {
+                padding: 0 20px;
+            }
+
+            .product-details-card {
+                padding: 20px;
+                gap: 25px;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .buyer-topbar-title {
+                font-size: 17px;
+            }
+
+            .buyer-topbar {
+                height: 62px;
+            }
+
+            .buyer-topbar-actions {
+                gap: 4px;
+            }
+
+            .buyer-topbar-btn {
+                width: 34px;
+                height: 34px;
+            }
+
+            .buyer-page-content {
+                padding: 15px;
+            }
+
+            .product-details-card {
+                padding: 15px;
+            }
+
+            .product-image,
+            .no-image {
+                height: 300px;
+            }
+
+            .product-info h1 {
+                font-size: 25px;
+            }
+
+            .price {
+                font-size: 27px;
+            }
+
+            .product-actions {
+                flex-direction: column;
+            }
+
+            .action-form {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body class="buyer-page">
+
+<div class="buyer-layout">
+
+    <!-- =========================================================
+         BUYER SIDEBAR
+         ========================================================= -->
+
+    <aside class="buyer-sidebar">
+
+        <a href="{{ url_for('buyer_dashboard') }}"
+           class="sidebar-brand">
+
+            <div class="sidebar-brand-icon">
+                S
+            </div>
+
+            <div class="sidebar-brand-text">
+                SheRise
+            </div>
+
+        </a>
+
+
+        <div class="buyer-sidebar-profile">
+
+            <div class="buyer-profile-avatar">
+                {% if session.get('full_name') %}
+                    {{ session.get('full_name')[0]|upper }}
+                {% else %}
+                    U
+                {% endif %}
+            </div>
+
+            <div class="buyer-profile-info">
+
+                <strong>
+                    {{ session.get('full_name', 'Buyer') }}
+                </strong>
+
+                <span>
+                    Buyer Account
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <nav class="buyer-nav">
+
+            <div class="buyer-nav-group">
+
+                <div class="buyer-nav-title">
+                    Main
+                </div>
+
+                <a href="{{ url_for('buyer_dashboard') }}"
+                   class="buyer-nav-link">
+
+                    <span class="buyer-nav-icon">⌂</span>
+                    <span>Dashboard</span>
+
+                </a>
+
+                <a href="{{ url_for('buyer_products') }}"
+                   class="buyer-nav-link active">
+
+                    <span class="buyer-nav-icon">🛍</span>
+                    <span>Marketplace</span>
+
+                </a>
+
+                <a href="{{ url_for('buyer_wishlist') }}"
+                   class="buyer-nav-link">
+
+                    <span class="buyer-nav-icon">♥</span>
+                    <span>Wishlist</span>
+
+                </a>
+
+                <a href="{{ url_for('buyer_cart') }}"
+                   class="buyer-nav-link">
+
+                    <span class="buyer-nav-icon">🛒</span>
+                    <span>Cart</span>
+
+                </a>
+
+            </div>
+
+
+            <div class="buyer-nav-group">
+
+                <div class="buyer-nav-title">
+                    Orders
+                </div>
+
+                <a href="{{ url_for('buyer_orders') }}"
+                   class="buyer-nav-link">
+
+                    <span class="buyer-nav-icon">▣</span>
+                    <span>My Orders</span>
+
+                </a>
+
+                <a href="{{ url_for('buyer_custom_request') }}"
+                   class="buyer-nav-link">
+
+                    <span class="buyer-nav-icon">✦</span>
+                    <span>Custom Request</span>
+
+                </a>
+
+            </div>
+
+
+            <div class="buyer-nav-group">
+
+                <div class="buyer-nav-title">
+                    Account
+                </div>
+
+                <a href="{{ url_for('buyer_profile') }}"
+                   class="buyer-nav-link">
+
+                    <span class="buyer-nav-icon">◉</span>
+                    <span>Profile</span>
+
+                </a>
+
+            </div>
+
+        </nav>
+
+
+        <div class="buyer-sidebar-bottom">
+
+            <a href="{{ url_for('logout') }}"
+               class="buyer-logout-link">
+
+                <span class="buyer-nav-icon">↪</span>
+                <span>Logout</span>
+
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =========================================================
+         MAIN CONTENT
+         ========================================================= -->
+
+    <main class="buyer-main">
+
+        <header class="buyer-topbar">
+
+            <h1 class="buyer-topbar-title">
+                Product Details
+            </h1>
+
+            <div class="buyer-topbar-actions">
+
+                <a href="{{ url_for('buyer_wishlist') }}"
+                   class="buyer-topbar-btn"
+                   title="Wishlist">
+                    ♥
+                </a>
+
+                <a href="{{ url_for('buyer_cart') }}"
+                   class="buyer-topbar-btn"
+                   title="Cart">
+                    🛒
+                </a>
+
+            </div>
+
+        </header>
+
+
+        <div class="buyer-page-content">
+
+            {% if product %}
+
+                <!-- Breadcrumb -->
+
+                <div class="buyer-breadcrumb">
+
+                    <a href="{{ url_for('buyer_dashboard') }}">
+                        Dashboard
+                    </a>
+
+                    <span>›</span>
+
+                    <a href="{{ url_for('buyer_products') }}">
+                        Marketplace
+                    </a>
+
+                    <span>›</span>
+
+                    <span>
+                        {{ product.name }}
+                    </span>
+
+                </div>
+
+
+                <!-- Product -->
+
+                <div class="product-details-card">
+
+                    <!-- Product Image -->
+
+                    <div class="product-image-container">
+
+                        {% if product.image_url %}
+
+                            <img
+                                src="{{ product.image_url }}"
+                                alt="{{ product.name }}"
+                                class="product-image"
+                            >
+
+                        {% else %}
+
+                            <div class="no-image">
+                                No Image Available
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- Product Information -->
+
+                    <div class="product-info">
+
+                        {% if product.category_name %}
+
+                            <span class="category">
+                                {{ product.category_name }}
+                            </span>
+
+                        {% endif %}
+
+
+                        <h1>
+                            {{ product.name }}
+                        </h1>
+
+
+                        {% if product.seller_name %}
+
+                            <div class="seller">
+
+                                Sold by:
+                                <strong>
+                                    {{ product.seller_name }}
+                                </strong>
+
+                            </div>
+
+                        {% endif %}
+
+
+                        <div class="price">
+                            ₹{{ "%.2f"|format(product.price) }}
+                        </div>
+
+
+                        <h3 class="description-title">
+                            Product Description
+                        </h3>
+
+
+                        <p class="description">
+
+                            {% if product.description %}
+
+                                {{ product.description }}
+
+                            {% else %}
+
+                                No description available for this product.
+
+                            {% endif %}
+
+                        </p>
+
+
+                        <!-- Stock Status -->
+
+                        {% if product.stock <= 0 %}
+
+                            <div class="stock-box out-of-stock">
+                                ❌ Out of Stock
+                            </div>
+
+                        {% elif product.stock <= 5 %}
+
+                            <div class="stock-box low-stock">
+                                ⚠️ Only {{ product.stock }} left in stock
+                            </div>
+
+                        {% else %}
+
+                            <div class="stock-box in-stock">
+                                ✓ In Stock — {{ product.stock }} available
+                            </div>
+
+                        {% endif %}
+
+
+                        <!-- Product Actions -->
+
+                        {% if product.stock > 0 %}
+
+                            <div class="product-actions">
+
+                                <form
+                                    method="POST"
+                                    action="{{ url_for('add_to_cart', product_id=product.id) }}"
+                                    class="action-form">
+{% include "_csrf_field.html" %}
+
+                                    <button
+                                        type="submit"
+                                        class="action-btn cart-btn">
+
+                                        🛒 Add to Cart
+
+                                    </button>
+
+                                </form>
+
+
+                                <form
+                                    method="POST"
+                                    action="{{ url_for('add_to_wishlist', product_id=product.id) }}"
+                                    class="action-form">
+{% include "_csrf_field.html" %}
+
+                                    <button
+                                        type="submit"
+                                        class="action-btn wishlist-btn">
+
+                                        ♥ Add to Wishlist
+
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        {% else %}
+
+                            <div class="product-actions">
+
+                                <button
+                                    type="button"
+                                    class="action-btn disabled-btn">
+
+                                    Currently Unavailable
+
+                                </button>
+
+                            </div>
+
+                        {% endif %}
+
+
+                        <a
+                            href="{{ url_for('buyer_products') }}"
+                            class="back-btn">
+
+                            ← Back to Marketplace
+
+                        </a>
+
+
+                        <!-- Product Information -->
+
+                        <div class="product-extra">
+
+                            <h3>
+                                Product Information
+                            </h3>
+
+                            <p>
+                                <strong>Category:</strong>
+                                {{ product.category_name or 'Not specified' }}
+                            </p>
+
+                            <p>
+                                <strong>Available Stock:</strong>
+                                {{ product.stock }}
+                            </p>
+
+                            <p>
+                                <strong>Seller:</strong>
+                                {{ product.seller_name or 'Women Entrepreneur' }}
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+            {% else %}
+
+                <!-- Product Not Found -->
+
+                <div class="not-found">
+
+                    <div class="not-found-icon">
+                        🛍
+                    </div>
+
+                    <h2>
+                        Product Not Found
+                    </h2>
+
+                    <p>
+                        The product you are looking for is no longer
+                        available or could not be found.
+                    </p>
+
+                    <a
+                        href="{{ url_for('buyer_products') }}"
+                        class="shop-btn">
+
+                        Browse Marketplace
+
+                    </a>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+</html>

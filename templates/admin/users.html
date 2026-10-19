@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Manage Users | SheRise Admin</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+    <style>
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f7f5fa;
+            color: #333;
+        }
+
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* =========================================
+           SIDEBAR
+        ========================================== */
+
+        .admin-sidebar {
+            width: 250px;
+            background: #ffffff;
+            border-right: 1px solid #e6e1eb;
+            padding: 25px 18px;
+            box-sizing: border-box;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            overflow-y: auto;
+        }
+
+        .admin-role-header { display:flex; align-items:center; gap:12px; padding:20px 18px; border-bottom:1px solid #e6e1eb; margin-bottom:20px; }
+        .admin-role-avatar { width:42px; height:42px; min-width:42px; border-radius:50%; background:#7b2cbf; color:#fff; display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:700; flex-shrink:0; }
+        .admin-role-info strong { display:block; color:#333; font-size:13px; }
+        .admin-role-info span { display:block; margin-top:2px; color:#777; font-size:11px; }
+
+        .admin-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .admin-nav a {
+            text-decoration: none;
+            color: #555;
+            padding: 13px 15px;
+            border-radius: 9px;
+            font-size: 14px;
+            display: block;
+            transition: 0.2s;
+        }
+
+        .admin-nav a:hover,
+        .admin-nav a.active {
+            background: #f0e5f8;
+            color: #7b2cbf;
+            font-weight: 600;
+        }
+
+        .admin-nav .logout-link {
+            margin-top: 18px;
+            color: #c62828;
+            background: #fff3f3;
+        }
+
+        .admin-nav .logout-link:hover {
+            background: #ffe2e2;
+            color: #b71c1c;
+        }
+
+        /* =========================================
+           MAIN CONTENT
+        ========================================== */
+
+        .admin-main {
+            margin-left: 250px;
+            width: calc(100% - 250px);
+            min-height: 100vh;
+        }
+
+        .admin-header {
+            background: #ffffff;
+            border-bottom: 1px solid #e6e1eb;
+            padding: 22px 30px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .admin-header h1 {
+            margin: 0;
+            font-size: 25px;
+            color: #333;
+        }
+
+        .admin-header p {
+            margin: 5px 0 0;
+            color: #777;
+            font-size: 14px;
+        }
+
+        .admin-user {
+            text-align: right;
+        }
+
+        .admin-user strong {
+            display: block;
+            color: #333;
+        }
+
+        .admin-user span {
+            color: #777;
+            font-size: 13px;
+        }
+
+        .admin-content {
+            padding: 30px;
+        }
+
+        /* =========================================
+           PAGE CARD
+        ========================================== */
+
+        .admin-card {
+            background: #ffffff;
+            border: 1px solid #e7e2eb;
+            border-radius: 12px;
+            padding: 22px;
+            margin-bottom: 22px;
+            box-sizing: border-box;
+        }
+
+        .admin-card h2 {
+            margin: 0 0 7px;
+            font-size: 19px;
+            color: #333;
+        }
+
+        .admin-card-description {
+            margin: 0 0 20px;
+            color: #777;
+            font-size: 13px;
+        }
+
+        /* =========================================
+           FILTERS
+        ========================================== */
+
+        .filter-form {
+            display: flex;
+            gap: 12px;
+            align-items: end;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .filter-group label {
+            font-size: 12px;
+            color: #666;
+            font-weight: 600;
+        }
+
+        .filter-group input,
+        .filter-group select {
+            height: 40px;
+            min-width: 190px;
+            border: 1px solid #dcd5e2;
+            border-radius: 7px;
+            padding: 0 11px;
+            box-sizing: border-box;
+            background: #ffffff;
+            color: #333;
+            outline: none;
+        }
+
+        .filter-group input:focus,
+        .filter-group select:focus {
+            border-color: #9b59c7;
+        }
+
+        .filter-button {
+            height: 40px;
+            border: none;
+            border-radius: 7px;
+            padding: 0 18px;
+            background: #7b2cbf;
+            color: #ffffff;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .filter-button:hover {
+            background: #6821a3;
+        }
+
+        .clear-button {
+            height: 40px;
+            display: inline-flex;
+            align-items: center;
+            padding: 0 16px;
+            border: 1px solid #dcd5e2;
+            border-radius: 7px;
+            color: #555;
+            background: #ffffff;
+            text-decoration: none;
+            box-sizing: border-box;
+            font-size: 13px;
+        }
+
+        .clear-button:hover {
+            background: #f8f5fa;
+        }
+
+        /* =========================================
+           USER SUMMARY
+        ========================================== */
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 22px;
+        }
+
+        .summary-card {
+            background: #ffffff;
+            border: 1px solid #e7e2eb;
+            border-radius: 10px;
+            padding: 18px;
+        }
+
+        .summary-card-title {
+            font-size: 12px;
+            color: #777;
+            margin-bottom: 8px;
+        }
+
+        .summary-card-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #7b2cbf;
+        }
+
+        /* =========================================
+           TABLE
+        ========================================== */
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 850px;
+        }
+
+        .users-table th {
+            background: #faf8fc;
+            color: #555;
+            font-size: 12px;
+            text-align: left;
+            padding: 13px 12px;
+            border-bottom: 1px solid #e4dfe7;
+            white-space: nowrap;
+        }
+
+        .users-table td {
+            padding: 14px 12px;
+            border-bottom: 1px solid #eee;
+            font-size: 13px;
+            color: #444;
+            vertical-align: middle;
+        }
+
+        .users-table tr:hover td {
+            background: #fcfafd;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .user-email {
+            color: #666;
+        }
+
+        .user-id {
+            color: #888;
+            font-size: 12px;
+        }
+
+        /* =========================================
+           ROLE BADGES
+        ========================================== */
+
+        .role-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+
+        .role-buyer {
+            background: #e8f4ff;
+            color: #1565c0;
+        }
+
+        .role-seller {
+            background: #f2e8fa;
+            color: #7b2cbf;
+        }
+
+        .role-mentor {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .role-admin {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+
+        .role-default {
+            background: #eeeeee;
+            color: #555;
+        }
+
+        /* =========================================
+           STATUS
+        ========================================== */
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status-inactive {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .status-pending {
+            background: #fff8e1;
+            color: #f57f17;
+        }
+
+        .status-unknown {
+            background: #eeeeee;
+            color: #666;
+        }
+
+        /* =========================================
+           ACTION BUTTONS
+        ========================================== */
+
+        .action-group {
+            display: flex;
+            gap: 7px;
+            flex-wrap: wrap;
+        }
+
+        .action-button {
+            border: none;
+            border-radius: 6px;
+            padding: 7px 10px;
+            font-size: 11px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            white-space: nowrap;
+        }
+
+        .view-button {
+            background: #f0e5f8;
+            color: #7b2cbf;
+        }
+
+        .view-button:hover {
+            background: #e4d4ef;
+        }
+
+        .activate-button {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .activate-button:hover {
+            background: #d8edd9;
+        }
+
+        .deactivate-button {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .deactivate-button:hover {
+            background: #f8d9dc;
+        }
+
+        /* =========================================
+           EMPTY STATE
+        ========================================== */
+
+        .empty-state {
+            text-align: center;
+            padding: 45px 20px;
+            color: #888;
+            font-size: 13px;
+        }
+
+        .empty-state strong {
+            display: block;
+            color: #555;
+            font-size: 16px;
+            margin-bottom: 7px;
+        }
+
+        /* =========================================
+           PAGINATION
+        ========================================== */
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 7px;
+            margin-top: 22px;
+            flex-wrap: wrap;
+        }
+
+        .pagination a,
+        .pagination span {
+            min-width: 34px;
+            height: 34px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 8px;
+            box-sizing: border-box;
+            border: 1px solid #ddd5e4;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 12px;
+            color: #555;
+            background: #ffffff;
+        }
+
+        .pagination a:hover,
+        .pagination .active {
+            background: #7b2cbf;
+            color: #ffffff;
+            border-color: #7b2cbf;
+        }
+
+        /* =========================================
+           RESPONSIVE
+        ========================================== */
+
+        @media (max-width: 1100px) {
+
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+        }
+
+        @media (max-width: 700px) {
+
+            .admin-layout {
+                display: block;
+            }
+
+            .admin-sidebar {
+                position: relative;
+                width: 100%;
+                min-height: auto;
+                border-right: none;
+                border-bottom: 1px solid #e6e1eb;
+            }
+
+            .admin-main {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .admin-header {
+                padding: 18px;
+                display: block;
+            }
+
+            .admin-user {
+                text-align: left;
+                margin-top: 12px;
+            }
+
+            .admin-content {
+                padding: 18px;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-form {
+                display: block;
+            }
+
+            .filter-group {
+                margin-bottom: 12px;
+            }
+
+            .filter-group input,
+            .filter-group select {
+                width: 100%;
+            }
+
+            .filter-button,
+            .clear-button {
+                margin-top: 5px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="admin-layout">
+
+
+    <!-- =========================================
+         ADMIN SIDEBAR
+    ========================================== -->
+
+    <aside class="admin-sidebar">
+
+        <div class="admin-role-header">
+            <div class="admin-role-avatar">A</div>
+            <div class="admin-role-info">
+                <strong>Administrator</strong>
+                <span>Admin</span>
+            </div>
+        </div>
+
+
+        <nav class="admin-nav">
+
+            <a href="{{ url_for('admin_dashboard') }}">
+                Dashboard
+            </a>
+
+            <a
+                href="{{ url_for('admin_users') }}"
+                class="active"
+            >
+                Users
+            </a>
+
+            <a href="{{ url_for('admin_sellers') }}">
+                Seller Approvals
+            </a>
+
+            <a href="{{ url_for('admin_products') }}">
+                Products
+            </a>
+
+            <a href="{{ url_for('admin_complaints') }}">
+                Complaints
+            </a>
+
+            <a href="{{ url_for('admin_analytics') }}">
+                Analytics
+            </a>
+
+            <a href="{{ url_for('admin_ai_usage') }}">
+                AI Usage
+            </a>
+
+            <a
+                href="{{ url_for('logout') }}"
+                class="logout-link"
+            >
+                Logout
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- =========================================
+         MAIN
+    ========================================== -->
+
+    <main class="admin-main">
+
+
+        <!-- HEADER -->
+
+        <header class="admin-header">
+
+            <div>
+
+                <h1>
+                    User Management
+                </h1>
+
+                <p>
+                    Monitor and manage registered platform users.
+                </p>
+
+            </div>
+
+
+            <div class="admin-user">
+
+                <strong>
+                    {{ session.get('full_name', 'Administrator') }}
+                </strong>
+
+                <span>
+                    Administrator
+                </span>
+
+            </div>
+
+        </header>
+
+
+        <!-- CONTENT -->
+
+        <section class="admin-content">
+
+
+            <!-- =====================================
+                 USER SUMMARY
+            ====================================== -->
+
+            <div class="summary-grid">
+
+
+                <div class="summary-card">
+
+                    <div class="summary-card-title">
+                        Total Users
+                    </div>
+
+                    <div class="summary-card-value">
+                        {{ total_users|default(users|length if users else 0) }}
+                    </div>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <div class="summary-card-title">
+                        Buyers
+                    </div>
+
+                    <div class="summary-card-value">
+                        {{ total_buyers|default(0) }}
+                    </div>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <div class="summary-card-title">
+                        Sellers
+                    </div>
+
+                    <div class="summary-card-value">
+                        {{ total_sellers|default(0) }}
+                    </div>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <div class="summary-card-title">
+                        Mentors
+                    </div>
+
+                    <div class="summary-card-value">
+                        {{ total_mentors|default(0) }}
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+            <!-- =====================================
+                 FILTERS
+            ====================================== -->
+
+            <div class="admin-card">
+
+                <h2>
+                    Search Users
+                </h2>
+
+                <p class="admin-card-description">
+                    Search by name, email or filter users by role.
+                </p>
+
+
+                <form
+                    method="GET"
+                    action="{{ url_for('admin_users') }}"
+                    class="filter-form"
+                >
+
+
+                    <div class="filter-group">
+
+                        <label for="search">
+                            Search
+                        </label>
+
+                        <input
+                            type="text"
+                            id="search"
+                            name="search"
+                            value="{{ search|default('') }}"
+                            placeholder="Name or email"
+                        >
+
+                    </div>
+
+
+                    <div class="filter-group">
+
+                        <label for="role">
+                            Role
+                        </label>
+
+                        <select
+                            id="role"
+                            name="role"
+                        >
+
+                            <option value="">
+                                All Roles
+                            </option>
+
+                            <option
+                                value="buyer"
+                                {% if selected_role|default('') == 'buyer' %}
+                                    selected
+                                {% endif %}
+                            >
+                                Buyer
+                            </option>
+
+                            <option
+                                value="seller"
+                                {% if selected_role|default('') == 'seller' %}
+                                    selected
+                                {% endif %}
+                            >
+                                Seller
+                            </option>
+
+                            <option
+                                value="mentor"
+                                {% if selected_role|default('') == 'mentor' %}
+                                    selected
+                                {% endif %}
+                            >
+                                Mentor
+                            </option>
+
+                            <option
+                                value="admin"
+                                {% if selected_role|default('') == 'admin' %}
+                                    selected
+                                {% endif %}
+                            >
+                                Admin
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <button
+                        type="submit"
+                        class="filter-button"
+                    >
+                        Search
+                    </button>
+
+
+                    <a
+                        href="{{ url_for('admin_users') }}"
+                        class="clear-button"
+                    >
+                        Clear
+                    </a>
+
+
+                </form>
+
+            </div>
+
+
+            <!-- =====================================
+                 USER TABLE
+            ====================================== -->
+
+            <div class="admin-card">
+
+                <h2>
+                    Registered Users
+                </h2>
+
+                <p class="admin-card-description">
+                    All user accounts currently available in the platform.
+                </p>
+
+
+                {% if users %}
+
+                    <div class="table-wrapper">
+
+                        <table class="users-table">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        ID
+                                    </th>
+
+                                    <th>
+                                        User
+                                    </th>
+
+                                    <th>
+                                        Email
+                                    </th>
+
+                                    <th>
+                                        Mobile
+                                    </th>
+
+                                    <th>
+                                        Role
+                                    </th>
+
+                                    <th>
+                                        Status
+                                    </th>
+
+                                    <th>
+                                        Actions
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody>
+
+                                {% for user in users %}
+
+                                    <tr>
+
+
+                                        <!-- ID -->
+
+                                        <td>
+
+                                            <span class="user-id">
+                                                #{{ user.id }}
+                                            </span>
+
+                                        </td>
+
+
+                                        <!-- USER -->
+
+                                        <td>
+
+                                            <div class="user-name">
+                                                {{ user.full_name }}
+                                            </div>
+
+                                        </td>
+
+
+                                        <!-- EMAIL -->
+
+                                        <td>
+
+                                            <div class="user-email">
+                                                {{ user.email }}
+                                            </div>
+
+                                        </td>
+
+
+                                        <!-- MOBILE -->
+
+                                        <td>
+
+                                            {{ user.mobile|default('Not provided') }}
+
+                                        </td>
+
+
+                                        <!-- ROLE -->
+
+                                        <td>
+
+                                            {% if user.role == 'buyer' %}
+
+                                                <span class="role-badge role-buyer">
+                                                    Buyer
+                                                </span>
+
+                                            {% elif user.role == 'seller' %}
+
+                                                <span class="role-badge role-seller">
+                                                    Seller
+                                                </span>
+
+                                            {% elif user.role == 'mentor' %}
+
+                                                <span class="role-badge role-mentor">
+                                                    Mentor
+                                                </span>
+
+                                            {% elif user.role == 'admin' %}
+
+                                                <span class="role-badge role-admin">
+                                                    Admin
+                                                </span>
+
+                                            {% else %}
+
+                                                <span class="role-badge role-default">
+                                                    {{ user.role|default('Unknown') }}
+                                                </span>
+
+                                            {% endif %}
+
+                                        </td>
+
+
+                                        <!-- STATUS -->
+
+                                        <td>
+
+                                            {% if user.status|default('active') == 'active' %}
+
+                                                <span class="status-badge status-active">
+                                                    Active
+                                                </span>
+
+                                            {% elif user.status == 'inactive' %}
+
+                                                <span class="status-badge status-inactive">
+                                                    Inactive
+                                                </span>
+
+                                            {% elif user.status == 'pending' %}
+
+                                                <span class="status-badge status-pending">
+                                                    Pending
+                                                </span>
+
+                                            {% else %}
+
+                                                <span class="status-badge status-unknown">
+                                                    {{ user.status|default('Active') }}
+                                                </span>
+
+                                            {% endif %}
+
+                                        </td>
+
+
+                                        <!-- ACTIONS -->
+
+                                        <td>
+
+                                            <div class="action-group">
+
+
+                                                {% if user.id %}
+
+                                                    <a
+                                                        href="{{ url_for('admin_user_details', user_id=user.id) }}"
+                                                        class="action-button view-button"
+                                                    >
+                                                        View
+                                                    </a>
+
+
+                                                    {% if user.role != 'admin' %}
+
+                                                        {% if user.status|default('active') == 'active' %}
+
+                                                            <form
+                                                                method="POST"
+                                                                action="{{ url_for('admin_user_status', user_id=user.id) }}"
+                                                                style="display:inline;"
+                                                            >
+{% include "_csrf_field.html" %}
+
+                                                                <input
+                                                                    type="hidden"
+                                                                    name="status"
+                                                                    value="inactive"
+                                                                >
+
+                                                                <button
+                                                                    type="submit"
+                                                                    class="action-button deactivate-button"
+                                                                    onclick="return confirm('Deactivate this user account?');"
+                                                                >
+                                                                    Deactivate
+                                                                </button>
+
+                                                            </form>
+
+                                                        {% else %}
+
+                                                            <form
+                                                                method="POST"
+                                                                action="{{ url_for('admin_user_status', user_id=user.id) }}"
+                                                                style="display:inline;"
+                                                            >
+{% include "_csrf_field.html" %}
+
+                                                                <input
+                                                                    type="hidden"
+                                                                    name="status"
+                                                                    value="active"
+                                                                >
+
+                                                                <button
+                                                                    type="submit"
+                                                                    class="action-button activate-button"
+                                                                    onclick="return confirm('Activate this user account?');"
+                                                                >
+                                                                    Activate
+                                                                </button>
+
+                                                            </form>
+
+                                                        {% endif %}
+
+                                                    {% endif %}
+
+                                                {% endif %}
+
+
+                                            </div>
+
+                                        </td>
+
+
+                                    </tr>
+
+                                {% endfor %}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+
+                    <!-- =================================
+                         PAGINATION
+                    ================================== -->
+
+                    {% if pagination %}
+
+                        <div class="pagination">
+
+                            {% if pagination.has_prev %}
+
+                                <a
+                                    href="{{ url_for(
+                                        'admin_users',
+                                        page=pagination.prev_num,
+                                        search=search,
+                                        role=selected_role
+                                    ) }}"
+                                >
+                                    Previous
+                                </a>
+
+                            {% endif %}
+
+
+                            {% for page_number in pagination.iter_pages() %}
+
+                                {% if page_number %}
+
+                                    {% if page_number == pagination.page %}
+
+                                        <span class="active">
+                                            {{ page_number }}
+                                        </span>
+
+                                    {% else %}
+
+                                        <a
+                                            href="{{ url_for(
+                                                'admin_users',
+                                                page=page_number,
+                                                search=search,
+                                                role=selected_role
+                                            ) }}"
+                                        >
+                                            {{ page_number }}
+                                        </a>
+
+                                    {% endif %}
+
+                                {% else %}
+
+                                    <span>
+                                        ...
+                                    </span>
+
+                                {% endif %}
+
+                            {% endfor %}
+
+
+                            {% if pagination.has_next %}
+
+                                <a
+                                    href="{{ url_for(
+                                        'admin_users',
+                                        page=pagination.next_num,
+                                        search=search,
+                                        role=selected_role
+                                    ) }}"
+                                >
+                                    Next
+                                </a>
+
+                            {% endif %}
+
+                        </div>
+
+                    {% endif %}
+
+
+                {% else %}
+
+                    <div class="empty-state">
+
+                        <strong>
+                            No users found
+                        </strong>
+
+                        No users match the current search or filter.
+
+                    </div>
+
+                {% endif %}
+
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+</div>
+
+
+</body>
+
+</html>

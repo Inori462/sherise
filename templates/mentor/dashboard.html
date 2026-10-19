@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mentor Dashboard | SheRise</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="mentor-page">
+<aside class="mentor-sidebar">
+<div class="mentor-role-header">
+<div class="mentor-mini-avatar">{{ mentor.full_name[0]|upper if mentor and mentor.full_name else 'M' }}</div>
+<div class="mentor-role-info">
+<strong>{{ mentor.full_name if mentor and mentor.full_name else 'Mentor' }}</strong>
+<span>Mentor</span>
+</div>
+</div>
+<nav class="mentor-nav">
+<div class="mentor-nav-title">Mentor Workspace</div>
+<a href="{{ url_for('mentor_dashboard') }}" class="active"><span class="mentor-nav-icon">⌂</span><span>Dashboard</span></a>
+<a href="{{ url_for('mentor_requests') }}"><span class="mentor-nav-icon">✉</span><span>Requests</span></a>
+<a href="{{ url_for('mentor_sessions') }}"><span class="mentor-nav-icon">◷</span><span>Sessions</span></a>
+<a href="{{ url_for('mentor_feedback') }}"><span class="mentor-nav-icon">★</span><span>Feedback</span></a>
+<a href="{{ url_for('mentor_profile') }}"><span class="mentor-nav-icon">◎</span><span>Profile</span></a>
+<div class="mentor-logout"><a href="{{ url_for('logout') }}"><span class="mentor-nav-icon">↪</span><span>Logout</span></a></div>
+</nav>
+</aside>
+<main class="mentor-main">
+<header class="mentor-topbar"><div><h2>Mentor Dashboard</h2><p>Manage mentorship requests, sessions and feedback.</p></div><div class="mentor-welcome">Welcome, <strong>{{ mentor.full_name if mentor and mentor.full_name else 'Mentor' }}</strong></div></header>
+<section class="mentor-content">
+{% if mentor_pending %}<div class="mentor-notice pending"><div>⏳</div><div><strong>Your mentor profile is awaiting approval.</strong><p>An administrator must approve your profile before active mentorship can begin.</p></div></div>{% elif mentor_approved %}<div class="mentor-notice approved"><div>✓</div><div><strong>Your mentor profile is approved.</strong><p>You can review requests, manage sessions and view entrepreneur feedback.</p></div></div>{% endif %}
+<div class="mentor-stat-grid">
+<div class="mentor-stat-card"><div class="mentor-stat-label">Total Requests</div><div class="mentor-stat-value">{{ total_requests or 0 }}</div><div class="mentor-stat-sub">All mentorship requests</div></div>
+<div class="mentor-stat-card"><div class="mentor-stat-label">Pending Requests</div><div class="mentor-stat-value">{{ pending_requests or 0 }}</div><div class="mentor-stat-sub">Waiting for response</div></div>
+<div class="mentor-stat-card"><div class="mentor-stat-label">Active Sessions</div><div class="mentor-stat-value">{{ active_sessions or 0 }}</div><div class="mentor-stat-sub">Current mentorships</div></div>
+<div class="mentor-stat-card"><div class="mentor-stat-label">Completed Sessions</div><div class="mentor-stat-value">{{ completed_sessions or 0 }}</div><div class="mentor-stat-sub">Finished sessions</div></div>
+<div class="mentor-stat-card"><div class="mentor-stat-label">Average Rating</div><div class="mentor-stat-value">{{ '%.1f'|format(average_rating or 0) }}</div><div class="mentor-stat-sub">{{ total_feedback or 0 }} feedback entries</div></div>
+</div>
+<div class="mentor-grid">
+<section class="mentor-panel"><div class="mentor-panel-header"><h3 class="mentor-panel-title">Recent Requests</h3><a class="mentor-panel-link" href="{{ url_for('mentor_requests') }}">View all →</a></div><div class="mentor-panel-body">{% if mentorship_requests %}<div class="mentor-request-list">{% for item in mentorship_requests %}<div class="mentor-request-card"><div style="display:flex;justify-content:space-between;gap:10px"><div><h4>{{ item.subject or 'Mentorship Request' }}</h4><p>From: {{ item.seller_name or item.entrepreneur_name or 'Entrepreneur' }}</p></div><span class="mentor-status {{ item.status or 'default' }}">{{ item.status or 'pending' }}</span></div>{% if item.message %}<p>{{ item.message }}</p>{% endif %}{% if item.scheduled_at %}<p><strong>Scheduled:</strong> {{ item.scheduled_at }}</p>{% endif %}</div>{% endfor %}</div>{% else %}<div class="mentor-empty-state"><h4>No mentorship requests yet</h4><p>New entrepreneur requests will appear here.</p></div>{% endif %}</div></section>
+<section class="mentor-panel"><div class="mentor-panel-header"><h3 class="mentor-panel-title">Upcoming Sessions</h3><a class="mentor-panel-link" href="{{ url_for('mentor_sessions') }}">View all →</a></div><div class="mentor-panel-body">{% if upcoming_sessions %}<div class="mentor-session-list">{% for session in upcoming_sessions %}<div class="mentor-session-card"><h4>{{ session.subject or 'Mentorship Session' }}</h4><p>{{ session.seller_name or session.entrepreneur_name or 'Entrepreneur' }}</p>{% if session.scheduled_at %}<p><strong>Time:</strong> {{ session.scheduled_at }}</p>{% endif %}{% if session.duration_minutes %}<p><strong>Duration:</strong> {{ session.duration_minutes }} minutes</p>{% endif %}</div>{% endfor %}</div>{% else %}<div class="mentor-empty-state"><h4>No upcoming sessions</h4><p>Accepted mentorship sessions will appear here.</p></div>{% endif %}</div></section>
+</div>
+<div class="mentor-grid">
+<section class="mentor-panel"><div class="mentor-panel-header"><h3 class="mentor-panel-title">Mentor Information</h3><a class="mentor-panel-link" href="{{ url_for('mentor_profile') }}">Edit profile →</a></div><div class="mentor-panel-body"><div class="mentor-info-box"><div class="mentor-info-item"><span class="mentor-info-label">Name</span><span class="mentor-info-value">{{ mentor.full_name if mentor and mentor.full_name else '—' }}</span></div><div class="mentor-info-item"><span class="mentor-info-label">Email</span><span class="mentor-info-value">{{ mentor.email if mentor and mentor.email else '—' }}</span></div><div class="mentor-info-item"><span class="mentor-info-label">Expertise</span><span class="mentor-info-value">{{ mentor.expertise if mentor and mentor.expertise else '—' }}</span></div><div class="mentor-info-item"><span class="mentor-info-label">Experience</span><span class="mentor-info-value">{{ mentor.experience_years if mentor and mentor.experience_years is not none else 0 }} years</span></div></div></div></section>
+<section class="mentor-panel"><div class="mentor-panel-header"><h3 class="mentor-panel-title">Quick Actions</h3></div><div class="mentor-panel-body"><div class="mentor-actions"><a class="mentor-action" href="{{ url_for('mentor_requests') }}"><div><strong>Requests</strong><span>Accept or reject requests</span></div></a><a class="mentor-action" href="{{ url_for('mentor_sessions') }}"><div><strong>Sessions</strong><span>Manage mentorship sessions</span></div></a><a class="mentor-action" href="{{ url_for('mentor_feedback') }}"><div><strong>Feedback</strong><span>View entrepreneur feedback</span></div></a><a class="mentor-action" href="{{ url_for('mentor_profile') }}"><div><strong>Profile</strong><span>Update mentor information</span></div></a></div></div></section>
+</div>
+</section>
+</main>
+</div>
+</body>
+</html>

@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Mentorship Requests | SheRise</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap"
+          rel="stylesheet">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+
+<body class="mentor-page">
+
+<div class="mentor-layout">
+
+    <!-- =========================================================
+         SIDEBAR
+         ========================================================= -->
+    <aside class="mentor-sidebar">
+
+        <div class="mentor-role-header">
+            <div class="mentor-mini-avatar">M</div>
+            <div class="mentor-role-info">
+                <strong>Mentor</strong>
+                <span>Mentor Portal</span>
+            </div>
+        </div>
+
+
+        <nav class="mentor-nav">
+
+            <a href="{{ url_for('mentor_dashboard') }}"
+               class="mentor-nav-link">
+
+                <i class="fa-solid fa-house"></i>
+
+                <span>
+                    Dashboard
+                </span>
+
+            </a>
+
+
+            <a href="{{ url_for('mentor_requests') }}"
+               class="mentor-nav-link active">
+
+                <i class="fa-solid fa-user-clock"></i>
+
+                <span>
+                    Requests
+                </span>
+
+                {% if pending_requests is defined and pending_requests > 0 %}
+
+                    <span class="mentor-nav-badge">
+                        {{ pending_requests }}
+                    </span>
+
+                {% endif %}
+
+            </a>
+
+
+            <a href="{{ url_for('mentor_sessions') }}"
+               class="mentor-nav-link">
+
+                <i class="fa-solid fa-calendar-check"></i>
+
+                <span>
+                    Sessions
+                </span>
+
+            </a>
+
+
+            <a href="{{ url_for('mentor_feedback') }}"
+               class="mentor-nav-link">
+
+                <i class="fa-solid fa-star"></i>
+
+                <span>
+                    Feedback
+                </span>
+
+            </a>
+
+
+            <a href="{{ url_for('mentor_profile') }}"
+               class="mentor-nav-link">
+
+                <i class="fa-solid fa-user"></i>
+
+                <span>
+                    Profile
+                </span>
+
+            </a>
+
+        </nav>
+
+
+        <div class="mentor-sidebar-bottom">
+
+            <div class="mentor-sidebar-help">
+
+                <div class="mentor-help-icon">
+                    <i class="fa-solid fa-heart"></i>
+                </div>
+
+                <div>
+
+                    <strong>
+                        Support Women
+                    </strong>
+
+                    <span>
+                        Guide. Inspire. Empower.
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <a href="{{ url_for('logout') }}"
+               class="mentor-logout-link">
+
+                <i class="fa-solid fa-right-from-bracket"></i>
+
+                <span>
+                    Logout
+                </span>
+
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =========================================================
+         MAIN CONTENT
+         ========================================================= -->
+    <main class="mentor-main">
+
+        <!-- TOP BAR -->
+        <header class="mentor-topbar">
+
+            <div class="mentor-topbar-left">
+
+                <button type="button"
+                        class="mentor-mobile-toggle"
+                        onclick="toggleMentorSidebar()"
+                        aria-label="Open menu">
+
+                    <i class="fa-solid fa-bars"></i>
+
+                </button>
+
+
+                <div>
+
+                    <p class="mentor-topbar-label">
+                        Mentor Portal
+                    </p>
+
+                    <h1>
+                        Mentorship Requests
+                    </h1>
+
+                </div>
+
+            </div>
+
+
+            <div class="mentor-topbar-right">
+
+                <div class="mentor-welcome-profile">
+
+                    <div class="mentor-avatar">
+
+                        {% if mentor is defined and mentor.name %}
+
+                            {{ mentor.name[:1]|upper }}
+
+                        {% else %}
+
+                            M
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="mentor-profile-mini">
+
+                        <strong>
+
+                            {% if mentor is defined and mentor.name %}
+
+                                {{ mentor.name }}
+
+                            {% else %}
+
+                                {{ session.get('name', 'Mentor') }}
+
+                            {% endif %}
+
+                        </strong>
+
+                        <span>
+                            Mentor
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- =========================================================
+             PAGE CONTENT
+             ========================================================= -->
+        <section class="mentor-content">
+
+
+            <!-- PAGE HEADER -->
+            <div class="mentor-page-header">
+
+                <div>
+
+                    <span class="mentor-section-label">
+                        MENTORSHIP
+                    </span>
+
+                    <h2>
+                        Requests
+                    </h2>
+
+                    <p>
+                        Review requests from women entrepreneurs and
+                        decide which mentorship opportunities you would
+                        like to accept.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- =====================================================
+                 FLASH MESSAGES
+                 ===================================================== -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+
+                {% if messages %}
+
+                    <div class="mentor-flash-messages">
+
+                        {% for category, message in messages %}
+
+                            <div class="mentor-alert
+                                {% if category == 'success' %}
+                                    mentor-alert-success
+                                {% elif category == 'danger' or category == 'error' %}
+                                    mentor-alert-danger
+                                {% elif category == 'warning' %}
+                                    mentor-alert-warning
+                                {% else %}
+                                    mentor-alert-info
+                                {% endif %}">
+
+                                <div class="mentor-alert-icon">
+
+                                    {% if category == 'success' %}
+
+                                        <i class="fa-solid fa-circle-check"></i>
+
+                                    {% elif category == 'warning' %}
+
+                                        <i class="fa-solid fa-triangle-exclamation"></i>
+
+                                    {% elif category == 'danger' or category == 'error' %}
+
+                                        <i class="fa-solid fa-circle-exclamation"></i>
+
+                                    {% else %}
+
+                                        <i class="fa-solid fa-circle-info"></i>
+
+                                    {% endif %}
+
+                                </div>
+
+                                <div>
+                                    {{ message }}
+                                </div>
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% endif %}
+
+            {% endwith %}
+
+
+            <!-- =====================================================
+                 REQUEST STATISTICS
+                 ===================================================== -->
+            <div class="mentor-stat-grid">
+
+
+                <!-- TOTAL -->
+                <div class="mentor-stat-card">
+
+                    <div class="mentor-stat-icon">
+                        <i class="fa-solid fa-envelope"></i>
+                    </div>
+
+                    <div class="mentor-stat-content">
+
+                        <span class="mentor-stat-label">
+                            Total Requests
+                        </span>
+
+                        <strong>
+                            {{ total_requests|default(0) }}
+                        </strong>
+
+                        <small>
+                            Requests received
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <!-- PENDING -->
+                <div class="mentor-stat-card">
+
+                    <div class="mentor-stat-icon">
+                        <i class="fa-solid fa-hourglass-half"></i>
+                    </div>
+
+                    <div class="mentor-stat-content">
+
+                        <span class="mentor-stat-label">
+                            Pending
+                        </span>
+
+                        <strong>
+                            {{ pending_requests|default(0) }}
+                        </strong>
+
+                        <small>
+                            Waiting for your response
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ACCEPTED -->
+                <div class="mentor-stat-card">
+
+                    <div class="mentor-stat-icon">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+
+                    <div class="mentor-stat-content">
+
+                        <span class="mentor-stat-label">
+                            Accepted
+                        </span>
+
+                        <strong>
+                            {{ accepted_requests|default(0) }}
+                        </strong>
+
+                        <small>
+                            Accepted requests
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <!-- REJECTED -->
+                <div class="mentor-stat-card">
+
+                    <div class="mentor-stat-icon">
+                        <i class="fa-solid fa-circle-xmark"></i>
+                    </div>
+
+                    <div class="mentor-stat-content">
+
+                        <span class="mentor-stat-label">
+                            Rejected
+                        </span>
+
+                        <strong>
+                            {{ rejected_requests|default(0) }}
+                        </strong>
+
+                        <small>
+                            Declined requests
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =====================================================
+                 REQUEST LIST
+                 ===================================================== -->
+            <div class="mentor-panel">
+
+                <div class="mentor-panel-header">
+
+                    <div>
+
+                        <span class="mentor-section-label">
+                            REQUESTS
+                        </span>
+
+                        <h3>
+                            Seller Mentorship Requests
+                        </h3>
+
+                    </div>
+
+                    {% if pending_requests is defined and pending_requests > 0 %}
+
+                        <span class="mentor-status mentor-status-pending">
+
+                            <i class="fa-solid fa-clock"></i>
+
+                            {{ pending_requests }}
+                            Pending
+
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+
+                {% if mentorship_requests is defined and mentorship_requests %}
+
+
+                    <div class="mentor-request-list">
+
+                        {% for request in mentorship_requests %}
+
+                            <article class="mentor-request-card mentor-request-card-large">
+
+
+                                <!-- =================================================
+                                     REQUEST TOP
+                                     ================================================= -->
+                                <div class="mentor-request-card-top">
+
+
+                                    <!-- SELLER -->
+                                    <div class="mentor-request-person">
+
+                                        <div class="mentor-request-avatar">
+
+                                            {{
+                                                (
+                                                    request.seller_name[:1]
+                                                    if request.seller_name
+                                                    else request.entrepreneur_name[:1]
+                                                    if request.entrepreneur_name
+                                                    else 'S'
+                                                )|upper
+                                            }}
+
+                                        </div>
+
+
+                                        <div class="mentor-request-person-info">
+
+                                            <strong>
+
+                                                {{ request.seller_name
+                                                   if request.seller_name
+                                                   else request.entrepreneur_name
+                                                   if request.entrepreneur_name
+                                                   else 'Seller' }}
+
+                                            </strong>
+
+
+                                            {% if request.business_name %}
+
+                                                <span>
+                                                    {{ request.business_name }}
+                                                </span>
+
+                                            {% elif request.seller_email %}
+
+                                                <span>
+                                                    {{ request.seller_email }}
+                                                </span>
+
+                                            {% elif request.email %}
+
+                                                <span>
+                                                    {{ request.email }}
+                                                </span>
+
+                                            {% else %}
+
+                                                <span>
+                                                    Women Entrepreneur
+                                                </span>
+
+                                            {% endif %}
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <!-- STATUS -->
+                                    <div class="mentor-request-status">
+
+                                        {% if request.status == 'pending' %}
+
+                                            <span class="mentor-status mentor-status-pending">
+
+                                                <i class="fa-solid fa-clock"></i>
+
+                                                Pending
+
+                                            </span>
+
+                                        {% elif request.status == 'accepted' %}
+
+                                            <span class="mentor-status mentor-status-accepted">
+
+                                                <i class="fa-solid fa-circle-check"></i>
+
+                                                Accepted
+
+                                            </span>
+
+                                        {% elif request.status == 'rejected' %}
+
+                                            <span class="mentor-status mentor-status-rejected">
+
+                                                <i class="fa-solid fa-circle-xmark"></i>
+
+                                                Rejected
+
+                                            </span>
+
+                                        {% elif request.status == 'completed' %}
+
+                                            <span class="mentor-status mentor-status-completed">
+
+                                                <i class="fa-solid fa-check-double"></i>
+
+                                                Completed
+
+                                            </span>
+
+                                        {% else %}
+
+                                            <span class="mentor-status">
+
+                                                {{ request.status|title }}
+
+                                            </span>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- =================================================
+                                     REQUEST DETAILS
+                                     ================================================= -->
+                                <div class="mentor-request-details">
+
+
+                                    <!-- SUBJECT -->
+                                    <div class="mentor-info-item">
+
+                                        <div class="mentor-info-icon">
+                                            <i class="fa-solid fa-message"></i>
+                                        </div>
+
+                                        <div>
+
+                                            <span>
+                                                Topic
+                                            </span>
+
+                                            <strong>
+
+                                                {{ request.subject
+                                                   if request.subject
+                                                   else 'Mentorship Request' }}
+
+                                            </strong>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <!-- DATE -->
+                                    <div class="mentor-info-item">
+
+                                        <div class="mentor-info-icon">
+                                            <i class="fa-solid fa-calendar"></i>
+                                        </div>
+
+                                        <div>
+
+                                            <span>
+                                                Requested On
+                                            </span>
+
+                                            <strong>
+
+                                                {% if request.created_at %}
+
+                                                    {{ request.created_at.strftime('%d %b %Y') }}
+
+                                                {% else %}
+
+                                                    Recently
+
+                                                {% endif %}
+
+                                            </strong>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <!-- SCHEDULE -->
+                                    {% if request.scheduled_at %}
+
+                                        <div class="mentor-info-item">
+
+                                            <div class="mentor-info-icon">
+                                                <i class="fa-solid fa-calendar-check"></i>
+                                            </div>
+
+                                            <div>
+
+                                                <span>
+                                                    Scheduled
+                                                </span>
+
+                                                <strong>
+
+                                                    {{ request.scheduled_at.strftime('%d %b %Y, %I:%M %p') }}
+
+                                                </strong>
+
+                                            </div>
+
+                                        </div>
+
+                                    {% endif %}
+
+                                </div>
+
+
+                                <!-- =================================================
+                                     MESSAGE
+                                     ================================================= -->
+                                {% if request.message %}
+
+                                    <div class="mentor-request-message">
+
+                                        <div class="mentor-request-message-title">
+
+                                            <i class="fa-solid fa-quote-left"></i>
+
+                                            <span>
+                                                Seller's Message
+                                            </span>
+
+                                        </div>
+
+                                        <p>
+                                            {{ request.message }}
+                                        </p>
+
+                                    </div>
+
+                                {% endif %}
+
+
+                                <!-- =================================================
+                                     MENTOR RESPONSE
+                                     ================================================= -->
+                                {% if request.mentor_response %}
+
+                                    <div class="mentor-request-response">
+
+                                        <div class="mentor-request-response-title">
+
+                                            <i class="fa-solid fa-reply"></i>
+
+                                            <span>
+                                                Your Response
+                                            </span>
+
+                                        </div>
+
+                                        <p>
+                                            {{ request.mentor_response }}
+                                        </p>
+
+                                    </div>
+
+                                {% endif %}
+
+
+                                <!-- =================================================
+                                     ACTIONS
+                                     ================================================= -->
+                                <div class="mentor-request-actions">
+
+
+                                    {% if request.status == 'pending' %}
+
+
+                                        <!-- ACCEPT -->
+                                        <form method="POST"
+                                              action="{{ url_for('mentor_request_action', request_id=request.id) }}"
+                                              class="mentor-request-action-form">
+{% include "_csrf_field.html" %}
+
+                                            <input type="hidden"
+                                                   name="action"
+                                                   value="accept">
+
+                                            <button type="submit"
+                                                    class="mentor-btn mentor-btn-primary">
+
+                                                <i class="fa-solid fa-check"></i>
+
+                                                Accept Request
+
+                                            </button>
+
+                                        </form>
+
+
+                                        <!-- REJECT -->
+                                        <form method="POST"
+                                              action="{{ url_for('mentor_request_action', request_id=request.id) }}"
+                                              class="mentor-request-action-form mentor-reject-form">
+{% include "_csrf_field.html" %}
+
+                                            <input type="hidden"
+                                                   name="action"
+                                                   value="reject">
+
+                                            <button type="submit"
+                                                    class="mentor-btn mentor-btn-danger">
+
+                                                <i class="fa-solid fa-xmark"></i>
+
+                                                Reject
+
+                                            </button>
+
+                                        </form>
+
+
+                                    {% elif request.status == 'accepted' %}
+
+                                        <a href="{{ url_for('mentor_sessions') }}"
+                                           class="mentor-btn mentor-btn-outline">
+
+                                            <i class="fa-solid fa-calendar-check"></i>
+
+                                            View Sessions
+
+                                        </a>
+
+
+                                    {% elif request.status == 'completed' %}
+
+                                        <a href="{{ url_for('mentor_feedback') }}"
+                                           class="mentor-btn mentor-btn-outline">
+
+                                            <i class="fa-solid fa-star"></i>
+
+                                            View Feedback
+
+                                        </a>
+
+
+                                    {% else %}
+
+                                        <span class="mentor-request-processed">
+
+                                            <i class="fa-solid fa-circle-check"></i>
+
+                                            Request Processed
+
+                                        </span>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </article>
+
+                        {% endfor %}
+
+                    </div>
+
+
+                {% else %}
+
+
+                    <!-- =================================================
+                         EMPTY STATE
+                         ================================================= -->
+                    <div class="mentor-empty-state">
+
+                        <div class="mentor-empty-icon">
+
+                            <i class="fa-regular fa-envelope"></i>
+
+                        </div>
+
+
+                        <h3>
+                            No Mentorship Requests
+                        </h3>
+
+
+                        <p>
+                            You do not have any mentorship requests at
+                            the moment. New requests from women
+                            entrepreneurs will appear here.
+                        </p>
+
+
+                        <a href="{{ url_for('mentor_dashboard') }}"
+                           class="mentor-btn mentor-btn-outline">
+
+                            <i class="fa-solid fa-house"></i>
+
+                            Back to Dashboard
+
+                        </a>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- =====================================================
+                 HOW IT WORKS
+                 ===================================================== -->
+            <div class="mentor-panel mentor-request-guide">
+
+                <div class="mentor-panel-header">
+
+                    <div>
+
+                        <span class="mentor-section-label">
+                            MENTORSHIP PROCESS
+                        </span>
+
+                        <h3>
+                            How Requests Work
+                        </h3>
+
+                    </div>
+
+                </div>
+
+
+                <div class="mentor-guide-grid">
+
+
+                    <!-- STEP 1 -->
+                    <div class="mentor-guide-step">
+
+                        <div class="mentor-guide-number">
+                            01
+                        </div>
+
+                        <div class="mentor-guide-icon">
+                            <i class="fa-solid fa-envelope-open-text"></i>
+                        </div>
+
+                        <div>
+
+                            <h4>
+                                Receive Request
+                            </h4>
+
+                            <p>
+                                A seller sends you a mentorship request
+                                describing the area where they need
+                                guidance.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- STEP 2 -->
+                    <div class="mentor-guide-step">
+
+                        <div class="mentor-guide-number">
+                            02
+                        </div>
+
+                        <div class="mentor-guide-icon">
+                            <i class="fa-solid fa-hand-pointer"></i>
+                        </div>
+
+                        <div>
+
+                            <h4>
+                                Review & Respond
+                            </h4>
+
+                            <p>
+                                Review the seller's request and accept
+                                it if you are available to provide
+                                mentorship.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- STEP 3 -->
+                    <div class="mentor-guide-step">
+
+                        <div class="mentor-guide-number">
+                            03
+                        </div>
+
+                        <div class="mentor-guide-icon">
+                            <i class="fa-solid fa-calendar-check"></i>
+                        </div>
+
+                        <div>
+
+                            <h4>
+                                Conduct Session
+                            </h4>
+
+                            <p>
+                                Meet with the seller and provide guidance
+                                based on your expertise.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- STEP 4 -->
+                    <div class="mentor-guide-step">
+
+                        <div class="mentor-guide-number">
+                            04
+                        </div>
+
+                        <div class="mentor-guide-icon">
+                            <i class="fa-solid fa-star"></i>
+                        </div>
+
+                        <div>
+
+                            <h4>
+                                Receive Feedback
+                            </h4>
+
+                            <p>
+                                After the session, the seller can share
+                                their rating and feedback with you.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- =============================================================
+     MOBILE SIDEBAR OVERLAY
+     ============================================================= -->
+<div class="mentor-sidebar-overlay"
+     id="mentorSidebarOverlay"
+     onclick="toggleMentorSidebar()">
+</div>
+
+
+<!-- =============================================================
+     JAVASCRIPT
+     ============================================================= -->
+<script>
+
+function toggleMentorSidebar() {
+
+    const sidebar =
+        document.querySelector('.mentor-sidebar');
+
+    const overlay =
+        document.getElementById('mentorSidebarOverlay');
+
+
+    if (!sidebar) {
+        return;
+    }
+
+
+    sidebar.classList.toggle(
+        'mentor-sidebar-open'
+    );
+
+
+    if (overlay) {
+
+        overlay.classList.toggle(
+            'mentor-overlay-visible'
+        );
+
+    }
+
+}
+
+
+/* =============================================================
+   MOBILE NAVIGATION
+   ============================================================= */
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    const sidebarLinks =
+        document.querySelectorAll(
+            '.mentor-nav-link'
+        );
+
+
+    sidebarLinks.forEach(function (link) {
+
+        link.addEventListener(
+            'click',
+            function () {
+
+                if (window.innerWidth <= 768) {
+
+                    const sidebar =
+                        document.querySelector(
+                            '.mentor-sidebar'
+                        );
+
+                    const overlay =
+                        document.getElementById(
+                            'mentorSidebarOverlay'
+                        );
+
+
+                    if (sidebar) {
+
+                        sidebar.classList.remove(
+                            'mentor-sidebar-open'
+                        );
+
+                    }
+
+
+                    if (overlay) {
+
+                        overlay.classList.remove(
+                            'mentor-overlay-visible'
+                        );
+
+                    }
+
+                }
+
+            }
+        );
+
+    });
+
+
+    /* =========================================================
+       CONFIRM REQUEST ACTIONS
+       ========================================================= */
+
+    const rejectForms =
+        document.querySelectorAll(
+            '.mentor-reject-form'
+        );
+
+
+    rejectForms.forEach(function (form) {
+
+        form.addEventListener(
+            'submit',
+            function (event) {
+
+                const confirmed =
+                    window.confirm(
+                        'Are you sure you want to reject this mentorship request?'
+                    );
+
+
+                if (!confirmed) {
+
+                    event.preventDefault();
+
+                }
+
+            }
+        );
+
+    });
+
+
+    const acceptForms =
+        document.querySelectorAll(
+            '.mentor-request-action-form:not(.mentor-reject-form)'
+        );
+
+
+    acceptForms.forEach(function (form) {
+
+        form.addEventListener(
+            'submit',
+            function (event) {
+
+                const confirmed =
+                    window.confirm(
+                        'Accept this mentorship request?'
+                    );
+
+
+                if (!confirmed) {
+
+                    event.preventDefault();
+
+                }
+
+            }
+        );
+
+    });
+
+});
+
+</script>
+
+</body>
+</html>

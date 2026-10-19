@@ -1,0 +1,1883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Mentorship | SheRise</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <link rel="preconnect"
+          href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap"
+          rel="stylesheet">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+
+
+<body class="seller-page">
+
+
+<div class="seller-layout">
+
+
+    <!-- =========================================================
+         SELLER SIDEBAR
+         ========================================================= -->
+
+    <aside class="seller-sidebar"
+           id="sellerSidebar">
+
+
+        <!-- BRAND -->
+        <div class="seller-role-header">
+            <div class="seller-mini-avatar">S</div>
+            <div class="seller-role-info">
+                <strong>Seller</strong>
+                <span>Seller Portal</span>
+            </div>
+        </div>
+
+
+        <!-- =====================================================
+             SELLER NAVIGATION
+             ===================================================== -->
+
+        <nav class="seller-nav">
+
+
+            <!-- Dashboard -->
+            <a href="{{ url_for('seller_dashboard') }}"
+               class="seller-nav-link">
+
+                <i class="fa-solid fa-house"></i>
+
+                <span>
+                    Dashboard
+                </span>
+
+            </a>
+
+
+            <!-- Products -->
+            <a href="{{ url_for('seller_products') }}"
+               class="seller-nav-link">
+
+                <i class="fa-solid fa-box"></i>
+
+                <span>
+                    Products
+                </span>
+
+            </a>
+
+
+            <!-- Add Product -->
+            <a href="{{ url_for('add_product') }}"
+               class="seller-nav-link">
+
+                <i class="fa-solid fa-plus"></i>
+
+                <span>
+                    Add Product
+                </span>
+
+            </a>
+
+
+            <!-- Orders -->
+            <a href="{{ url_for('seller_orders') }}"
+               class="seller-nav-link">
+
+                <i class="fa-solid fa-bag-shopping"></i>
+
+                <span>
+                    Orders
+                </span>
+
+            </a>
+
+
+            <!-- Sales -->
+            <a href="{{ url_for('seller_sales') }}"
+               class="seller-nav-link">
+
+                <i class="fa-solid fa-chart-line"></i>
+
+                <span>
+                    Sales
+                </span>
+
+            </a>
+
+
+            <!-- Revenue -->
+            <a href="{{ url_for('seller_revenue') }}"
+               class="seller-nav-link">
+
+                <i class="fa-solid fa-indian-rupee-sign"></i>
+
+                <span>
+                    Revenue
+                </span>
+
+            </a>
+
+
+            <!-- AI Business Assistant -->
+            <a href="{{ url_for('seller_ai_assistant') }}"
+               class="seller-nav-link">
+
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+
+                <span>
+                    AI Business Assistant
+                </span>
+
+            </a>
+
+
+            <!-- Mentorship -->
+            <a href="{{ url_for('seller_mentor') }}"
+               class="seller-nav-link active">
+
+                <i class="fa-solid fa-hand-holding-heart"></i>
+
+                <span>
+                    Mentorship
+                </span>
+
+            </a>
+
+
+            <!-- Profile -->
+            <a href="{{ url_for('seller_profile') }}"
+               class="seller-nav-link">
+
+                <i class="fa-solid fa-user"></i>
+
+                <span>
+                    Profile
+                </span>
+
+            </a>
+
+
+        </nav>
+
+
+        <!-- SIDEBAR BOTTOM -->
+
+        <div class="seller-sidebar-bottom">
+
+
+            <div class="seller-sidebar-support">
+
+                <div class="seller-support-icon">
+                    <i class="fa-solid fa-heart"></i>
+                </div>
+
+                <div>
+
+                    <strong>
+                        SheRise Community
+                    </strong>
+
+                    <span>
+                        Grow together
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- LOGOUT -->
+
+            <a href="{{ url_for('logout') }}"
+               class="seller-logout-link">
+
+                <i class="fa-solid fa-right-from-bracket"></i>
+
+                <span>
+                    Logout
+                </span>
+
+            </a>
+
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- =========================================================
+         MAIN CONTENT
+         ========================================================= -->
+
+    <main class="seller-main">
+
+
+        <!-- =====================================================
+             TOP BAR
+             ===================================================== -->
+
+        <header class="seller-topbar">
+
+
+            <div class="seller-topbar-left">
+
+                <button type="button"
+                        class="seller-mobile-toggle"
+                        onclick="toggleSellerSidebar()"
+                        aria-label="Open navigation">
+
+                    <i class="fa-solid fa-bars"></i>
+
+                </button>
+
+
+                <div>
+
+                    <p class="seller-topbar-label">
+                        Seller Portal
+                    </p>
+
+                    <h1>
+                        Mentorship
+                    </h1>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="seller-topbar-right">
+
+
+                <div class="seller-welcome-profile">
+
+
+                    <div class="seller-avatar">
+
+                        {% if session.get('full_name') %}
+
+                            {{ session.get('full_name')[:1]|upper }}
+
+                        {% else %}
+
+                            S
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="seller-profile-mini">
+
+                        <strong>
+
+                            {{ session.get('full_name', 'Seller') }}
+
+                        </strong>
+
+                        <span>
+                            Seller
+                        </span>
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+        </header>
+
+
+
+        <!-- =====================================================
+             PAGE CONTENT
+             ===================================================== -->
+
+        <section class="seller-content">
+
+
+            <!-- =================================================
+                 PAGE HEADER
+                 ================================================= -->
+
+            <div class="seller-page-header">
+
+
+                <div>
+
+                    <span class="seller-section-label">
+                        WOMEN EMPOWERMENT
+                    </span>
+
+                    <h2>
+                        Find a Mentor
+                    </h2>
+
+                    <p>
+                        Connect with experienced mentors who can help
+                        you grow your business and overcome challenges.
+                    </p>
+
+                </div>
+
+
+                <div class="seller-header-action">
+
+                    <div class="seller-mentor-header-icon">
+
+                        <i class="fa-solid fa-hand-holding-heart"></i>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- =================================================
+                 FLASH MESSAGES
+                 ================================================= -->
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+
+                {% if messages %}
+
+                    <div class="seller-flash-messages">
+
+                        {% for category, message in messages %}
+
+                            <div class="seller-alert
+                                {% if category == 'success' %}
+                                    seller-alert-success
+                                {% elif category == 'danger' or category == 'error' %}
+                                    seller-alert-danger
+                                {% elif category == 'warning' %}
+                                    seller-alert-warning
+                                {% else %}
+                                    seller-alert-info
+                                {% endif %}">
+
+                                <div class="seller-alert-icon">
+
+                                    {% if category == 'success' %}
+
+                                        <i class="fa-solid fa-circle-check"></i>
+
+                                    {% elif category == 'warning' %}
+
+                                        <i class="fa-solid fa-triangle-exclamation"></i>
+
+                                    {% elif category == 'danger' or category == 'error' %}
+
+                                        <i class="fa-solid fa-circle-exclamation"></i>
+
+                                    {% else %}
+
+                                        <i class="fa-solid fa-circle-info"></i>
+
+                                    {% endif %}
+
+                                </div>
+
+                                <div>
+                                    {{ message }}
+                                </div>
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% endif %}
+
+            {% endwith %}
+
+
+
+            <!-- =================================================
+                 INTRODUCTION CARD
+                 ================================================= -->
+
+            <div class="seller-mentor-intro-card">
+
+
+                <div class="seller-mentor-intro-icon">
+
+                    <i class="fa-solid fa-people-arrows"></i>
+
+                </div>
+
+
+                <div class="seller-mentor-intro-content">
+
+                    <h3>
+                        Learn. Connect. Grow.
+                    </h3>
+
+                    <p>
+                        Get guidance from experienced professionals
+                        and successful entrepreneurs who are volunteering
+                        their time to support women in business.
+                    </p>
+
+                </div>
+
+
+                <div class="seller-mentor-intro-decoration">
+
+                    <i class="fa-solid fa-heart"></i>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- =================================================
+                 SEARCH / FILTER
+                 ================================================= -->
+
+            <div class="seller-panel seller-mentor-search-panel">
+
+
+                <div class="seller-panel-header">
+
+
+                    <div>
+
+                        <span class="seller-section-label">
+                            EXPLORE
+                        </span>
+
+                        <h3>
+                            Find the Right Mentor
+                        </h3>
+
+                        <p>
+                            Search mentors by name or area of expertise.
+                        </p>
+
+                    </div>
+
+
+                    <div class="seller-mentor-count">
+
+                        <i class="fa-solid fa-user-group"></i>
+
+                        <span>
+                            {{ mentors|length if mentors is defined else 0 }}
+                            Mentors
+                        </span>
+
+                    </div>
+
+
+                </div>
+
+
+
+                <form method="GET"
+                      action="{{ url_for('seller_mentor') }}"
+                      class="seller-mentor-search-form">
+
+
+                    <div class="seller-search-field">
+
+
+                        <i class="fa-solid fa-magnifying-glass"></i>
+
+
+                        <input
+                            type="text"
+                            name="search"
+                            value="{{ search|default('') }}"
+                            placeholder="Search by mentor name or expertise..."
+                            autocomplete="off"
+                        >
+
+
+                    </div>
+
+
+
+                    <div class="seller-search-field seller-mentor-expertise-field">
+
+
+                        <i class="fa-solid fa-briefcase"></i>
+
+
+                        <select name="expertise">
+
+                            <option value="">
+                                All Expertise
+                            </option>
+
+                            {% if expertise_options is defined %}
+
+                                {% for item in expertise_options %}
+
+                                    <option
+                                        value="{{ item }}"
+                                        {% if selected_expertise|default('') == item %}
+                                            selected
+                                        {% endif %}
+                                    >
+                                        {{ item }}
+                                    </option>
+
+                                {% endfor %}
+
+                            {% endif %}
+
+                        </select>
+
+
+                    </div>
+
+
+
+                    <button type="submit"
+                            class="seller-btn seller-btn-primary">
+
+                        <i class="fa-solid fa-magnifying-glass"></i>
+
+                        Search Mentors
+
+                    </button>
+
+
+                    {% if search|default('') or selected_expertise|default('') %}
+
+                        <a href="{{ url_for('seller_mentor') }}"
+                           class="seller-btn seller-btn-outline">
+
+                            <i class="fa-solid fa-rotate-left"></i>
+
+                            Clear
+
+                        </a>
+
+                    {% endif %}
+
+
+                </form>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 CURRENT MENTORSHIP STATUS
+                 ================================================= -->
+
+            {% if active_mentorships is defined and active_mentorships %}
+
+
+                <div class="seller-panel">
+
+
+                    <div class="seller-panel-header">
+
+
+                        <div>
+
+                            <span class="seller-section-label">
+                                YOUR MENTORSHIP
+                            </span>
+
+                            <h3>
+                                Current Mentorship
+                            </h3>
+
+                        </div>
+
+
+                        <span class="seller-status seller-status-approved">
+
+                            <i class="fa-solid fa-circle-check"></i>
+
+                            Active
+
+                        </span>
+
+
+                    </div>
+
+
+
+                    <div class="seller-mentor-active-list">
+
+
+                        {% for mentorship in active_mentorships %}
+
+
+                            <div class="seller-mentor-active-card">
+
+
+                                <div class="seller-mentor-active-avatar">
+
+                                    {{
+                                        (
+                                            mentorship.mentor_name[:1]
+                                            if mentorship.mentor_name
+                                            else 'M'
+                                        )|upper
+                                    }}
+
+                                </div>
+
+
+                                <div class="seller-mentor-active-info">
+
+
+                                    <h4>
+                                        {{ mentorship.mentor_name|default('Mentor') }}
+                                    </h4>
+
+
+                                    <span>
+
+                                        {{ mentorship.expertise|default('Business Mentor') }}
+
+                                    </span>
+
+
+                                    {% if mentorship.subject %}
+
+                                        <p>
+
+                                            <strong>
+                                                Topic:
+                                            </strong>
+
+                                            {{ mentorship.subject }}
+
+                                        </p>
+
+                                    {% endif %}
+
+
+                                </div>
+
+
+                                <div class="seller-mentor-active-status">
+
+
+                                    <span class="seller-status seller-status-approved">
+
+                                        <i class="fa-solid fa-check"></i>
+
+                                        {{ mentorship.status|default('Accepted')|title }}
+
+                                    </span>
+
+
+                                </div>
+
+
+                            </div>
+
+
+                        {% endfor %}
+
+
+                    </div>
+
+
+                </div>
+
+
+            {% endif %}
+
+
+
+            <!-- =================================================
+                 PENDING REQUESTS
+                 ================================================= -->
+
+            {% if pending_mentorships is defined and pending_mentorships %}
+
+
+                <div class="seller-panel">
+
+
+                    <div class="seller-panel-header">
+
+
+                        <div>
+
+                            <span class="seller-section-label">
+                                REQUESTS
+                            </span>
+
+                            <h3>
+                                Pending Mentorship Requests
+                            </h3>
+
+                            <p>
+                                These requests are waiting for mentor approval.
+                            </p>
+
+                        </div>
+
+
+                        <span class="seller-status seller-status-pending">
+
+                            <i class="fa-solid fa-clock"></i>
+
+                            {{ pending_mentorships|length }}
+                            Pending
+
+                        </span>
+
+
+                    </div>
+
+
+
+                    <div class="seller-mentor-pending-list">
+
+
+                        {% for request_item in pending_mentorships %}
+
+
+                            <div class="seller-mentor-request-card">
+
+
+                                <div class="seller-mentor-request-avatar">
+
+                                    {{
+                                        (
+                                            request_item.mentor_name[:1]
+                                            if request_item.mentor_name
+                                            else 'M'
+                                        )|upper
+                                    }}
+
+                                </div>
+
+
+                                <div class="seller-mentor-request-info">
+
+
+                                    <h4>
+
+                                        {{ request_item.mentor_name|default('Mentor') }}
+
+                                    </h4>
+
+
+                                    <span>
+
+                                        {{ request_item.expertise|default('Mentor') }}
+
+                                    </span>
+
+
+                                    {% if request_item.subject %}
+
+                                        <p>
+
+                                            <strong>
+                                                Topic:
+                                            </strong>
+
+                                            {{ request_item.subject }}
+
+                                        </p>
+
+                                    {% endif %}
+
+
+                                    {% if request_item.created_at %}
+
+                                        <small>
+
+                                            Requested:
+
+                                            {{ request_item.created_at.strftime('%d %b %Y') }}
+
+                                        </small>
+
+                                    {% endif %}
+
+
+                                </div>
+
+
+                                <div class="seller-mentor-request-status">
+
+                                    <span class="seller-status seller-status-pending">
+
+                                        Pending
+
+                                    </span>
+
+                                </div>
+
+
+                            </div>
+
+
+                        {% endfor %}
+
+
+                    </div>
+
+
+                </div>
+
+
+            {% endif %}
+
+
+
+            <!-- =================================================
+                 MENTOR GRID
+                 ================================================= -->
+
+            <div class="seller-panel">
+
+
+                <div class="seller-panel-header">
+
+
+                    <div>
+
+                        <span class="seller-section-label">
+                            MENTORS
+                        </span>
+
+                        <h3>
+                            Available Mentors
+                        </h3>
+
+                        <p>
+                            Choose a mentor based on their experience
+                            and expertise.
+                        </p>
+
+                    </div>
+
+
+                </div>
+
+
+
+                {% if mentors is defined and mentors %}
+
+
+                    <div class="seller-mentor-grid">
+
+
+                        {% for mentor_item in mentors %}
+
+
+                            <article class="seller-mentor-card">
+
+
+                                <!-- ==============================
+                                     CARD HEADER
+                                     ============================== -->
+
+                                <div class="seller-mentor-card-header">
+
+
+                                    <div class="seller-mentor-avatar">
+
+                                        {{
+                                            (
+                                                mentor_item.full_name[:1]
+                                                if mentor_item.full_name
+                                                else mentor_item.name[:1]
+                                                if mentor_item.name
+                                                else 'M'
+                                            )|upper
+                                        }}
+
+                                    </div>
+
+
+                                    <div class="seller-mentor-card-name">
+
+
+                                        <h3>
+
+                                            {{ mentor_item.full_name
+                                               if mentor_item.full_name
+                                               else mentor_item.name
+                                               if mentor_item.name
+                                               else 'Mentor' }}
+
+                                        </h3>
+
+
+                                        <span>
+
+                                            <i class="fa-solid fa-circle-check"></i>
+
+                                            Verified Mentor
+
+                                        </span>
+
+
+                                    </div>
+
+
+                                </div>
+
+
+
+                                <!-- ==============================
+                                     EXPERTISE
+                                     ============================== -->
+
+                                <div class="seller-mentor-expertise">
+
+
+                                    <div class="seller-mentor-expertise-icon">
+
+                                        <i class="fa-solid fa-lightbulb"></i>
+
+                                    </div>
+
+
+                                    <div>
+
+                                        <span>
+                                            Expertise
+                                        </span>
+
+                                        <strong>
+
+                                            {{ mentor_item.expertise|default('Business Guidance') }}
+
+                                        </strong>
+
+                                    </div>
+
+
+                                </div>
+
+
+
+                                <!-- ==============================
+                                     MENTOR DETAILS
+                                     ============================== -->
+
+                                <div class="seller-mentor-details">
+
+
+                                    <!-- EXPERIENCE -->
+
+                                    <div class="seller-mentor-detail">
+
+
+                                        <i class="fa-solid fa-briefcase"></i>
+
+
+                                        <div>
+
+                                            <span>
+                                                Experience
+                                            </span>
+
+                                            <strong>
+
+                                                {% if mentor_item.experience_years is not none %}
+
+                                                    {{ mentor_item.experience_years }}
+                                                    years
+
+                                                {% else %}
+
+                                                    Not specified
+
+                                                {% endif %}
+
+                                            </strong>
+
+                                        </div>
+
+
+                                    </div>
+
+
+
+                                    <!-- AVAILABILITY -->
+
+                                    <div class="seller-mentor-detail">
+
+
+                                        <i class="fa-solid fa-calendar-check"></i>
+
+
+                                        <div>
+
+                                            <span>
+                                                Availability
+                                            </span>
+
+                                            <strong>
+
+                                                {{ mentor_item.availability|default('Flexible') }}
+
+                                            </strong>
+
+                                        </div>
+
+
+                                    </div>
+
+
+                                </div>
+
+
+
+                                <!-- ==============================
+                                     BIO
+                                     ============================== -->
+
+                                <div class="seller-mentor-bio">
+
+
+                                    <p>
+
+                                        {% if mentor_item.bio %}
+
+                                            {{ mentor_item.bio }}
+
+                                        {% else %}
+
+                                            This mentor is available to
+                                            support women entrepreneurs
+                                            with business guidance.
+
+                                        {% endif %}
+
+                                    </p>
+
+
+                                </div>
+
+
+
+                                <!-- ==============================
+                                     REQUEST FORM
+                                     ============================== -->
+
+                                <div class="seller-mentor-card-footer">
+
+
+                                    <button
+                                        type="button"
+                                        class="seller-btn seller-btn-primary seller-mentor-request-button"
+                                        onclick="openMentorRequestModal(
+                                            '{{ mentor_item.id }}',
+                                            '{{ (
+                                                mentor_item.full_name
+                                                if mentor_item.full_name
+                                                else mentor_item.name
+                                                if mentor_item.name
+                                                else 'Mentor'
+                                            )|e }}'
+                                        )"
+                                    >
+
+                                        <i class="fa-solid fa-paper-plane"></i>
+
+                                        Request Mentorship
+
+                                    </button>
+
+
+                                </div>
+
+
+                            </article>
+
+
+                        {% endfor %}
+
+
+                    </div>
+
+
+                {% else %}
+
+
+                    <!-- =================================================
+                         NO MENTORS
+                         ================================================= -->
+
+                    <div class="seller-empty-state">
+
+
+                        <div class="seller-empty-icon">
+
+                            <i class="fa-solid fa-user-group"></i>
+
+                        </div>
+
+
+                        <h3>
+                            No Mentors Found
+                        </h3>
+
+
+                        {% if search|default('') or selected_expertise|default('') %}
+
+                            <p>
+                                No mentors match your current search.
+                                Try another name or expertise.
+                            </p>
+
+
+                            <a href="{{ url_for('seller_mentor') }}"
+                               class="seller-btn seller-btn-outline">
+
+                                <i class="fa-solid fa-rotate-left"></i>
+
+                                View All Mentors
+
+                            </a>
+
+                        {% else %}
+
+                            <p>
+                                Approved mentors will appear here when
+                                they become available.
+                            </p>
+
+                        {% endif %}
+
+
+                    </div>
+
+
+                {% endif %}
+
+
+            </div>
+
+
+
+            <!-- =================================================
+                 HOW IT WORKS
+                 ================================================= -->
+
+            <div class="seller-panel seller-mentor-how-it-works">
+
+
+                <div class="seller-panel-header">
+
+
+                    <div>
+
+                        <span class="seller-section-label">
+                            HOW IT WORKS
+                        </span>
+
+                        <h3>
+                            Your Mentorship Journey
+                        </h3>
+
+                    </div>
+
+
+                </div>
+
+
+
+                <div class="seller-mentor-steps">
+
+
+                    <!-- STEP 1 -->
+
+                    <div class="seller-mentor-step">
+
+
+                        <div class="seller-mentor-step-number">
+                            01
+                        </div>
+
+
+                        <div class="seller-mentor-step-icon">
+
+                            <i class="fa-solid fa-magnifying-glass"></i>
+
+                        </div>
+
+
+                        <div>
+
+                            <h4>
+                                Find a Mentor
+                            </h4>
+
+                            <p>
+                                Browse approved mentors and explore
+                                their areas of expertise.
+                            </p>
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <!-- STEP 2 -->
+
+                    <div class="seller-mentor-step">
+
+
+                        <div class="seller-mentor-step-number">
+                            02
+                        </div>
+
+
+                        <div class="seller-mentor-step-icon">
+
+                            <i class="fa-solid fa-paper-plane"></i>
+
+                        </div>
+
+
+                        <div>
+
+                            <h4>
+                                Send a Request
+                            </h4>
+
+                            <p>
+                                Tell the mentor what you would like
+                                help with and send your request.
+                            </p>
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <!-- STEP 3 -->
+
+                    <div class="seller-mentor-step">
+
+
+                        <div class="seller-mentor-step-number">
+                            03
+                        </div>
+
+
+                        <div class="seller-mentor-step-icon">
+
+                            <i class="fa-solid fa-calendar-check"></i>
+
+                        </div>
+
+
+                        <div>
+
+                            <h4>
+                                Attend Your Session
+                            </h4>
+
+                            <p>
+                                Once accepted, connect with your mentor
+                                for your scheduled session.
+                            </p>
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <!-- STEP 4 -->
+
+                    <div class="seller-mentor-step">
+
+
+                        <div class="seller-mentor-step-number">
+                            04
+                        </div>
+
+
+                        <div class="seller-mentor-step-icon">
+
+                            <i class="fa-solid fa-star"></i>
+
+                        </div>
+
+
+                        <div>
+
+                            <h4>
+                                Share Feedback
+                            </h4>
+
+                            <p>
+                                After the completed session, share your
+                                experience and feedback with your mentor.
+                            </p>
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+
+        </section>
+
+
+    </main>
+
+
+</div>
+
+
+
+<!-- =============================================================
+     MOBILE OVERLAY
+     ============================================================= -->
+
+<div class="seller-sidebar-overlay"
+     id="sellerSidebarOverlay"
+     onclick="toggleSellerSidebar()">
+</div>
+
+
+
+<!-- =============================================================
+     MENTOR REQUEST MODAL
+     ============================================================= -->
+
+<div class="seller-modal-overlay"
+     id="mentorRequestModal">
+
+
+    <div class="seller-modal seller-mentor-request-modal">
+
+
+        <!-- MODAL HEADER -->
+
+        <div class="seller-modal-header">
+
+
+            <div>
+
+                <span class="seller-section-label">
+                    MENTORSHIP REQUEST
+                </span>
+
+                <h3>
+                    Request Mentorship
+                </h3>
+
+            </div>
+
+
+            <button type="button"
+                    class="seller-modal-close"
+                    onclick="closeMentorRequestModal()"
+                    aria-label="Close">
+
+                <i class="fa-solid fa-xmark"></i>
+
+            </button>
+
+
+        </div>
+
+
+
+        <!-- FORM -->
+
+        <form method="POST"
+              action="{{ url_for('seller_mentor_request') }}"
+              id="mentorRequestForm">
+{% include "_csrf_field.html" %}
+
+
+            <input type="hidden"
+                   name="mentor_id"
+                   id="selectedMentorId"
+                   value="">
+
+
+            <!-- SELECTED MENTOR -->
+
+            <div class="seller-selected-mentor">
+
+
+                <div class="seller-selected-mentor-icon">
+
+                    <i class="fa-solid fa-user-tie"></i>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Selected Mentor
+                    </span>
+
+                    <strong id="selectedMentorName">
+                        Mentor
+                    </strong>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- SUBJECT -->
+
+            <div class="seller-form-group">
+
+
+                <label for="mentorSubject">
+
+                    <i class="fa-solid fa-heading"></i>
+
+                    What would you like help with?
+
+                    <span>
+                        *
+                    </span>
+
+                </label>
+
+
+                <input
+                    type="text"
+                    id="mentorSubject"
+                    name="subject"
+                    maxlength="150"
+                    required
+                    placeholder="e.g. Marketing, pricing, finance, branding..."
+                >
+
+
+            </div>
+
+
+
+            <!-- MESSAGE -->
+
+            <div class="seller-form-group">
+
+
+                <label for="mentorMessage">
+
+                    <i class="fa-solid fa-message"></i>
+
+                    Tell the mentor about your requirement
+
+                    <span>
+                        *
+                    </span>
+
+                </label>
+
+
+                <textarea
+                    id="mentorMessage"
+                    name="message"
+                    rows="5"
+                    maxlength="1000"
+                    required
+                    placeholder="Explain what you would like guidance on..."
+                ></textarea>
+
+
+                <small>
+                    Briefly describe your business and the guidance
+                    you are looking for.
+                </small>
+
+
+            </div>
+
+
+
+            <!-- SCHEDULE -->
+
+            <div class="seller-form-group">
+
+
+                <label for="preferredDate">
+
+                    <i class="fa-solid fa-calendar"></i>
+
+                    Preferred Session Date
+
+                </label>
+
+
+                <input
+                    type="datetime-local"
+                    id="preferredDate"
+                    name="preferred_date"
+                >
+
+
+                <small>
+                    This is only your preferred time. The mentor can
+                    confirm or arrange the actual session.
+                </small>
+
+
+            </div>
+
+
+
+            <!-- MODAL ACTIONS -->
+
+            <div class="seller-modal-actions">
+
+
+                <button type="button"
+                        class="seller-btn seller-btn-outline"
+                        onclick="closeMentorRequestModal()">
+
+                    Cancel
+
+                </button>
+
+
+                <button type="submit"
+                        class="seller-btn seller-btn-primary">
+
+                    <i class="fa-solid fa-paper-plane"></i>
+
+                    Send Request
+
+                </button>
+
+
+            </div>
+
+
+        </form>
+
+
+    </div>
+
+</div>
+
+
+
+<!-- =============================================================
+     JAVASCRIPT
+     ============================================================= -->
+
+<script>
+
+
+/* =============================================================
+   SIDEBAR
+   ============================================================= */
+
+function toggleSellerSidebar() {
+
+    const sidebar =
+        document.getElementById('sellerSidebar');
+
+    const overlay =
+        document.getElementById('sellerSidebarOverlay');
+
+
+    if (!sidebar) {
+        return;
+    }
+
+
+    sidebar.classList.toggle(
+        'seller-sidebar-open'
+    );
+
+
+    if (overlay) {
+
+        overlay.classList.toggle(
+            'seller-overlay-visible'
+        );
+
+    }
+
+}
+
+
+
+/* =============================================================
+   OPEN MENTOR REQUEST MODAL
+   ============================================================= */
+
+function openMentorRequestModal(
+    mentorId,
+    mentorName
+) {
+
+    const modal =
+        document.getElementById(
+            'mentorRequestModal'
+        );
+
+    const selectedId =
+        document.getElementById(
+            'selectedMentorId'
+        );
+
+    const selectedName =
+        document.getElementById(
+            'selectedMentorName'
+        );
+
+
+    if (!modal) {
+        return;
+    }
+
+
+    if (selectedId) {
+
+        selectedId.value = mentorId;
+
+    }
+
+
+    if (selectedName) {
+
+        selectedName.textContent =
+            mentorName;
+
+    }
+
+
+    modal.classList.add(
+        'seller-modal-visible'
+    );
+
+
+    document.body.classList.add(
+        'seller-modal-open'
+    );
+
+
+    const subject =
+        document.getElementById(
+            'mentorSubject'
+        );
+
+
+    if (subject) {
+
+        setTimeout(
+            function () {
+
+                subject.focus();
+
+            },
+            150
+        );
+
+    }
+
+}
+
+
+
+/* =============================================================
+   CLOSE MENTOR REQUEST MODAL
+   ============================================================= */
+
+function closeMentorRequestModal() {
+
+    const modal =
+        document.getElementById(
+            'mentorRequestModal'
+        );
+
+
+    if (!modal) {
+        return;
+    }
+
+
+    modal.classList.remove(
+        'seller-modal-visible'
+    );
+
+
+    document.body.classList.remove(
+        'seller-modal-open'
+    );
+
+}
+
+
+
+/* =============================================================
+   CLOSE MODAL ON OUTSIDE CLICK
+   ============================================================= */
+
+document.addEventListener(
+    'click',
+    function (event) {
+
+        const modal =
+            document.getElementById(
+                'mentorRequestModal'
+            );
+
+
+        if (!modal) {
+            return;
+        }
+
+
+        if (
+            event.target === modal
+        ) {
+
+            closeMentorRequestModal();
+
+        }
+
+    }
+);
+
+
+
+/* =============================================================
+   ESCAPE KEY
+   ============================================================= */
+
+document.addEventListener(
+    'keydown',
+    function (event) {
+
+        if (
+            event.key === 'Escape'
+        ) {
+
+            closeMentorRequestModal();
+
+        }
+
+    }
+);
+
+
+
+/* =============================================================
+   MOBILE NAVIGATION
+   ============================================================= */
+
+document.addEventListener(
+    'DOMContentLoaded',
+    function () {
+
+
+        const links =
+            document.querySelectorAll(
+                '.seller-nav-link'
+            );
+
+
+        links.forEach(
+            function (link) {
+
+                link.addEventListener(
+                    'click',
+                    function () {
+
+                        if (
+                            window.innerWidth <= 768
+                        ) {
+
+                            const sidebar =
+                                document.getElementById(
+                                    'sellerSidebar'
+                                );
+
+                            const overlay =
+                                document.getElementById(
+                                    'sellerSidebarOverlay'
+                                );
+
+
+                            if (sidebar) {
+
+                                sidebar.classList.remove(
+                                    'seller-sidebar-open'
+                                );
+
+                            }
+
+
+                            if (overlay) {
+
+                                overlay.classList.remove(
+                                    'seller-overlay-visible'
+                                );
+
+                            }
+
+                        }
+
+                    }
+                );
+
+            }
+        );
+
+
+    }
+);
+
+
+</script>
+
+
+</body>
+</html>

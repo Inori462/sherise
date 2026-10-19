@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Profile | SheRise</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #faf7fa;
+            color: #333;
+        }
+
+        .buyer-layout {
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* =========================
+           SIDEBAR
+        ========================== */
+
+        .sidebar {
+            width: 245px;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #7b2f6d, #a84d91);
+            color: white;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            padding: 28px 18px;
+            z-index: 1000;
+        }
+
+        .sidebar-brand {
+            display: block;
+            color: white;
+            text-decoration: none;
+            font-size: 25px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .sidebar-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .sidebar-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 12px 15px;
+            border-radius: 9px;
+            font-size: 14px;
+            transition: 0.2s ease;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.18);
+        }
+
+        .sidebar-menu .logout {
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.10);
+        }
+
+        /* =========================
+           MAIN CONTENT
+        ========================== */
+
+        .main-content {
+            margin-left: 245px;
+            width: calc(100% - 245px);
+            min-height: 100vh;
+            padding: 35px 45px;
+        }
+
+        .profile-container {
+            max-width: 1050px;
+            margin: auto;
+        }
+
+        .page-header {
+            margin-bottom: 28px;
+        }
+
+        .page-header h1 {
+            margin: 0 0 8px;
+            color: #333;
+            font-size: 32px;
+        }
+
+        .page-header p {
+            margin: 0;
+            color: #777;
+            font-size: 15px;
+        }
+
+        /* =========================
+           PROFILE GRID
+        ========================== */
+
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 25px;
+            align-items: start;
+        }
+
+        .profile-summary {
+            background: white;
+            border-radius: 14px;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.06);
+        }
+
+        .profile-avatar {
+            width: 90px;
+            height: 90px;
+            margin: 0 auto 18px;
+            border-radius: 50%;
+            background: #f5e8f2;
+            color: #a84d91;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 35px;
+            font-weight: 700;
+        }
+
+        .profile-summary h2 {
+            margin: 0 0 6px;
+            color: #333;
+            font-size: 21px;
+        }
+
+        .profile-email {
+            color: #888;
+            font-size: 13px;
+            word-break: break-word;
+        }
+
+        .profile-role {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: #f5e8f2;
+            color: #a14f8b;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+
+        /* =========================
+           PROFILE CARD
+        ========================== */
+
+        .profile-card {
+            background: white;
+            border-radius: 14px;
+            padding: 28px;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.06);
+        }
+
+        .profile-card h2 {
+            margin: 0 0 6px;
+            color: #333;
+            font-size: 21px;
+        }
+
+        .section-description {
+            color: #888;
+            font-size: 13px;
+            margin: 0 0 22px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            margin-bottom: 7px;
+            color: #444;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            padding: 12px 13px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            background: white;
+        }
+
+        .form-group input:focus {
+            border-color: #b45f9b;
+        }
+
+        .form-group input:disabled {
+            background: #f5f5f5;
+            color: #888;
+            cursor: not-allowed;
+        }
+
+        .field-note {
+            color: #999;
+            font-size: 11px;
+            margin-top: 5px;
+        }
+
+        .save-btn {
+            margin-top: 22px;
+            padding: 12px 24px;
+            background: #a84d91;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .save-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* =========================
+           ADDRESSES
+        ========================== */
+
+        .address-section {
+            margin-top: 25px;
+        }
+
+        .address-list {
+            display: grid;
+            gap: 12px;
+            margin-bottom: 22px;
+        }
+
+        .address-card {
+            border: 1px solid #eadfea;
+            background: #fcfafc;
+            border-radius: 10px;
+            padding: 16px;
+        }
+
+        .address-card p {
+            margin: 5px 0;
+            color: #666;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .default-badge {
+            display: inline-block;
+            background: #f5e8f2;
+            color: #a14f8b;
+            padding: 4px 8px;
+            border-radius: 15px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .no-address {
+            padding: 20px;
+            background: #faf8fa;
+            border-radius: 10px;
+            color: #888;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .add-address {
+            border-top: 1px solid #eee;
+            padding-top: 24px;
+        }
+
+        .add-address h3 {
+            margin: 0 0 5px;
+            color: #444;
+            font-size: 17px;
+        }
+
+        .add-address-description {
+            margin: 0 0 18px;
+            color: #888;
+            font-size: 13px;
+        }
+
+        .address-form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .address-form-grid .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .address-form-grid input {
+            width: 100%;
+            padding: 12px 13px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .address-form-grid input:focus {
+            border-color: #b45f9b;
+        }
+
+        .address-btn {
+            margin-top: 18px;
+            padding: 11px 20px;
+            background: white;
+            color: #a84d91;
+            border: 1px solid #a84d91;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .address-btn:hover {
+            background: #a84d91;
+            color: white;
+        }
+
+        /* =========================
+           QUICK LINKS
+        ========================== */
+
+        .quick-links {
+            margin-top: 25px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .quick-link {
+            background: white;
+            padding: 18px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: #444;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+            transition: 0.2s;
+        }
+
+        .quick-link:hover {
+            transform: translateY(-2px);
+        }
+
+        .quick-link strong {
+            display: block;
+            margin-bottom: 5px;
+            color: #a84d91;
+            font-size: 14px;
+        }
+
+        .quick-link span {
+            color: #888;
+            font-size: 12px;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================== */
+
+        @media (max-width: 900px) {
+
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-summary {
+                text-align: center;
+            }
+
+            .quick-links {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 700px) {
+
+            .sidebar {
+                position: relative;
+                width: 100%;
+                min-height: auto;
+                padding: 18px;
+            }
+
+            .buyer-layout {
+                display: block;
+            }
+
+            .sidebar-brand {
+                margin-bottom: 15px;
+            }
+
+            .sidebar-menu {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .sidebar-menu a {
+                padding: 9px 11px;
+                font-size: 13px;
+            }
+
+            .sidebar-menu .logout {
+                margin-top: 0;
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                padding: 25px 15px;
+            }
+
+            .page-header h1 {
+                font-size: 27px;
+            }
+
+            .profile-card {
+                padding: 20px;
+            }
+
+            .form-grid,
+            .address-form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group.full-width,
+            .address-form-grid .full-width {
+                grid-column: auto;
+            }
+
+            .quick-links {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="buyer-layout">
+
+    <!-- =========================
+         SIDEBAR
+    ========================== -->
+
+    <aside class="sidebar">
+
+        <a href="{{ url_for('buyer_dashboard') }}"
+           class="sidebar-brand">
+            SheRise
+        </a>
+
+        <nav class="sidebar-menu">
+
+            <a href="{{ url_for('buyer_dashboard') }}">
+                🏠 Dashboard
+            </a>
+
+            <a href="{{ url_for('buyer_products') }}">
+                🛍️ Marketplace
+            </a>
+
+            <a href="{{ url_for('buyer_wishlist') }}">
+                ❤️ Wishlist
+            </a>
+
+            <a href="{{ url_for('buyer_cart') }}">
+                🛒 Cart
+            </a>
+
+            <a href="{{ url_for('buyer_orders') }}">
+                📦 Orders
+            </a>
+
+            <a href="{{ url_for('buyer_profile') }}"
+               class="active">
+                👤 Profile
+            </a>
+
+            <a href="{{ url_for('buyer_custom_request') }}">
+                ✨ Custom Request
+            </a>
+
+            <a href="{{ url_for('logout') }}"
+               class="logout">
+                🚪 Logout
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- =========================
+         MAIN CONTENT
+    ========================== -->
+
+    <main class="main-content">
+
+        <div class="profile-container">
+
+            <!-- Page Header -->
+
+            <section class="page-header">
+
+                <h1>
+                    My Profile
+                </h1>
+
+                <p>
+                    Manage your personal information and delivery addresses.
+                </p>
+
+            </section>
+
+
+            <div class="profile-grid">
+
+                <!-- =========================
+                     PROFILE SUMMARY
+                ========================== -->
+
+                <aside class="profile-summary">
+
+                    <div class="profile-avatar">
+
+                        {% if user.full_name %}
+                            {{ user.full_name[0]|upper }}
+                        {% else %}
+                            U
+                        {% endif %}
+
+                    </div>
+
+
+                    <h2>
+                        {{ user.full_name or 'Buyer' }}
+                    </h2>
+
+
+                    <div class="profile-email">
+                        {{ user.email }}
+                    </div>
+
+
+                    <span class="profile-role">
+                        {{ user.role or 'Buyer' }}
+                    </span>
+
+                </aside>
+
+
+                <!-- =========================
+                     PROFILE DETAILS
+                ========================== -->
+
+                <section class="profile-card">
+
+                    <h2>
+                        Personal Information
+                    </h2>
+
+                    <p class="section-description">
+                        Update your name and mobile number.
+                    </p>
+
+
+                    <form method="POST"
+                          action="{{ url_for('buyer_profile') }}">
+{% include "_csrf_field.html" %}
+
+                        <div class="form-grid">
+
+                            <!-- Full Name -->
+
+                            <div class="form-group">
+
+                                <label for="full_name">
+                                    Full Name
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="full_name"
+                                    name="full_name"
+                                    value="{{ user.full_name or '' }}"
+                                    placeholder="Enter your full name"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <!-- Email -->
+
+                            <div class="form-group">
+
+                                <label for="email">
+                                    Email Address
+                                </label>
+
+                                <input
+                                    type="email"
+                                    id="email"
+                                    value="{{ user.email or '' }}"
+                                    disabled
+                                >
+
+                                <span class="field-note">
+                                    Email address cannot be changed here.
+                                </span>
+
+                            </div>
+
+
+                            <!-- Mobile -->
+
+                            <div class="form-group">
+
+                                <label for="mobile">
+                                    Mobile Number
+                                </label>
+
+                                <input
+                                    type="tel"
+                                    id="mobile"
+                                    name="mobile"
+                                    value="{{ user.mobile or '' }}"
+                                    placeholder="Enter 10-digit mobile number"
+                                    maxlength="10"
+                                    pattern="[0-9]{10}"
+                                    required
+                                >
+
+                                <span class="field-note">
+                                    Enter exactly 10 digits.
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <button type="submit"
+                                class="save-btn">
+
+                            Save Changes
+
+                        </button>
+
+                    </form>
+
+
+                    <!-- =========================
+                         SAVED ADDRESSES
+                    ========================== -->
+
+                    <div class="address-section">
+
+                        <h2>
+                            Saved Addresses
+                        </h2>
+
+                        <p class="section-description">
+                            Manage your delivery addresses.
+                        </p>
+
+
+                        {% if addresses %}
+
+                            <div class="address-list">
+
+                                {% for address in addresses %}
+
+                                    <div class="address-card">
+
+                                        {% if address.is_default %}
+
+                                            <span class="default-badge">
+                                                Default Address
+                                            </span>
+
+                                        {% endif %}
+
+
+                                        <p>
+                                            <strong>
+                                                Address:
+                                            </strong>
+
+                                            {{ address.address_line }}
+                                        </p>
+
+
+                                        <p>
+                                            <strong>
+                                                City:
+                                            </strong>
+
+                                            {{ address.city }}
+                                        </p>
+
+
+                                        <p>
+                                            <strong>
+                                                State:
+                                            </strong>
+
+                                            {{ address.state }}
+                                        </p>
+
+
+                                        <p>
+                                            <strong>
+                                                Pincode:
+                                            </strong>
+
+                                            {{ address.pincode }}
+                                        </p>
+
+                                    </div>
+
+                                {% endfor %}
+
+                            </div>
+
+                        {% else %}
+
+                            <div class="no-address">
+
+                                You haven't added a delivery address yet.
+
+                            </div>
+
+                        {% endif %}
+
+
+                        <!-- =========================
+                             ADD NEW ADDRESS
+                        ========================== -->
+
+                        <div class="add-address">
+
+                            <h3>
+                                Add New Address
+                            </h3>
+
+                            <p class="add-address-description">
+                                Add an address to use during checkout.
+                            </p>
+
+
+                            <form method="POST"
+                                  action="{{ url_for('add_buyer_address') }}">
+{% include "_csrf_field.html" %}
+
+                                <div class="address-form-grid">
+
+                                    <!-- Address -->
+
+                                    <div class="form-group full-width">
+
+                                        <label for="address_line">
+                                            Address
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            id="address_line"
+                                            name="address_line"
+                                            placeholder="House number, street, area"
+                                            required
+                                        >
+
+                                    </div>
+
+
+                                    <!-- City -->
+
+                                    <div class="form-group">
+
+                                        <label for="city">
+                                            City
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            id="city"
+                                            name="city"
+                                            placeholder="Enter city"
+                                            required
+                                        >
+
+                                    </div>
+
+
+                                    <!-- State -->
+
+                                    <div class="form-group">
+
+                                        <label for="state">
+                                            State
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            id="state"
+                                            name="state"
+                                            placeholder="Enter state"
+                                            required
+                                        >
+
+                                    </div>
+
+
+                                    <!-- Pincode -->
+
+                                    <div class="form-group">
+
+                                        <label for="pincode">
+                                            Pincode
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            id="pincode"
+                                            name="pincode"
+                                            placeholder="Enter pincode"
+                                            maxlength="10"
+                                            required
+                                        >
+
+                                    </div>
+
+                                </div>
+
+
+                                <button type="submit"
+                                        class="address-btn">
+
+                                    + Add Address
+
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+
+            <!-- =========================
+                 QUICK LINKS
+            ========================== -->
+
+            <div class="quick-links">
+
+                <a href="{{ url_for('buyer_orders') }}"
+                   class="quick-link">
+
+                    <strong>
+                        📦 My Orders
+                    </strong>
+
+                    <span>
+                        View your previous purchases and order status.
+                    </span>
+
+                </a>
+
+
+                <a href="{{ url_for('buyer_wishlist') }}"
+                   class="quick-link">
+
+                    <strong>
+                        ❤️ Wishlist
+                    </strong>
+
+                    <span>
+                        View products you have saved.
+                    </span>
+
+                </a>
+
+
+                <a href="{{ url_for('buyer_cart') }}"
+                   class="quick-link">
+
+                    <strong>
+                        🛒 Shopping Cart
+                    </strong>
+
+                    <span>
+                        Review products before placing your order.
+                    </span>
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+</html>

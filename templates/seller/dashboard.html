@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Seller Dashboard | SheRise</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f7f5f7;
+            color: #333;
+        }
+
+        /* =====================================================
+           LAYOUT
+        ===================================================== */
+
+        .seller-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+
+        /* =====================================================
+           SIDEBAR
+        ===================================================== */
+
+        .sidebar {
+            width: 250px;
+            background: #ffffff;
+            border-right: 1px solid #e8dfe6;
+
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+
+            padding: 22px 16px;
+
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+
+        /* BRAND */
+
+        .brand {
+            padding: 5px 10px 25px;
+            border-bottom: 1px solid #eee7ed;
+            margin-bottom: 20px;
+        }
+
+        .brand h2 {
+            color: #b45f9b;
+            font-size: 25px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .brand p {
+            color: #999;
+            font-size: 12px;
+        }
+
+
+        /* NAVIGATION */
+
+        .nav-section {
+            margin-bottom: 22px;
+        }
+
+        .nav-title {
+            font-size: 10px;
+            font-weight: 700;
+            color: #aaa;
+
+            text-transform: uppercase;
+            letter-spacing: 1px;
+
+            margin: 0 10px 8px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+
+            width: 100%;
+
+            text-decoration: none;
+            color: #555;
+
+            padding: 10px 12px;
+            margin-bottom: 4px;
+
+            border-radius: 8px;
+
+            font-size: 14px;
+
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover {
+            background: #faf0f7;
+            color: #b45f9b;
+        }
+
+        .nav-link.active {
+            background: #b45f9b;
+            color: white;
+            font-weight: 600;
+        }
+
+        .nav-icon {
+            width: 20px;
+            text-align: center;
+            font-size: 15px;
+        }
+
+
+        /* SUB NAVIGATION */
+
+        .sub-nav {
+            margin-left: 31px;
+            margin-top: 2px;
+            margin-bottom: 7px;
+        }
+
+        .sub-nav a {
+            display: block;
+
+            text-decoration: none;
+            color: #777;
+
+            font-size: 13px;
+
+            padding: 7px 9px;
+
+            border-radius: 6px;
+
+            margin-bottom: 2px;
+
+            transition: 0.2s;
+        }
+
+        .sub-nav a:hover {
+            color: #b45f9b;
+            background: #faf0f7;
+        }
+
+
+        /* DISABLED / FUTURE ITEMS */
+
+        .nav-link.disabled,
+        .sub-nav a.disabled {
+            color: #aaa;
+            cursor: default;
+        }
+
+        .nav-link.disabled:hover,
+        .sub-nav a.disabled:hover {
+            background: transparent;
+            color: #aaa;
+        }
+
+
+        /* LOGOUT */
+
+        .logout-link {
+            color: #c0392b !important;
+        }
+
+        .logout-link:hover {
+            background: #fdecea !important;
+            color: #c0392b !important;
+        }
+
+
+        /* =====================================================
+           MAIN CONTENT
+        ===================================================== */
+
+        .main-content {
+            margin-left: 250px;
+            width: calc(100% - 250px);
+
+            min-height: 100vh;
+
+            padding: 30px 35px;
+        }
+
+
+        /* =====================================================
+           TOP BAR
+        ===================================================== */
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            margin-bottom: 25px;
+        }
+
+        .top-bar-left h1 {
+            font-size: 27px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .top-bar-left p {
+            font-size: 14px;
+            color: #888;
+        }
+
+        .seller-name {
+            color: #b45f9b;
+            font-weight: 600;
+        }
+
+        .add-product-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+
+            text-decoration: none;
+
+            background: #b45f9b;
+            color: white;
+
+            padding: 11px 18px;
+
+            border-radius: 8px;
+
+            font-size: 14px;
+            font-weight: 600;
+
+            transition: 0.2s;
+        }
+
+        .add-product-btn:hover {
+            background: #994b82;
+            transform: translateY(-1px);
+        }
+
+
+        /* =====================================================
+           WELCOME BANNER
+        ===================================================== */
+
+        .welcome-banner {
+            background: linear-gradient(
+                135deg,
+                #fff7fc,
+                #f9eef7
+            );
+
+            border: 1px solid #ead8e5;
+
+            border-radius: 14px;
+
+            padding: 24px 26px;
+
+            margin-bottom: 25px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            gap: 20px;
+        }
+
+        .welcome-text h2 {
+            font-size: 21px;
+            color: #333;
+            margin-bottom: 7px;
+        }
+
+        .welcome-text p {
+            color: #777;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .welcome-icon {
+            width: 55px;
+            height: 55px;
+
+            border-radius: 50%;
+
+            background: white;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 25px;
+
+            flex-shrink: 0;
+        }
+
+
+        /* =====================================================
+           STATISTICS
+        ===================================================== */
+
+        .section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            margin-bottom: 14px;
+        }
+
+        .section-heading h2 {
+            font-size: 18px;
+            color: #333;
+        }
+
+        .statistics-grid {
+            display: grid;
+
+            grid-template-columns: repeat(4, 1fr);
+
+            gap: 18px;
+
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+
+            border: 1px solid #eadfe7;
+
+            border-radius: 12px;
+
+            padding: 21px;
+
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.035);
+
+            transition: 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+        }
+
+        .stat-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            margin-bottom: 14px;
+        }
+
+        .stat-label {
+            color: #777;
+            font-size: 13px;
+        }
+
+        .stat-icon {
+            width: 38px;
+            height: 38px;
+
+            border-radius: 9px;
+
+            background: #faf0f7;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 18px;
+        }
+
+        .stat-value {
+            color: #333;
+
+            font-size: 26px;
+            font-weight: 700;
+        }
+
+        .stat-description {
+            color: #999;
+            font-size: 11px;
+            margin-top: 5px;
+        }
+
+
+        /* =====================================================
+           QUICK ACTIONS
+        ===================================================== */
+
+        .quick-section {
+            margin-bottom: 30px;
+        }
+
+        .quick-actions {
+            display: grid;
+
+            grid-template-columns: repeat(3, 1fr);
+
+            gap: 18px;
+        }
+
+        .action-card {
+            background: white;
+
+            border: 1px solid #eadfe7;
+
+            border-radius: 12px;
+
+            padding: 20px;
+
+            text-decoration: none;
+            color: inherit;
+
+            transition: 0.2s;
+        }
+
+        .action-card:hover {
+            border-color: #d9b8d0;
+
+            transform: translateY(-2px);
+
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+        }
+
+        .action-icon {
+            width: 42px;
+            height: 42px;
+
+            background: #faf0f7;
+
+            border-radius: 9px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 19px;
+
+            margin-bottom: 13px;
+        }
+
+        .action-card h3 {
+            font-size: 15px;
+            color: #333;
+            margin-bottom: 6px;
+        }
+
+        .action-card p {
+            color: #888;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+
+        /* =====================================================
+           INFORMATION BOX
+        ===================================================== */
+
+        .info-box {
+            background: white;
+
+            border: 1px solid #eadfe7;
+
+            border-radius: 12px;
+
+            padding: 22px;
+
+            margin-bottom: 25px;
+        }
+
+        .info-box h3 {
+            font-size: 16px;
+            color: #444;
+
+            margin-bottom: 10px;
+        }
+
+        .info-box p {
+            color: #777;
+
+            font-size: 13px;
+
+            line-height: 1.6;
+        }
+
+        .info-points {
+            margin-top: 13px;
+
+            display: grid;
+
+            grid-template-columns: repeat(3, 1fr);
+
+            gap: 12px;
+        }
+
+        .info-point {
+            background: #faf8fa;
+
+            border-radius: 8px;
+
+            padding: 13px;
+
+            font-size: 12px;
+
+            color: #666;
+        }
+
+        .info-point strong {
+            display: block;
+
+            color: #444;
+
+            margin-bottom: 4px;
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+
+        @media (max-width: 1150px) {
+
+            .statistics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .quick-actions {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .info-points {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+
+        @media (max-width: 850px) {
+
+            .sidebar {
+                position: relative;
+
+                width: 100%;
+
+                min-height: auto;
+
+                border-right: none;
+                border-bottom: 1px solid #e8dfe6;
+            }
+
+            .seller-layout {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+
+                width: 100%;
+
+                padding: 22px;
+            }
+
+            .top-bar {
+                flex-direction: column;
+
+                align-items: flex-start;
+
+                gap: 15px;
+            }
+
+            .welcome-banner {
+                align-items: flex-start;
+            }
+        }
+
+
+        @media (max-width: 600px) {
+
+            .main-content {
+                padding: 17px;
+            }
+
+            .statistics-grid,
+            .quick-actions,
+            .info-points {
+                grid-template-columns: 1fr;
+            }
+
+            .welcome-banner {
+                padding: 20px;
+            }
+
+            .welcome-icon {
+                display: none;
+            }
+
+            .top-bar-left h1 {
+                font-size: 23px;
+            }
+
+            .add-product-btn {
+                width: 100%;
+
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+
+<body>
+
+<div class="seller-layout">
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+        <!-- ROLE HEADER -->
+
+        <div class="brand">
+
+            <h2>{{ seller_name|default('Seller') }}</h2>
+
+            <p>Seller</p>
+
+        </div>
+
+
+        <!-- MAIN -->
+
+        <div class="nav-section">
+
+            <div class="nav-title">
+                Main
+            </div>
+
+            <a href="{{ url_for('seller_dashboard') }}"
+               class="nav-link active">
+
+                <span class="nav-icon">⌂</span>
+
+                <span>Dashboard</span>
+
+            </a>
+
+        </div>
+
+
+        <!-- MY PRODUCTS -->
+
+        <div class="nav-section">
+
+            <div class="nav-title">
+                My Products
+            </div>
+
+            <a href="{{ url_for('seller_products') }}"
+               class="nav-link">
+
+                <span class="nav-icon">▣</span>
+
+                <span>All Products</span>
+
+            </a>
+
+
+            <div class="sub-nav">
+
+                <a href="{{ url_for('add_product') }}">
+                    + Add Product
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- CUSTOM REQUESTS -->
+
+        <div class="nav-section">
+
+            <div class="nav-title">
+                Requests
+            </div>
+
+            <a href="{{ url_for('seller_custom_requests') }}"
+               class="nav-link">
+
+                <span class="nav-icon">✎</span>
+                <span>Custom Requests</span>
+
+            </a>
+
+        </div>
+
+
+        <!-- ORDERS -->
+
+        <div class="nav-section">
+
+            <div class="nav-title">
+                Orders
+            </div>
+
+            <a href="{{ url_for('seller_orders') }}"
+               class="nav-link">
+
+                <span class="nav-icon">▤</span>
+
+                <span>Customer Orders</span>
+
+            </a>
+
+        </div>
+
+
+        <!-- REPORTS -->
+
+        <div class="nav-section">
+
+            <div class="nav-title">
+                Reports
+            </div>
+
+            <a href="{{ url_for('seller_sales') }}"
+               class="nav-link">
+
+                <span class="nav-icon">◫</span>
+
+                <span>Sales Reports</span>
+
+            </a>
+
+            <a href="{{ url_for('seller_revenue') }}"
+               class="nav-link">
+
+                <span class="nav-icon">₹</span>
+
+                <span>Revenue Analytics</span>
+
+            </a>
+
+        </div>
+
+
+        <!-- ACCOUNT -->
+
+        <div class="nav-section">
+
+            <div class="nav-title">
+                Account
+            </div>
+
+            <a href="{{ url_for('seller_profile') }}"
+               class="nav-link">
+                <span class="nav-icon">◯</span>
+                <span>Profile</span>
+            </a>
+
+            <a href="{{ url_for('seller_ai_assistant') }}"
+               class="nav-link">
+                <span class="nav-icon">✦</span>
+                <span>Business Assistant</span>
+            </a>
+
+            <a href="{{ url_for('seller_marketing') }}"
+               class="nav-link">
+                <span class="nav-icon">↗</span>
+                <span>Marketing Tool</span>
+            </a>
+
+            <a href="{{ url_for('seller_mentor') }}"
+               class="nav-link">
+
+                <span class="nav-icon">◎</span>
+
+                <span>Find a Mentor</span>
+
+            </a>
+
+
+            <a href="{{ url_for('logout') }}"
+               class="nav-link logout-link">
+
+                <span class="nav-icon">↪</span>
+
+                <span>Logout</span>
+
+            </a>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+    ====================================================== -->
+
+    <main class="main-content">
+
+
+        <!-- TOP BAR -->
+
+        <div class="top-bar">
+
+            <div class="top-bar-left">
+
+                <h1>Seller Dashboard</h1>
+
+                <p>
+                    Manage your products, orders and business from one place.
+                </p>
+
+            </div>
+
+
+            <a href="{{ url_for('add_product') }}"
+               class="add-product-btn">
+
+                <span>＋</span>
+
+                <span>Add Product</span>
+
+            </a>
+
+        </div>
+
+
+
+        <!-- =================================================
+             WELCOME
+        ================================================== -->
+
+        <div class="welcome-banner">
+
+            <div class="welcome-text">
+
+                <h2>
+                    Welcome back,
+                    <span class="seller-name">
+                        {{ seller_name|default('Seller') }}
+                    </span>!
+                </h2>
+
+                <p>
+                    Keep your products updated, respond to customer requests,
+                    and track your business performance.
+                </p>
+
+            </div>
+
+
+            <div class="welcome-icon">
+                ♡
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             STATISTICS
+        ================================================== -->
+
+        <div class="section-heading">
+
+            <h2>Business Overview</h2>
+
+        </div>
+
+
+        <div class="statistics-grid">
+
+
+            <!-- TOTAL PRODUCTS -->
+
+            <div class="stat-card">
+
+                <div class="stat-top">
+
+                    <div class="stat-label">
+                        Total Products
+                    </div>
+
+                    <div class="stat-icon">
+                        ▣
+                    </div>
+
+                </div>
+
+                <div class="stat-value">
+                    {{ total_products|default(0) }}
+                </div>
+
+                <div class="stat-description">
+                    Products listed in your store
+                </div>
+
+            </div>
+
+
+
+            <!-- TOTAL ORDERS -->
+
+            <div class="stat-card">
+
+                <div class="stat-top">
+
+                    <div class="stat-label">
+                        Total Orders
+                    </div>
+
+                    <div class="stat-icon">
+                        ▤
+                    </div>
+
+                </div>
+
+                <div class="stat-value">
+                    {{ total_orders|default(0) }}
+                </div>
+
+                <div class="stat-description">
+                    Orders containing your products
+                </div>
+
+            </div>
+
+
+
+            <!-- TOTAL SALES -->
+
+            <div class="stat-card">
+
+                <div class="stat-top">
+
+                    <div class="stat-label">
+                        Total Sales
+                    </div>
+
+                    <div class="stat-icon">
+                        ↗
+                    </div>
+
+                </div>
+
+                <div class="stat-value">
+                    {{ total_sales|default(0) }}
+                </div>
+
+                <div class="stat-description">
+                    Units sold through the marketplace
+                </div>
+
+            </div>
+
+
+
+            <!-- TOTAL REVENUE -->
+
+            <div class="stat-card">
+
+                <div class="stat-top">
+
+                    <div class="stat-label">
+                        Revenue
+                    </div>
+
+                    <div class="stat-icon">
+                        ₹
+                    </div>
+
+                </div>
+
+                <div class="stat-value">
+
+                    ₹{{ "%.2f"|format(total_revenue|default(0)|float) }}
+
+                </div>
+
+                <div class="stat-description">
+                    Total recorded sales revenue
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             QUICK ACTIONS
+        ================================================== -->
+
+        <div class="quick-section">
+
+            <div class="section-heading">
+
+                <h2>Quick Actions</h2>
+
+            </div>
+
+
+            <div class="quick-actions">
+
+
+                <!-- PRODUCTS -->
+
+                <a href="{{ url_for('seller_products') }}"
+                   class="action-card">
+
+                    <div class="action-icon">
+                        ▣
+                    </div>
+
+                    <h3>
+                        Manage Products
+                    </h3>
+
+                    <p>
+                        View, edit, delete and manage the stock of your
+                        products.
+                    </p>
+
+                </a>
+
+
+
+                <!-- ADD PRODUCT -->
+
+                <a href="{{ url_for('add_product') }}"
+                   class="action-card">
+
+                    <div class="action-icon">
+                        ＋
+                    </div>
+
+                    <h3>
+                        Add New Product
+                    </h3>
+
+                    <p>
+                        Add a new product to your marketplace store.
+                    </p>
+
+                </a>
+
+
+
+                <!-- CUSTOM REQUESTS -->
+
+                <a href="{{ url_for('seller_custom_requests') }}"
+                   class="action-card">
+
+                    <div class="action-icon">
+                        ✎
+                    </div>
+
+                    <h3>
+                        Custom Requests
+                    </h3>
+
+                    <p>
+                        Review customer requirements and send quotations
+                        or responses.
+                    </p>
+
+                </a>
+
+
+
+                <!-- ORDERS -->
+
+                <a href="{{ url_for('seller_orders') }}"
+                   class="action-card">
+
+                    <div class="action-icon">
+                        ▤
+                    </div>
+
+                    <h3>
+                        Customer Orders
+                    </h3>
+
+                    <p>
+                        View orders containing your products and customer
+                        information.
+                    </p>
+
+                </a>
+
+
+
+                <!-- SALES -->
+
+                <a href="{{ url_for('seller_sales') }}"
+                   class="action-card">
+
+                    <div class="action-icon">
+                        ◫
+                    </div>
+
+                    <h3>
+                        Sales Reports
+                    </h3>
+
+                    <p>
+                        Monitor your sales transactions and product
+                        performance.
+                    </p>
+
+                </a>
+
+
+
+                <!-- REVENUE -->
+
+                <a href="{{ url_for('seller_revenue') }}"
+                   class="action-card">
+
+                    <div class="action-icon">
+                        ₹
+                    </div>
+
+                    <h3>
+                        Revenue Analytics
+                    </h3>
+
+                    <p>
+                        Review revenue, order value and product revenue
+                        information.
+                    </p>
+
+                </a>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             SELLER INFORMATION
+        ================================================== -->
+
+        <div class="info-box">
+
+            <h3>
+                Grow Your Business on SheRise
+            </h3>
+
+            <p>
+                Use your seller dashboard to keep your product catalog
+                updated, respond to customer requirements and monitor
+                your sales performance.
+            </p>
+
+
+            <div class="info-points">
+
+
+                <div class="info-point">
+
+                    <strong>
+                        Keep Products Updated
+                    </strong>
+
+                    Manage prices, descriptions and available stock.
+
+                </div>
+
+
+                <div class="info-point">
+
+                    <strong>
+                        Respond to Customers
+                    </strong>
+
+                    Review custom product requirements and provide
+                    quotations.
+
+                </div>
+
+
+                <div class="info-point">
+
+                    <strong>
+                        Track Performance
+                    </strong>
+
+                    Monitor orders, sales and revenue from your dashboard.
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+    </main>
+
+</div>
+
+</body>
+</html>

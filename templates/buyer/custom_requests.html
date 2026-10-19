@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Requests | SheRise</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        body { margin: 0; background: #f8f4f7; color: #333; font-family: Arial, sans-serif; }
+        main { max-width: 1000px; margin: 36px auto; padding: 24px; }
+        .card { background: #fff; border: 1px solid #eadde5; border-radius: 14px; padding: 24px; margin-bottom: 20px; }
+        .request { border-top: 1px solid #eee; padding: 16px 0; }
+        label { display: block; margin: 12px 0 6px; }
+        input, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 7px; }
+        button { margin-top: 14px; padding: 10px 16px; border: 0; border-radius: 7px; background: #a84f8d; color: #fff; cursor: pointer; }
+        nav { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+<main>
+    <nav>
+        <a href="{{ url_for('buyer_dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('buyer_products') }}">Products</a>
+        <a href="{{ url_for('buyer_orders') }}">Orders</a>
+        <a href="{{ url_for('buyer_profile') }}">Profile</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </nav>
+    {% for category, message in get_flashed_messages(with_categories=true) %}
+        <p class="alert alert-success" role="status">{{ message }}</p>
+    {% endfor %}
+    <section class="card">
+        <h1>Custom product request</h1>
+        <p>Describe what you need. Sellers can respond with a quotation.</p>
+        <form method="post" action="{{ url_for('buyer_custom_requests') }}">
+            {% include "_csrf_field.html" %}
+            <label for="product_name">Product name</label>
+            <input id="product_name" name="product_name" maxlength="150" required>
+            <label for="description">Description</label>
+            <textarea id="description" name="description" rows="4" maxlength="5000" required></textarea>
+            <label for="budget">Budget (optional)</label>
+            <input id="budget" name="budget" type="number" min="0" step="0.01">
+            <button type="submit">Submit request</button>
+        </form>
+    </section>
+    <section class="card">
+        <h2>Your requests</h2>
+        {% for item in requests %}
+            <article class="request">
+                <p>Request #{{ item.id }}</p>
+                <h3>{{ item.product_name }}</h3>
+                <p>{{ item.description }}</p>
+                <p>Status: {{ item.status|replace('_', ' ')|title }}</p>
+                {% if item.budget is not none %}<p>Budget: ₹{{ "%.2f"|format(item.budget|float) }}</p>{% endif %}
+                {% if item.quotation_amount is not none %}<p>Seller quotation: ₹{{ "%.2f"|format(item.quotation_amount|float) }}</p>{% endif %}
+                {% if item.seller_response %}<p>Seller response: {{ item.seller_response }}</p>{% endif %}
+            </article>
+        {% else %}
+            <p>You have not submitted any custom requests yet.</p>
+        {% endfor %}
+    </section>
+</main>
+</body>
+</html>

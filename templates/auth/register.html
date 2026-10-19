@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Create Account | WomenEmpower</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+    <style>
+        .auth-alert {
+            padding: 12px 14px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+
+        .auth-alert-error {
+            background: #ffe8e8;
+            color: #a11a1a;
+            border: 1px solid #f2b8b8;
+        }
+
+        .auth-info {
+            display: block;
+            margin-top: 6px;
+            font-size: 13px;
+            opacity: .75;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="auth-container">
+
+    <div class="auth-box">
+
+        <!-- HEADER -->
+        <h1>
+            Create Your Account
+        </h1>
+
+        <p class="auth-subtitle">
+            Join our community and start your journey.
+        </p>
+
+        <!-- REGISTRATION FORM -->
+        <form
+            method="POST"
+            action="{{ url_for('register') }}"
+            id="registerForm"
+        >
+{% include "_csrf_field.html" %}
+
+            {% if error %}
+            <div class="auth-alert auth-alert-error">{{ error }}</div>
+            {% endif %}
+
+            {% if message %}
+            <div class="auth-alert">{{ message }}</div>
+            {% endif %}
+
+            <!-- FULL NAME -->
+            <div class="form-group">
+                <label for="full_name">
+                    Full Name
+                </label>
+
+                <input
+                    type="text"
+                    id="full_name"
+                    name="full_name"
+                    placeholder="Enter your full name"
+                    value="{{ form_data.get('full_name', '') if form_data else '' }}"
+                    required
+                >
+            </div>
+
+            <!-- EMAIL -->
+            <div class="form-group">
+                <label for="email">
+                    Email
+                </label>
+
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="Enter your email"
+                    value="{{ form_data.get('email', '') if form_data else '' }}"
+                    required
+                >
+
+                <small class="auth-info">
+                    Your Google account must authenticate this email before registration is completed.
+                </small>
+            </div>
+
+            <!-- MOBILE -->
+            <div class="form-group">
+                <label for="mobile">
+                    Mobile Number
+                </label>
+
+                <input
+                    type="tel"
+                    id="mobile"
+                    name="mobile"
+                    placeholder="Enter 10-digit mobile number"
+                    maxlength="10"
+                    pattern="[0-9]{10}"
+                    value="{{ form_data.get('mobile', '') if form_data else '' }}"
+                    required
+                >
+
+                <small class="auth-info">
+                    Stored as profile information. It is not used for phone authentication.
+                </small>
+            </div>
+
+            <!-- PASSWORD -->
+            <div class="form-group">
+                <label for="password">
+                    Password
+                </label>
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Create a password"
+                    required
+                >
+            </div>
+
+            <!-- PASSWORD RULES -->
+            <div class="password-rules">
+                <p id="lengthRule" class="rule-invalid">
+                    ✗ At least 8 characters
+                </p>
+
+                <p id="uppercaseRule" class="rule-invalid">
+                    ✗ At least one uppercase letter
+                </p>
+
+                <p id="lowercaseRule" class="rule-invalid">
+                    ✗ At least one lowercase letter
+                </p>
+
+                <p id="numberRule" class="rule-invalid">
+                    ✗ At least one number
+                </p>
+            </div>
+
+            <!-- CONFIRM PASSWORD -->
+            <div class="form-group">
+                <label for="confirm_password">
+                    Confirm Password
+                </label>
+
+                <input
+                    type="password"
+                    id="confirm_password"
+                    name="confirm_password"
+                    placeholder="Re-enter your password"
+                    required
+                >
+
+                <p
+                    id="passwordMatch"
+                    class="password-match"
+                ></p>
+            </div>
+
+            <!-- ROLE -->
+            <div class="form-group">
+                <label for="role">
+                    Role
+                </label>
+
+                <select
+                    id="role"
+                    name="role"
+                    required
+                >
+                    <option value="">
+                        Select your role
+                    </option>
+
+                    <option value="buyer"
+                        {% if form_data and form_data.get('role') == 'buyer' %}selected{% endif %}>
+                        Buyer
+                    </option>
+
+                    <option value="seller"
+                        {% if form_data and form_data.get('role') == 'seller' %}selected{% endif %}>
+                        Seller
+                    </option>
+
+                    <option value="mentor"
+                        {% if form_data and form_data.get('role') == 'mentor' %}selected{% endif %}>
+                        Mentor
+                    </option>
+                </select>
+            </div>
+
+            <!-- SUBMIT -->
+            <button
+                type="submit"
+                class="auth-btn"
+            >
+                Continue with Google
+            </button>
+
+            <p class="auth-info" style="text-align:center; margin-top:12px;">
+                Your account will be created only after Google verifies the email address above.
+            </p>
+
+        </form>
+
+        <!-- LOGIN LINK -->
+        <p class="auth-footer">
+            Already have an account?
+
+            <a href="{{ url_for('login') }}">
+                Login
+            </a>
+        </p>
+
+    </div>
+</div>
+
+<script>
+const password = document.getElementById("password");
+const confirmPassword = document.getElementById("confirm_password");
+const passwordMatch = document.getElementById("passwordMatch");
+
+const lengthRule = document.getElementById("lengthRule");
+const uppercaseRule = document.getElementById("uppercaseRule");
+const lowercaseRule = document.getElementById("lowercaseRule");
+const numberRule = document.getElementById("numberRule");
+
+password.addEventListener("input", function () {
+    const value = password.value;
+
+    if (value.length >= 8) {
+        lengthRule.textContent = "✓ At least 8 characters";
+        lengthRule.className = "rule-valid";
+    } else {
+        lengthRule.textContent = "✗ At least 8 characters";
+        lengthRule.className = "rule-invalid";
+    }
+
+    if (/[A-Z]/.test(value)) {
+        uppercaseRule.textContent = "✓ At least one uppercase letter";
+        uppercaseRule.className = "rule-valid";
+    } else {
+        uppercaseRule.textContent = "✗ At least one uppercase letter";
+        uppercaseRule.className = "rule-invalid";
+    }
+
+    if (/[a-z]/.test(value)) {
+        lowercaseRule.textContent = "✓ At least one lowercase letter";
+        lowercaseRule.className = "rule-valid";
+    } else {
+        lowercaseRule.textContent = "✗ At least one lowercase letter";
+        lowercaseRule.className = "rule-invalid";
+    }
+
+    if (/[0-9]/.test(value)) {
+        numberRule.textContent = "✓ At least one number";
+        numberRule.className = "rule-valid";
+    } else {
+        numberRule.textContent = "✗ At least one number";
+        numberRule.className = "rule-invalid";
+    }
+
+    checkPasswordMatch();
+});
+
+confirmPassword.addEventListener("input", checkPasswordMatch);
+
+function checkPasswordMatch() {
+    if (confirmPassword.value === "") {
+        passwordMatch.textContent = "";
+        return;
+    }
+
+    if (password.value === confirmPassword.value) {
+        passwordMatch.textContent = "✓ Passwords match";
+        passwordMatch.className = "password-match match-success";
+    } else {
+        passwordMatch.textContent = "✗ Passwords do not match";
+        passwordMatch.className = "password-match match-error";
+    }
+}
+
+document.getElementById("registerForm").addEventListener("submit", function (event) {
+    const passwordValue = password.value;
+    const confirmValue = confirmPassword.value;
+
+    const validLength = passwordValue.length >= 8;
+    const hasUppercase = /[A-Z]/.test(passwordValue);
+    const hasLowercase = /[a-z]/.test(passwordValue);
+    const hasNumber = /[0-9]/.test(passwordValue);
+
+    if (!validLength || !hasUppercase || !hasLowercase || !hasNumber) {
+        event.preventDefault();
+
+        alert(
+            "Please create a password that contains at least 8 characters, one uppercase letter, one lowercase letter, and one number."
+        );
+
+        return;
+    }
+
+    if (passwordValue !== confirmValue) {
+        event.preventDefault();
+
+        alert("Passwords do not match.");
+
+        return;
+    }
+});
+</script>
+
+</body>
+</html>

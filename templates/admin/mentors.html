@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Mentor Approvals | SheRise Admin</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+    <style>
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f7f5fa;
+            color: #333;
+        }
+
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+        .admin-sidebar {
+            width: 250px;
+            background: #ffffff;
+            border-right: 1px solid #e6e1eb;
+            padding: 25px 18px;
+            box-sizing: border-box;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            overflow-y: auto;
+        }
+
+        .admin-role-header { display:flex; align-items:center; gap:12px; padding:20px 18px; border-bottom:1px solid #e6e1eb; margin-bottom:20px; }
+        .admin-role-avatar { width:42px; height:42px; min-width:42px; border-radius:50%; background:#7b2cbf; color:#fff; display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:700; flex-shrink:0; }
+        .admin-role-info strong { display:block; color:#333; font-size:13px; }
+        .admin-role-info span { display:block; margin-top:2px; color:#777; font-size:11px; }
+
+        .admin-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .admin-nav a {
+            text-decoration: none;
+            color: #555;
+            padding: 11px 15px;
+            border-radius: 9px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            transition: 0.2s;
+        }
+
+        .admin-nav a:hover,
+        .admin-nav a.active {
+            background: #faf0f7;
+            color: #b45f9b;
+            font-weight: 600;
+        }
+
+        .admin-nav .logout-link {
+            margin-top: 18px;
+            color: #c62828;
+            background: #fff3f3;
+        }
+
+        .admin-nav .logout-link:hover {
+            background: #ffe2e2;
+            color: #b71c1c;
+        }
+
+        .admin-nav-badge {
+            margin-left: auto;
+            background: #b45f9b;
+            color: white;
+            border-radius: 20px;
+            padding: 2px 8px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        /* MAIN */
+        .admin-main {
+            margin-left: 250px;
+            width: calc(100% - 250px);
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .admin-header {
+            background: #ffffff;
+            border-bottom: 1px solid #e6e1eb;
+            padding: 22px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .admin-header h1 {
+            margin: 0;
+            font-size: 25px;
+            color: #333;
+        }
+
+        .admin-header p {
+            margin: 5px 0 0;
+            color: #777;
+            font-size: 14px;
+        }
+
+        .admin-user {
+            text-align: right;
+        }
+
+        .admin-user strong {
+            display: block;
+            color: #333;
+        }
+
+        .admin-user span {
+            color: #777;
+            font-size: 13px;
+        }
+
+        .admin-content {
+            padding: 30px;
+        }
+
+        /* STATS */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: #ffffff;
+            border: 1px solid #e7e2eb;
+            border-radius: 12px;
+            padding: 22px;
+        }
+
+        .stat-card .stat-title {
+            color: #777;
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .stat-value {
+            font-size: 29px;
+            font-weight: 700;
+            color: #b45f9b;
+        }
+
+        .stat-card .stat-description {
+            margin-top: 8px;
+            color: #888;
+            font-size: 12px;
+        }
+
+        /* FILTERS */
+        .filter-bar {
+            background: white;
+            border: 1px solid #e7e2eb;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-bar form {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+
+        .filter-bar input[type="text"] {
+            flex: 1;
+            min-width: 200px;
+            padding: 9px 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .filter-bar input[type="text"]:focus {
+            outline: none;
+            border-color: #b45f9b;
+        }
+
+        .filter-bar select {
+            padding: 9px 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+        }
+
+        .filter-btn {
+            padding: 9px 18px;
+            background: #b45f9b;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .filter-btn:hover {
+            background: #994b82;
+        }
+
+        /* TABLE */
+        .admin-table-card {
+            background: white;
+            border: 1px solid #e7e2eb;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .admin-table-header {
+            padding: 18px 22px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .admin-table-header h2 {
+            margin: 0;
+            font-size: 17px;
+            color: #333;
+        }
+
+        .admin-table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 13px 18px;
+            text-align: left;
+            font-size: 14px;
+            border-bottom: 1px solid #f3f0f5;
+        }
+
+        th {
+            background: #faf8fc;
+            font-weight: 600;
+            color: #555;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: #fdf9fd;
+        }
+
+        /* STATUS BADGES */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .status-approved {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status-rejected {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        /* ACTION FORMS */
+        .action-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-approve {
+            padding: 7px 14px;
+            background: #2e7d32;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-approve:hover {
+            background: #1b5e20;
+        }
+
+        .btn-reject {
+            padding: 7px 14px;
+            background: #c62828;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-reject:hover {
+            background: #b71c1c;
+        }
+
+        /* EMPTY */
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+        }
+
+        .empty-state h3 {
+            margin: 0 0 8px;
+            font-size: 18px;
+            color: #555;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1100px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 700px) {
+            .admin-sidebar {
+                position: relative;
+                width: 100%;
+                min-height: auto;
+                border-right: none;
+                border-bottom: 1px solid #e6e1eb;
+            }
+            .admin-layout { display: block; }
+            .admin-main { margin-left: 0; width: 100%; }
+            .admin-content { padding: 18px; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid { grid-template-columns: 1fr; }
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="admin-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar">
+
+        <div class="admin-role-header">
+            <div class="admin-role-avatar">A</div>
+            <div class="admin-role-info">
+                <strong>Administrator</strong>
+                <span>Admin</span>
+            </div>
+        </div>
+
+        <nav class="admin-nav">
+
+            <a href="{{ url_for('admin_dashboard') }}">
+                ⌂ Dashboard
+            </a>
+
+            <a href="{{ url_for('admin_users') }}">
+                👥 Users
+            </a>
+
+            <a href="{{ url_for('admin_sellers') }}">
+                🏪 Seller Approvals
+            </a>
+
+            <a href="{{ url_for('admin_mentors') }}" class="active">
+                🎓 Mentor Approvals
+                {% if pending_mentors and pending_mentors > 0 %}
+                <span class="admin-nav-badge">{{ pending_mentors }}</span>
+                {% endif %}
+            </a>
+
+            <a href="{{ url_for('admin_products') }}">
+                📦 Products
+            </a>
+
+            <a href="{{ url_for('admin_complaints') }}">
+                ⚠ Complaints
+            </a>
+
+            <a href="{{ url_for('admin_analytics') }}">
+                📊 Analytics
+            </a>
+
+            <a href="{{ url_for('admin_ai_usage') }}">
+                ✦ AI Usage
+            </a>
+
+            <a href="{{ url_for('logout') }}" class="logout-link">
+                ↪ Logout
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- MAIN -->
+    <main class="admin-main">
+
+        <header class="admin-header">
+            <div>
+                <h1>Mentor Approvals</h1>
+                <p>Review and approve mentor registrations for the SheRise platform.</p>
+            </div>
+            <div class="admin-user">
+                <strong>{{ session.get('full_name', 'Administrator') }}</strong>
+                <span>Administrator</span>
+            </div>
+        </header>
+
+
+        <section class="admin-content">
+
+
+            <!-- STATS -->
+            <div class="stats-grid">
+
+                <div class="stat-card">
+                    <div class="stat-title">Total Mentors</div>
+                    <div class="stat-value">{{ total_mentors|default(0) }}</div>
+                    <div class="stat-description">Registered mentors</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-title">Pending</div>
+                    <div class="stat-value">{{ pending_mentors|default(0) }}</div>
+                    <div class="stat-description">Awaiting review</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-title">Approved</div>
+                    <div class="stat-value">{{ approved_mentors|default(0) }}</div>
+                    <div class="stat-description">Active mentors</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-title">Rejected</div>
+                    <div class="stat-value">{{ rejected_mentors|default(0) }}</div>
+                    <div class="stat-description">Declined applications</div>
+                </div>
+
+            </div>
+
+
+            <!-- FILTER BAR -->
+            <div class="filter-bar">
+                <form method="GET" action="{{ url_for('admin_mentors') }}">
+                    <input
+                        type="text"
+                        name="search"
+                        value="{{ search|default('') }}"
+                        placeholder="Search by name, email or expertise..."
+                    >
+                    <select name="status">
+                        <option value="">All Statuses</option>
+                        <option value="pending" {% if selected_status == 'pending' %}selected{% endif %}>Pending</option>
+                        <option value="approved" {% if selected_status == 'approved' %}selected{% endif %}>Approved</option>
+                        <option value="rejected" {% if selected_status == 'rejected' %}selected{% endif %}>Rejected</option>
+                    </select>
+                    <button type="submit" class="filter-btn">Filter</button>
+                    {% if search or selected_status %}
+                    <a href="{{ url_for('admin_mentors') }}" style="padding:9px 14px;color:#777;font-size:14px;">Clear</a>
+                    {% endif %}
+                </form>
+            </div>
+
+
+            <!-- TABLE -->
+            <div class="admin-table-card">
+
+                <div class="admin-table-header">
+                    <h2>Mentor Applications</h2>
+                    <span style="color:#777;font-size:13px;">{{ mentors|length }} mentor(s) found</span>
+                </div>
+
+                <div class="admin-table-wrapper">
+
+                    {% if mentors %}
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Mentor</th>
+                                <th>Expertise</th>
+                                <th>Experience</th>
+                                <th>Availability</th>
+                                <th>Status</th>
+                                <th>Applied</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            {% for mentor in mentors %}
+                            <tr>
+
+                                <td>
+                                    <strong>{{ mentor.full_name }}</strong><br>
+                                    <span style="color:#777;font-size:12px;">{{ mentor.email }}</span><br>
+                                    <span style="color:#999;font-size:12px;">{{ mentor.mobile }}</span>
+                                </td>
+
+                                <td>{{ mentor.expertise or '—' }}</td>
+
+                                <td>{{ mentor.experience_years or 0 }} yr(s)</td>
+
+                                <td>{{ mentor.availability or '—' }}</td>
+
+                                <td>
+                                    <span class="status-badge status-{{ mentor.status|default('pending') }}">
+                                        {{ mentor.status|default('pending')|title }}
+                                    </span>
+                                    {% if mentor.reviewed_at %}
+                                    <br><small style="color:#999;font-size:11px;">{{ mentor.reviewed_at.strftime('%d %b %Y') }}</small>
+                                    {% endif %}
+                                    {% if mentor.review_note %}
+                                    <br><small style="color:#777;font-size:11px;">{{ mentor.review_note[:60] }}{% if mentor.review_note|length > 60 %}...{% endif %}</small>
+                                    {% endif %}
+                                </td>
+
+                                <td style="font-size:13px;color:#777;">
+                                    {% if mentor.application_date %}
+                                    {{ mentor.application_date.strftime('%d %b %Y') }}
+                                    {% else %}
+                                    —
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    {% if mentor.status == 'pending' %}
+                                    <div class="action-group">
+
+                                        <form method="POST" action="{{ url_for('admin_mentor_approve', user_id=mentor.id) }}" style="display:inline;">
+{% include "_csrf_field.html" %}
+                                            <button type="submit" class="btn-approve" onclick="return confirm('Approve mentor {{ mentor.full_name }}?')">
+                                                ✓ Approve
+                                            </button>
+                                        </form>
+
+                                        <form method="POST" action="{{ url_for('admin_mentor_reject', user_id=mentor.id) }}" style="display:inline;">
+{% include "_csrf_field.html" %}
+                                            <button type="submit" class="btn-reject" onclick="return confirm('Reject mentor {{ mentor.full_name }}?')">
+                                                ✗ Reject
+                                            </button>
+                                        </form>
+
+                                    </div>
+                                    {% elif mentor.status == 'approved' %}
+                                    <div class="action-group">
+                                        <form method="POST" action="{{ url_for('admin_mentor_reject', user_id=mentor.id) }}" style="display:inline;">
+{% include "_csrf_field.html" %}
+                                            <button type="submit" class="btn-reject" onclick="return confirm('Revoke approval for {{ mentor.full_name }}?')">
+                                                Revoke
+                                            </button>
+                                        </form>
+                                    </div>
+                                    {% elif mentor.status == 'rejected' %}
+                                    <div class="action-group">
+                                        <form method="POST" action="{{ url_for('admin_mentor_approve', user_id=mentor.id) }}" style="display:inline;">
+{% include "_csrf_field.html" %}
+                                            <button type="submit" class="btn-approve" onclick="return confirm('Re-approve mentor {{ mentor.full_name }}?')">
+                                                Re-approve
+                                            </button>
+                                        </form>
+                                    </div>
+                                    {% else %}
+                                    <span style="color:#999;font-size:13px;">—</span>
+                                    {% endif %}
+                                </td>
+
+                            </tr>
+                            {% endfor %}
+
+                        </tbody>
+                    </table>
+
+                    {% else %}
+
+                    <div class="empty-state">
+                        <h3>No Mentors Found</h3>
+                        <p>
+                            {% if search or selected_status %}
+                            No mentors match your current filter.
+                            <a href="{{ url_for('admin_mentors') }}" style="color:#b45f9b;">Clear filters</a>
+                            {% else %}
+                            No mentor registrations have been submitted yet.
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+</div>
+
+
+</body>
+
+</html>

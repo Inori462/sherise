@@ -1,0 +1,1781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Revenue Analytics | Women Empowerment</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f7f7fa;
+            color: #333;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* =====================================================
+           SIDEBAR
+        ===================================================== */
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+
+            width: 250px;
+            height: 100vh;
+
+            background: #ffffff;
+            border-right: 1px solid #e8e8ec;
+
+            display: flex;
+            flex-direction: column;
+
+            overflow-y: auto;
+
+            z-index: 1000;
+        }
+
+        .logo {
+            padding: 24px 22px 8px;
+
+            color: #b45f9b;
+
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .seller-label {
+            padding: 0 22px 22px;
+
+            color: #888;
+
+            font-size: 12px;
+            font-weight: 600;
+
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-section {
+            margin-bottom: 8px;
+        }
+
+        .nav-title {
+            padding: 10px 22px 7px;
+
+            color: #999;
+
+            font-size: 11px;
+            font-weight: 700;
+
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+
+            padding: 11px 22px;
+
+            color: #555;
+
+            font-size: 14px;
+            font-weight: 500;
+
+            transition: 0.2s ease;
+        }
+
+        .nav-link:hover {
+            background: #faf0f7;
+            color: #b45f9b;
+        }
+
+        .nav-link.active {
+            background: #f7eaf4;
+            color: #b45f9b;
+
+            font-weight: 600;
+
+            border-right: 3px solid #b45f9b;
+        }
+
+        .nav-icon {
+            width: 24px;
+
+            margin-right: 9px;
+
+            text-align: center;
+
+            font-size: 15px;
+        }
+
+        .sub-link {
+            padding-left: 55px;
+
+            font-size: 13px;
+        }
+
+        .disabled-link {
+            color: #aaa;
+            cursor: default;
+        }
+
+        .disabled-link:hover {
+            background: transparent;
+            color: #aaa;
+        }
+
+        .logout-area {
+            margin-top: auto;
+
+            padding: 15px 0;
+
+            border-top: 1px solid #eee;
+        }
+
+        .logout {
+            color: #d9534f;
+        }
+
+        .logout:hover {
+            background: #fff5f5;
+            color: #c9302c;
+        }
+
+        /* =====================================================
+           MAIN
+        ===================================================== */
+
+        .main {
+            margin-left: 250px;
+
+            min-height: 100vh;
+        }
+
+        .top-header {
+            height: 70px;
+
+            background: #ffffff;
+
+            border-bottom: 1px solid #e8e8ec;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 32px;
+        }
+
+        .top-title {
+            color: #777;
+
+            font-size: 14px;
+        }
+
+        .top-title strong {
+            color: #333;
+        }
+
+        .seller-badge {
+            background: #faf0f7;
+            color: #b45f9b;
+
+            padding: 8px 14px;
+
+            border-radius: 20px;
+
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .content {
+            max-width: 1250px;
+
+            margin: 0 auto;
+
+            padding: 32px;
+        }
+
+        /* =====================================================
+           PAGE HEADER
+        ===================================================== */
+
+        .page-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+
+            margin-bottom: 25px;
+        }
+
+        .page-header h1 {
+            margin-bottom: 7px;
+
+            color: #333;
+
+            font-size: 28px;
+        }
+
+        .page-header p {
+            color: #777;
+
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+
+            padding: 10px 16px;
+
+            background: #ffffff;
+
+            border: 1px solid #ddd;
+            border-radius: 8px;
+
+            color: #555;
+
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .back-btn:hover {
+            border-color: #b45f9b;
+            color: #b45f9b;
+        }
+
+        /* =====================================================
+           SUMMARY CARDS
+        ===================================================== */
+
+        .summary-grid {
+            display: grid;
+
+            grid-template-columns: repeat(4, 1fr);
+
+            gap: 18px;
+
+            margin-bottom: 25px;
+        }
+
+        .summary-card {
+            background: #ffffff;
+
+            border: 1px solid #e8e8ec;
+            border-radius: 12px;
+
+            padding: 20px;
+
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+        }
+
+        .summary-label {
+            color: #888;
+
+            font-size: 12px;
+            font-weight: 600;
+
+            margin-bottom: 9px;
+        }
+
+        .summary-value {
+            color: #333;
+
+            font-size: 25px;
+            font-weight: 700;
+        }
+
+        .summary-description {
+            margin-top: 5px;
+
+            color: #aaa;
+
+            font-size: 11px;
+        }
+
+        /* =====================================================
+           FILTER CARD
+        ===================================================== */
+
+        .filter-card {
+            background: #ffffff;
+
+            border: 1px solid #e8e8ec;
+            border-radius: 12px;
+
+            padding: 20px;
+
+            margin-bottom: 25px;
+        }
+
+        .filter-title {
+            margin-bottom: 15px;
+
+            color: #444;
+
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .filter-form {
+            display: grid;
+
+            grid-template-columns: 1fr 1fr 1fr auto;
+
+            gap: 14px;
+
+            align-items: end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+
+            gap: 6px;
+        }
+
+        .filter-group label {
+            color: #777;
+
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .filter-control {
+            width: 100%;
+
+            padding: 10px 11px;
+
+            background: #ffffff;
+
+            border: 1px solid #ddd;
+            border-radius: 7px;
+
+            color: #444;
+
+            font-family: inherit;
+            font-size: 13px;
+
+            outline: none;
+        }
+
+        .filter-control:focus {
+            border-color: #b45f9b;
+
+            box-shadow: 0 0 0 3px rgba(180, 95, 155, 0.08);
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+
+            background: #b45f9b;
+            color: #ffffff;
+
+            border: none;
+            border-radius: 7px;
+
+            font-size: 13px;
+            font-weight: 600;
+
+            cursor: pointer;
+        }
+
+        .filter-btn:hover {
+            background: #9f5088;
+        }
+
+        .clear-filter {
+            margin-left: 8px;
+
+            color: #999;
+
+            font-size: 12px;
+        }
+
+        .clear-filter:hover {
+            color: #b45f9b;
+        }
+
+        /* =====================================================
+           TWO COLUMN SECTION
+        ===================================================== */
+
+        .two-column {
+            display: grid;
+
+            grid-template-columns: 1fr 1fr;
+
+            gap: 20px;
+
+            margin-bottom: 25px;
+        }
+
+        .section-card {
+            background: #ffffff;
+
+            border: 1px solid #e8e8ec;
+            border-radius: 12px;
+
+            overflow: hidden;
+
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+        }
+
+        .section-header {
+            padding: 20px 22px;
+
+            border-bottom: 1px solid #eee;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-header h2 {
+            color: #333;
+
+            font-size: 17px;
+        }
+
+        .section-header span {
+            color: #999;
+
+            font-size: 12px;
+        }
+
+        /* =====================================================
+           REVENUE BREAKDOWN
+        ===================================================== */
+
+        .breakdown {
+            padding: 20px;
+        }
+
+        .breakdown-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 14px 0;
+
+            border-bottom: 1px solid #f1f1f1;
+        }
+
+        .breakdown-row:last-child {
+            border-bottom: none;
+        }
+
+        .breakdown-label {
+            color: #666;
+
+            font-size: 13px;
+        }
+
+        .breakdown-value {
+            color: #333;
+
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .breakdown-row.total {
+            margin-top: 5px;
+
+            padding-top: 18px;
+
+            border-top: 2px solid #eee;
+        }
+
+        .breakdown-row.total .breakdown-label {
+            color: #333;
+
+            font-weight: 700;
+        }
+
+        .breakdown-row.total .breakdown-value {
+            color: #b45f9b;
+
+            font-size: 18px;
+        }
+
+        /* =====================================================
+           REVENUE BY PERIOD
+        ===================================================== */
+
+        .period-table-wrapper {
+            overflow-x: auto;
+        }
+
+        .period-table {
+            width: 100%;
+
+            border-collapse: collapse;
+
+            min-width: 450px;
+        }
+
+        .period-table th {
+            padding: 13px 18px;
+
+            background: #fafafa;
+
+            border-bottom: 1px solid #eee;
+
+            color: #777;
+
+            font-size: 11px;
+            font-weight: 700;
+
+            text-align: left;
+
+            text-transform: uppercase;
+        }
+
+        .period-table td {
+            padding: 14px 18px;
+
+            border-bottom: 1px solid #f1f1f1;
+
+            color: #555;
+
+            font-size: 13px;
+        }
+
+        .period-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .period-name {
+            color: #333;
+
+            font-weight: 600;
+        }
+
+        .money {
+            color: #333;
+
+            font-weight: 600;
+        }
+
+        /* =====================================================
+           TOP PRODUCTS
+        ===================================================== */
+
+        .products-table-wrapper {
+            overflow-x: auto;
+        }
+
+        .products-table {
+            width: 100%;
+
+            border-collapse: collapse;
+
+            min-width: 550px;
+        }
+
+        .products-table th {
+            padding: 13px 18px;
+
+            background: #fafafa;
+
+            border-bottom: 1px solid #eee;
+
+            color: #777;
+
+            font-size: 11px;
+            font-weight: 700;
+
+            text-align: left;
+
+            text-transform: uppercase;
+        }
+
+        .products-table td {
+            padding: 14px 18px;
+
+            border-bottom: 1px solid #f1f1f1;
+
+            color: #555;
+
+            font-size: 13px;
+        }
+
+        .products-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .product-name {
+            color: #333;
+
+            font-weight: 600;
+        }
+
+        /* =====================================================
+           GROWTH
+        ===================================================== */
+
+        .growth-box {
+            padding: 25px;
+        }
+
+        .growth-main {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            margin-bottom: 20px;
+        }
+
+        .growth-label {
+            color: #888;
+
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .growth-value {
+            margin-top: 7px;
+
+            color: #333;
+
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .growth-description {
+            max-width: 280px;
+
+            color: #999;
+
+            font-size: 12px;
+            line-height: 1.5;
+
+            text-align: right;
+        }
+
+        .growth-positive {
+            color: #328451;
+        }
+
+        .growth-negative {
+            color: #d9534f;
+        }
+
+        .growth-neutral {
+            color: #777;
+        }
+
+        /* =====================================================
+           EMPTY STATE
+        ===================================================== */
+
+        .empty-state {
+            padding: 50px 25px;
+
+            text-align: center;
+        }
+
+        .empty-icon {
+            width: 55px;
+            height: 55px;
+
+            margin: 0 auto 15px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #faf0f7;
+
+            border-radius: 50%;
+
+            color: #b45f9b;
+
+            font-size: 22px;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 7px;
+
+            color: #444;
+
+            font-size: 16px;
+        }
+
+        .empty-state p {
+            color: #999;
+
+            font-size: 13px;
+        }
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+
+        @media (max-width: 1100px) {
+
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .filter-form {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .filter-button-area {
+                grid-column: 1 / -1;
+            }
+
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 900px) {
+
+            .sidebar {
+                width: 220px;
+            }
+
+            .main {
+                margin-left: 220px;
+            }
+
+            .content {
+                padding: 24px;
+            }
+        }
+
+        @media (max-width: 750px) {
+
+            .sidebar {
+                position: relative;
+
+                width: 100%;
+                height: auto;
+            }
+
+            .main {
+                margin-left: 0;
+            }
+
+            .logout-area {
+                margin-top: 10px;
+            }
+
+            .top-header {
+                padding: 0 20px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .page-header {
+                flex-direction: column;
+
+                gap: 15px;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-form {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-button-area {
+                grid-column: auto;
+            }
+        }
+
+        @media (max-width: 600px) {
+
+            .top-header {
+                height: auto;
+
+                padding: 15px 20px;
+
+                flex-direction: column;
+                align-items: flex-start;
+
+                gap: 10px;
+            }
+
+            .content {
+                padding: 15px;
+            }
+
+            .growth-main {
+                flex-direction: column;
+                align-items: flex-start;
+
+                gap: 15px;
+            }
+
+            .growth-description {
+                max-width: none;
+
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+        <a href="{{ url_for('seller_dashboard') }}"
+           class="logo">
+            Women Empowerment
+        </a>
+
+        <div class="seller-label">
+            Seller Panel
+        </div>
+
+
+        <!-- MAIN -->
+
+        <div class="nav-section">
+
+            <div class="nav-title">
+                Main
+            </div>
+
+            <a href="{{ url_for('seller_dashboard') }}"
+               class="nav-link">
+
+                <span class="nav-icon">⌂</span>
+                Dashboard
+
+            </a>
+
+        </div>
+
+
+        <!-- MY PRODUCTS -->
+
+        <div class="nav-section">
+
+            <div class="nav-title">
+                My Products
+            </div>
+
+            <a href="{{ url_for('seller_products') }}"
+               class="nav-link">
+
+                <span class="nav-icon">▣</span>
+                All Products
+
+            </a>
+
+            <a href="{{ url_for('add_product') }}"
+               class="nav-link">
+
+                <span class="nav-icon">＋</span>
+                Add Product
+
+            </a>
+
+        </div>
+
+
+        <!-- CUSTOM REQUESTS -->
+
+        <div class="nav-section">
+
+            <div class="nav-title">
+                Requests
+            </div>
+
+            <a href="{{ url_for('seller_custom_requests') }}"
+               class="nav-link">
+
+                <span class="nav-icon">✦</span>
+                Custom Requests
+            </a>
+
+        </div>
+
+
+        <!-- ORDERS -->
+
+        <div class="nav-section">
+
+            <div class="nav-title">
+                Orders
+            </div>
+
+            <a href="{{ url_for('seller_orders') }}"
+               class="nav-link">
+
+                <span class="nav-icon">▤</span>
+                Customer Orders
+
+            </a>
+
+        </div>
+
+
+        <!-- REPORTS -->
+
+        <div class="nav-section">
+
+            <div class="nav-title">
+                Reports
+            </div>
+
+            <a href="{{ url_for('seller_sales') }}"
+               class="nav-link">
+
+                <span class="nav-icon">▥</span>
+                Sales Reports
+
+            </a>
+
+            <a href="{{ url_for('seller_revenue') }}"
+               class="nav-link active">
+
+                <span class="nav-icon">₹</span>
+                Revenue Analytics
+
+            </a>
+
+        </div>
+
+
+        <!-- AI TOOLS -->
+
+        <div class="nav-section">
+
+            <div class="nav-title">
+                AI Tools
+            </div>
+
+            <a href="{{ url_for('seller_ai_assistant') }}"
+               class="nav-link">
+
+                <span class="nav-icon">✧</span>
+                Business Assistant
+
+            </a>
+
+            <a href="{{ url_for('seller_marketing') }}"
+               class="nav-link">
+
+                Marketing Tool
+
+            </a>
+
+        </div>
+
+
+        <!-- ACCOUNT -->
+
+        <div class="nav-section">
+
+            <div class="nav-title">
+                Account
+            </div>
+
+            <a href="{{ url_for('seller_profile') }}"
+               class="nav-link">
+
+                <span class="nav-icon">◯</span>
+                Profile
+
+            </a>
+
+        </div>
+
+
+        <!-- LOGOUT -->
+
+        <div class="logout-area">
+
+            <a href="{{ url_for('logout') }}"
+               class="nav-link logout">
+
+                <span class="nav-icon">↪</span>
+                Logout
+
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+    ====================================================== -->
+
+    <main class="main">
+
+
+        <!-- TOP HEADER -->
+
+        <header class="top-header">
+
+            <div class="top-title">
+
+                Seller Panel /
+                <strong>Revenue Analytics</strong>
+
+            </div>
+
+            <div class="seller-badge">
+                Seller Account
+            </div>
+
+        </header>
+
+
+        <div class="content">
+
+
+            <!-- =================================================
+                 PAGE HEADER
+            ================================================== -->
+
+            <div class="page-header">
+
+                <div>
+
+                    <h1>
+                        Revenue Analytics
+                    </h1>
+
+                    <p>
+                        Monitor your revenue, order value,
+                        product earnings, and revenue trends.
+                    </p>
+
+                </div>
+
+                <a href="{{ url_for('seller_dashboard') }}"
+                   class="back-btn">
+
+                    ← Back to Dashboard
+
+                </a>
+
+            </div>
+
+
+            <!-- =================================================
+                 SUMMARY CARDS
+            ================================================== -->
+
+            <div class="summary-grid">
+
+
+                <div class="summary-card">
+
+                    <div class="summary-label">
+                        Total Revenue
+                    </div>
+
+                    <div class="summary-value">
+                        ₹{{ "%.2f"|format(total_revenue|default(0)) }}
+                    </div>
+
+                    <div class="summary-description">
+                        Gross revenue from sales
+                    </div>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <div class="summary-label">
+                        Total Orders
+                    </div>
+
+                    <div class="summary-value">
+                        {{ total_orders|default(0) }}
+                    </div>
+
+                    <div class="summary-description">
+                        Orders contributing to revenue
+                    </div>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <div class="summary-label">
+                        Units Sold
+                    </div>
+
+                    <div class="summary-value">
+                        {{ total_units|default(0) }}
+                    </div>
+
+                    <div class="summary-description">
+                        Total units sold
+                    </div>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <div class="summary-label">
+                        Average Order Value
+                    </div>
+
+                    <div class="summary-value">
+                        ₹{{ "%.2f"|format(average_order_value|default(0)) }}
+                    </div>
+
+                    <div class="summary-description">
+                        Average revenue per order
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 FILTERS
+            ================================================== -->
+
+            <div class="filter-card">
+
+                <div class="filter-title">
+                    Revenue Filters
+                </div>
+
+                <form method="GET"
+                      action="{{ url_for('seller_revenue') }}"
+                      class="filter-form">
+
+
+                    <!-- START DATE -->
+
+                    <div class="filter-group">
+
+                        <label for="start_date">
+                            Start Date
+                        </label>
+
+                        <input
+                            type="date"
+                            id="start_date"
+                            name="start_date"
+                            class="filter-control"
+                            value="{{ start_date|default('') }}"
+                        >
+
+                    </div>
+
+
+                    <!-- END DATE -->
+
+                    <div class="filter-group">
+
+                        <label for="end_date">
+                            End Date
+                        </label>
+
+                        <input
+                            type="date"
+                            id="end_date"
+                            name="end_date"
+                            class="filter-control"
+                            value="{{ end_date|default('') }}"
+                        >
+
+                    </div>
+
+
+                    <!-- PERIOD -->
+
+                    <div class="filter-group">
+
+                        <label for="period">
+                            Group Revenue By
+                        </label>
+
+                        <select
+                            id="period"
+                            name="period"
+                            class="filter-control"
+                        >
+
+                            <option value="daily"
+                                {% if period|default('daily') == 'daily' %}
+                                    selected
+                                {% endif %}
+                            >
+                                Daily
+                            </option>
+
+                            <option value="weekly"
+                                {% if period|default('') == 'weekly' %}
+                                    selected
+                                {% endif %}
+                            >
+                                Weekly
+                            </option>
+
+                            <option value="monthly"
+                                {% if period|default('') == 'monthly' %}
+                                    selected
+                                {% endif %}
+                            >
+                                Monthly
+                            </option>
+
+                            <option value="yearly"
+                                {% if period|default('') == 'yearly' %}
+                                    selected
+                                {% endif %}
+                            >
+                                Yearly
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- BUTTON -->
+
+                    <div class="filter-button-area">
+
+                        <button type="submit"
+                                class="filter-btn">
+
+                            Apply Filter
+
+                        </button>
+
+                        <a href="{{ url_for('seller_revenue') }}"
+                           class="clear-filter">
+
+                            Clear
+
+                        </a>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+
+            <!-- =================================================
+                 REVENUE BREAKDOWN + GROWTH
+            ================================================== -->
+
+            <div class="two-column">
+
+
+                <!-- REVENUE BREAKDOWN -->
+
+                <div class="section-card">
+
+                    <div class="section-header">
+
+                        <h2>
+                            Revenue Breakdown
+                        </h2>
+
+                        <span>
+                            Current period
+                        </span>
+
+                    </div>
+
+
+                    <div class="breakdown">
+
+
+                        <div class="breakdown-row">
+
+                            <span class="breakdown-label">
+                                Product Revenue
+                            </span>
+
+                            <span class="breakdown-value">
+                                ₹{{ "%.2f"|format(product_revenue|default(0)) }}
+                            </span>
+
+                        </div>
+
+
+                        <div class="breakdown-row">
+
+                            <span class="breakdown-label">
+                                Custom Request Revenue
+                            </span>
+
+                            <span class="breakdown-value">
+                                ₹{{ "%.2f"|format(custom_request_revenue|default(0)) }}
+                            </span>
+
+                        </div>
+
+
+                        <div class="breakdown-row">
+
+                            <span class="breakdown-label">
+                                Other Revenue
+                            </span>
+
+                            <span class="breakdown-value">
+                                ₹{{ "%.2f"|format(other_revenue|default(0)) }}
+                            </span>
+
+                        </div>
+
+
+                        <div class="breakdown-row">
+
+                            <span class="breakdown-label">
+                                Refunds
+                            </span>
+
+                            <span class="breakdown-value">
+                                ₹{{ "%.2f"|format(refunds|default(0)) }}
+                            </span>
+
+                        </div>
+
+
+                        <div class="breakdown-row total">
+
+                            <span class="breakdown-label">
+                                Net Revenue
+                            </span>
+
+                            <span class="breakdown-value">
+                                ₹{{ "%.2f"|format(net_revenue|default(0)) }}
+                            </span>
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+
+                <!-- REVENUE GROWTH -->
+
+                <div class="section-card">
+
+                    <div class="section-header">
+
+                        <h2>
+                            Revenue Growth
+                        </h2>
+
+                        <span>
+                            Trend
+                        </span>
+
+                    </div>
+
+
+                    <div class="growth-box">
+
+                        <div class="growth-main">
+
+                            <div>
+
+                                <div class="growth-label">
+                                    Growth Rate
+                                </div>
+
+                                {% if revenue_growth is not none %}
+
+                                    <div
+                                        class="growth-value
+                                        {% if revenue_growth > 0 %}
+                                            growth-positive
+                                        {% elif revenue_growth < 0 %}
+                                            growth-negative
+                                        {% else %}
+                                            growth-neutral
+                                        {% endif %}"
+                                    >
+
+                                        {% if revenue_growth > 0 %}
+                                            +
+                                        {% endif %}
+
+                                        {{ "%.2f"|format(revenue_growth) }}%
+
+                                    </div>
+
+                                {% else %}
+
+                                    <div class="growth-value growth-neutral">
+                                        —
+                                    </div>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            <div class="growth-description">
+
+                                {% if revenue_growth is not none %}
+
+                                    Revenue growth calculated
+                                    for the selected period.
+
+                                {% else %}
+
+                                    Select a date range to view
+                                    revenue growth information.
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 REVENUE BY PERIOD
+            ================================================== -->
+
+            <div class="section-card"
+                 style="margin-bottom: 25px;">
+
+                <div class="section-header">
+
+                    <h2>
+                        Revenue by Period
+                    </h2>
+
+                    <span>
+                        {{ period|default('daily')|capitalize }}
+                    </span>
+
+                </div>
+
+
+                {% if revenue_by_period %}
+
+                    <div class="period-table-wrapper">
+
+                        <table class="period-table">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        Period
+                                    </th>
+
+                                    <th>
+                                        Orders
+                                    </th>
+
+                                    <th>
+                                        Units
+                                    </th>
+
+                                    <th>
+                                        Revenue
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody>
+
+                                {% for item in revenue_by_period %}
+
+                                    <tr>
+
+                                        <td>
+
+                                            <span class="period-name">
+
+                                                {% if item.period is defined %}
+                                                    {{ item.period }}
+                                                {% elif item.date is defined %}
+                                                    {{ item.date }}
+                                                {% elif item.period_name is defined %}
+                                                    {{ item.period_name }}
+                                                {% else %}
+                                                    —
+                                                {% endif %}
+
+                                            </span>
+
+                                        </td>
+
+
+                                        <td>
+
+                                            {% if item.orders is defined %}
+                                                {{ item.orders }}
+                                            {% elif item.total_orders is defined %}
+                                                {{ item.total_orders }}
+                                            {% else %}
+                                                0
+                                            {% endif %}
+
+                                        </td>
+
+
+                                        <td>
+
+                                            {% if item.units is defined %}
+                                                {{ item.units }}
+                                            {% elif item.total_units is defined %}
+                                                {{ item.total_units }}
+                                            {% else %}
+                                                0
+                                            {% endif %}
+
+                                        </td>
+
+
+                                        <td>
+
+                                            <span class="money">
+
+                                                ₹{{ "%.2f"|format(
+                                                    item.revenue
+                                                    if item.revenue is defined
+                                                    else (
+                                                        item.total_revenue
+                                                        if item.total_revenue is defined
+                                                        else 0
+                                                    )
+                                                ) }}
+
+                                            </span>
+
+                                        </td>
+
+                                    </tr>
+
+                                {% endfor %}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                {% else %}
+
+                    <div class="empty-state">
+
+                        <div class="empty-icon">
+                            ₹
+                        </div>
+
+                        <h3>
+                            No Revenue Data
+                        </h3>
+
+                        <p>
+                            There is no revenue data available
+                            for the selected period.
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- =================================================
+                 TOP PRODUCTS
+            ================================================== -->
+
+            <div class="section-card">
+
+                <div class="section-header">
+
+                    <h2>
+                        Top Revenue-Generating Products
+                    </h2>
+
+                    <span>
+                        Product performance
+                    </span>
+
+                </div>
+
+
+                {% if top_products %}
+
+                    <div class="products-table-wrapper">
+
+                        <table class="products-table">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        Product
+                                    </th>
+
+                                    <th>
+                                        Units Sold
+                                    </th>
+
+                                    <th>
+                                        Orders
+                                    </th>
+
+                                    <th>
+                                        Revenue
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody>
+
+                                {% for product in top_products %}
+
+                                    <tr>
+
+                                        <td>
+
+                                            <span class="product-name">
+                                                {{ product.product_name }}
+                                            </span>
+
+                                        </td>
+
+
+                                        <td>
+
+                                            {% if product.units_sold is defined %}
+                                                {{ product.units_sold }}
+                                            {% elif product.total_units is defined %}
+                                                {{ product.total_units }}
+                                            {% else %}
+                                                0
+                                            {% endif %}
+
+                                        </td>
+
+
+                                        <td>
+
+                                            {% if product.orders is defined %}
+                                                {{ product.orders }}
+                                            {% elif product.total_orders is defined %}
+                                                {{ product.total_orders }}
+                                            {% else %}
+                                                0
+                                            {% endif %}
+
+                                        </td>
+
+
+                                        <td>
+
+                                            <span class="money">
+
+                                                ₹{{ "%.2f"|format(
+                                                    product.revenue
+                                                    if product.revenue is defined
+                                                    else (
+                                                        product.total_revenue
+                                                        if product.total_revenue is defined
+                                                        else 0
+                                                    )
+                                                ) }}
+
+                                            </span>
+
+                                        </td>
+
+                                    </tr>
+
+                                {% endfor %}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                {% else %}
+
+                    <div class="empty-state">
+
+                        <div class="empty-icon">
+                            ◫
+                        </div>
+
+                        <h3>
+                            No Product Revenue Data
+                        </h3>
+
+                        <p>
+                            Product revenue information will appear
+                            after your products generate sales.
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+</html>

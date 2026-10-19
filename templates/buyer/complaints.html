@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Help & Complaints | SheRise</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        body { margin: 0; font-family: Arial, sans-serif; background: #f8f4f7; color: #333; }
+        nav { display: flex; gap: 14px; flex-wrap: wrap; padding: 18px 24px; background: white; }
+        nav a { color: #a84f8d; text-decoration: none; }
+        main { max-width: 900px; margin: 30px auto; padding: 0 18px; }
+        section, article { background: white; border: 1px solid #eadde5; border-radius: 10px; padding: 20px; margin: 16px 0; }
+        label { display: block; margin: 12px 0 5px; }
+        input, select, textarea { width: 100%; box-sizing: border-box; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        textarea { min-height: 120px; }
+        button { margin-top: 14px; padding: 10px 16px; border: 0; border-radius: 6px; background: #a84f8d; color: white; cursor: pointer; }
+        .status { color: #75516b; }
+        .response { padding: 12px; background: #f7f0f6; border-radius: 6px; }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="{{ url_for('buyer_dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('buyer_orders') }}">Orders</a>
+        <a href="{{ url_for('buyer_custom_requests') }}">Custom Requests</a>
+        <a href="{{ url_for('buyer_complaints') }}">Help & Complaints</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </nav>
+    <main>
+        <h1>Help & Complaints</h1>
+        {% if message %}<p role="status">{{ message }}</p>{% endif %}
+        <section>
+            <h2>Submit a complaint</h2>
+            <form method="post" action="{{ url_for('buyer_complaints') }}">
+                {% include "_csrf_field.html" %}
+                <label for="title">Title</label>
+                <input id="title" name="title" maxlength="255" required>
+                <label for="complaint_type">Type</label>
+                <select id="complaint_type" name="complaint_type" required>
+                    <option value="general">General</option>
+                    <option value="order">Order</option>
+                    <option value="product">Product</option>
+                    <option value="payment">Payment</option>
+                    <option value="delivery">Delivery</option>
+                    <option value="account">Account</option>
+                </select>
+                <label for="order_id">Related order (optional)</label>
+                <select id="order_id" name="order_id">
+                    <option value="">No order selected</option>
+                    {% for order in orders %}
+                        <option value="{{ order.id }}">Order #{{ order.id }} — {{ order.created_at }}</option>
+                    {% endfor %}
+                </select>
+                <label for="description">Description</label>
+                <textarea id="description" name="description" maxlength="10000" required></textarea>
+                <button type="submit">Submit complaint</button>
+            </form>
+        </section>
+        <h2>Your complaints</h2>
+        {% for complaint in complaints %}
+            <article>
+                <h3>{{ complaint.title }}</h3>
+                <p class="status">{{ complaint.complaint_type|title }} · {{ complaint.status|replace("_", " ")|title }}{% if complaint.order_id %} · Order #{{ complaint.order_id }}{% endif %}</p>
+                <p>{{ complaint.description }}</p>
+                {% if complaint.admin_response %}
+                    <p class="response"><strong>Administrator response:</strong> {{ complaint.admin_response }}</p>
+                {% endif %}
+            </article>
+        {% else %}
+            <p>No complaints submitted yet.</p>
+        {% endfor %}
+    </main>
+</body>
+</html>

@@ -1,0 +1,150 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #f7f5f7;
+    color: #333;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.seller-layout {
+    min-height: 100vh;
+    display: flex;
+}
+
+.sidebar {
+    width: 250px;
+    background: #fff;
+    border-right: 1px solid #e8dfe6;
+    position: fixed;
+    inset: 0 auto 0 0;
+    padding: 22px 16px;
+    overflow-y: auto;
+}
+
+.brand {
+    padding: 5px 10px 25px;
+    border-bottom: 1px solid #eee7ed;
+    margin-bottom: 20px;
+}
+
+.brand h2 {
+    color: #b45f9b;
+    font-size: 25px;
+    margin: 0 0 4px;
+}
+
+.brand p,
+.nav-title {
+    color: #888;
+    font-size: 12px;
+}
+
+.nav-title {
+    margin: 18px 10px 8px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.nav-link {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: 8px;
+    color: #555;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.nav-link:hover,
+.nav-link.active {
+    background: #faf0f7;
+    color: #a84f8d;
+}
+
+.main-content {
+    width: calc(100% - 250px);
+    margin-left: 250px;
+    padding: 32px;
+}
+
+.page {
+    max-width: 1050px;
+    margin: 0 auto;
+}
+
+.card {
+    background: #fff;
+    border: 1px solid #eadde5;
+    border-radius: 14px;
+    padding: 22px;
+    margin: 18px 0;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+label {
+    display: block;
+    margin: 14px 0 6px;
+    font-weight: 600;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    padding: 11px;
+    border: 1px solid #ccc;
+    border-radius: 7px;
+    font: inherit;
+}
+
+textarea {
+    min-height: 92px;
+    resize: vertical;
+}
+
+button {
+    border: 0;
+    border-radius: 7px;
+    padding: 11px 16px;
+    background: #a84f8d;
+    color: #fff;
+    font: inherit;
+    cursor: pointer;
+}
+
+button:disabled {
+    opacity: .6;
+    cursor: wait;
+}
+
+@media (max-width: 760px) {
+    .seller-layout {
+        display: block;
+    }
+
+    .sidebar {
+        position: static;
+        width: auto;
+    }
+
+    .main-content {
+        margin: 0;
+        width: auto;
+        padding: 20px 14px;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}

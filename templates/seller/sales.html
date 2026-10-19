@@ -1,0 +1,1652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Sales Reports | Women Empowerment</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f7f7fa;
+            color: #333;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* =====================================================
+           SIDEBAR
+        ===================================================== */
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+
+            width: 250px;
+            height: 100vh;
+
+            background: #ffffff;
+            border-right: 1px solid #e8e8ec;
+
+            display: flex;
+            flex-direction: column;
+
+            overflow-y: auto;
+
+            z-index: 1000;
+        }
+
+        .logo {
+            padding: 24px 22px 8px;
+
+            color: #b45f9b;
+
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .seller-label {
+            padding: 0 22px 22px;
+
+            color: #888;
+
+            font-size: 12px;
+            font-weight: 600;
+
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-section {
+            margin-bottom: 8px;
+        }
+
+        .nav-title {
+            padding: 10px 22px 7px;
+
+            color: #999;
+
+            font-size: 11px;
+            font-weight: 700;
+
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+
+            padding: 11px 22px;
+
+            color: #555;
+
+            font-size: 14px;
+            font-weight: 500;
+
+            transition: 0.2s ease;
+        }
+
+        .nav-link:hover {
+            background: #faf0f7;
+            color: #b45f9b;
+        }
+
+        .nav-link.active {
+            background: #f7eaf4;
+            color: #b45f9b;
+
+            font-weight: 600;
+
+            border-right: 3px solid #b45f9b;
+        }
+
+        .nav-icon {
+            width: 24px;
+
+            margin-right: 9px;
+
+            text-align: center;
+
+            font-size: 15px;
+        }
+
+        .sub-link {
+            padding-left: 55px;
+
+            font-size: 13px;
+        }
+
+        .disabled-link {
+            color: #aaa;
+
+            cursor: default;
+        }
+
+        .disabled-link:hover {
+            background: transparent;
+            color: #aaa;
+        }
+
+        .logout-area {
+            margin-top: auto;
+
+            padding: 15px 0;
+
+            border-top: 1px solid #eee;
+        }
+
+        .logout {
+            color: #d9534f;
+        }
+
+        .logout:hover {
+            background: #fff5f5;
+            color: #c9302c;
+        }
+
+        /* =====================================================
+           MAIN
+        ===================================================== */
+
+        .main {
+            margin-left: 250px;
+
+            min-height: 100vh;
+        }
+
+        .top-header {
+            height: 70px;
+
+            background: #ffffff;
+
+            border-bottom: 1px solid #e8e8ec;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 32px;
+        }
+
+        .top-title {
+            color: #777;
+
+            font-size: 14px;
+        }
+
+        .top-title strong {
+            color: #333;
+        }
+
+        .seller-badge {
+            background: #faf0f7;
+            color: #b45f9b;
+
+            padding: 8px 14px;
+
+            border-radius: 20px;
+
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .content {
+            max-width: 1250px;
+
+            margin: 0 auto;
+
+            padding: 32px;
+        }
+
+        /* =====================================================
+           PAGE HEADER
+        ===================================================== */
+
+        .page-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+
+            margin-bottom: 25px;
+        }
+
+        .page-header h1 {
+            margin-bottom: 7px;
+
+            color: #333;
+
+            font-size: 28px;
+        }
+
+        .page-header p {
+            color: #777;
+
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+
+            padding: 10px 16px;
+
+            background: #ffffff;
+
+            border: 1px solid #ddd;
+            border-radius: 8px;
+
+            color: #555;
+
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .back-btn:hover {
+            border-color: #b45f9b;
+            color: #b45f9b;
+        }
+
+        /* =====================================================
+           SUMMARY CARDS
+        ===================================================== */
+
+        .summary-grid {
+            display: grid;
+
+            grid-template-columns: repeat(4, 1fr);
+
+            gap: 18px;
+
+            margin-bottom: 25px;
+        }
+
+        .summary-card {
+            background: #ffffff;
+
+            border: 1px solid #e8e8ec;
+            border-radius: 12px;
+
+            padding: 20px;
+
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+        }
+
+        .summary-label {
+            color: #888;
+
+            font-size: 12px;
+            font-weight: 600;
+
+            margin-bottom: 9px;
+        }
+
+        .summary-value {
+            color: #333;
+
+            font-size: 25px;
+            font-weight: 700;
+        }
+
+        .summary-description {
+            margin-top: 5px;
+
+            color: #aaa;
+
+            font-size: 11px;
+        }
+
+        /* =====================================================
+           FILTER CARD
+        ===================================================== */
+
+        .filter-card {
+            background: #ffffff;
+
+            border: 1px solid #e8e8ec;
+            border-radius: 12px;
+
+            padding: 20px;
+
+            margin-bottom: 25px;
+        }
+
+        .filter-title {
+            margin-bottom: 15px;
+
+            color: #444;
+
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .filter-form {
+            display: grid;
+
+            grid-template-columns: 1fr 1fr 1fr auto;
+
+            gap: 14px;
+
+            align-items: end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+
+            gap: 6px;
+        }
+
+        .filter-group label {
+            color: #777;
+
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .filter-control {
+            width: 100%;
+
+            padding: 10px 11px;
+
+            background: #ffffff;
+
+            border: 1px solid #ddd;
+            border-radius: 7px;
+
+            color: #444;
+
+            font-family: inherit;
+            font-size: 13px;
+
+            outline: none;
+        }
+
+        .filter-control:focus {
+            border-color: #b45f9b;
+
+            box-shadow: 0 0 0 3px rgba(180, 95, 155, 0.08);
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+
+            background: #b45f9b;
+            color: #ffffff;
+
+            border: none;
+            border-radius: 7px;
+
+            font-size: 13px;
+            font-weight: 600;
+
+            cursor: pointer;
+        }
+
+        .filter-btn:hover {
+            background: #9f5088;
+        }
+
+        .clear-filter {
+            margin-left: 8px;
+
+            color: #999;
+
+            font-size: 12px;
+        }
+
+        .clear-filter:hover {
+            color: #b45f9b;
+        }
+
+        /* =====================================================
+           SECTION CARD
+        ===================================================== */
+
+        .section-card {
+            background: #ffffff;
+
+            border: 1px solid #e8e8ec;
+            border-radius: 12px;
+
+            margin-bottom: 25px;
+
+            overflow: hidden;
+
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+        }
+
+        .section-header {
+            padding: 20px 22px;
+
+            border-bottom: 1px solid #eee;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-header h2 {
+            color: #333;
+
+            font-size: 17px;
+        }
+
+        .section-header span {
+            color: #999;
+
+            font-size: 12px;
+        }
+
+        /* =====================================================
+           SALES TABLE
+        ===================================================== */
+
+        .table-wrapper {
+            width: 100%;
+
+            overflow-x: auto;
+        }
+
+        .sales-table {
+            width: 100%;
+
+            border-collapse: collapse;
+
+            min-width: 850px;
+        }
+
+        .sales-table th {
+            padding: 13px 18px;
+
+            background: #fafafa;
+
+            border-bottom: 1px solid #eee;
+
+            color: #777;
+
+            font-size: 11px;
+            font-weight: 700;
+
+            text-align: left;
+
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .sales-table td {
+            padding: 15px 18px;
+
+            border-bottom: 1px solid #f1f1f1;
+
+            color: #555;
+
+            font-size: 13px;
+
+            vertical-align: middle;
+        }
+
+        .sales-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .sales-table tr:hover td {
+            background: #fcfafc;
+        }
+
+        .order-id {
+            color: #b45f9b;
+
+            font-weight: 700;
+        }
+
+        .product-name {
+            color: #333;
+
+            font-weight: 600;
+        }
+
+        .date-text {
+            color: #888;
+
+            white-space: nowrap;
+        }
+
+        .money {
+            color: #333;
+
+            font-weight: 600;
+        }
+
+        /* =====================================================
+           STATUS
+        ===================================================== */
+
+        .status {
+            display: inline-block;
+
+            padding: 5px 9px;
+
+            border-radius: 20px;
+
+            font-size: 10px;
+            font-weight: 700;
+
+            text-transform: capitalize;
+        }
+
+        .status.pending {
+            background: #fff7e6;
+            color: #b7791f;
+        }
+
+        .status.confirmed,
+        .status.processing {
+            background: #eef5ff;
+            color: #3478c7;
+        }
+
+        .status.shipped {
+            background: #f0edff;
+            color: #6d52c7;
+        }
+
+        .status.delivered,
+        .status.completed {
+            background: #edf8f1;
+            color: #328451;
+        }
+
+        .status.cancelled,
+        .status.returned {
+            background: #fff0f0;
+            color: #d9534f;
+        }
+
+        /* =====================================================
+           PRODUCT PERFORMANCE
+        ===================================================== */
+
+        .performance-table {
+            width: 100%;
+
+            border-collapse: collapse;
+        }
+
+        .performance-table th {
+            padding: 13px 18px;
+
+            background: #fafafa;
+
+            border-bottom: 1px solid #eee;
+
+            color: #777;
+
+            font-size: 11px;
+            font-weight: 700;
+
+            text-align: left;
+
+            text-transform: uppercase;
+        }
+
+        .performance-table td {
+            padding: 14px 18px;
+
+            border-bottom: 1px solid #f1f1f1;
+
+            color: #555;
+
+            font-size: 13px;
+        }
+
+        .performance-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .performance-product {
+            color: #333;
+
+            font-weight: 600;
+        }
+
+        /* =====================================================
+           QUICK INSIGHTS
+        ===================================================== */
+
+        .insights-grid {
+            display: grid;
+
+            grid-template-columns: repeat(3, 1fr);
+
+            gap: 18px;
+        }
+
+        .insight-card {
+            background: #ffffff;
+
+            border: 1px solid #e8e8ec;
+            border-radius: 12px;
+
+            padding: 20px;
+        }
+
+        .insight-label {
+            margin-bottom: 8px;
+
+            color: #999;
+
+            font-size: 11px;
+            font-weight: 600;
+
+            text-transform: uppercase;
+        }
+
+        .insight-value {
+            color: #333;
+
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        .insight-subtext {
+            margin-top: 6px;
+
+            color: #999;
+
+            font-size: 11px;
+        }
+
+        /* =====================================================
+           EMPTY STATE
+        ===================================================== */
+
+        .empty-state {
+            padding: 55px 25px;
+
+            text-align: center;
+        }
+
+        .empty-icon {
+            width: 55px;
+            height: 55px;
+
+            margin: 0 auto 15px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #faf0f7;
+
+            border-radius: 50%;
+
+            color: #b45f9b;
+
+            font-size: 23px;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 7px;
+
+            color: #444;
+
+            font-size: 16px;
+        }
+
+        .empty-state p {
+            color: #999;
+
+            font-size: 13px;
+        }
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+
+        @media (max-width: 1100px) {
+
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .filter-form {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .filter-button-area {
+                grid-column: 1 / -1;
+            }
+
+            .insights-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 900px) {
+
+            .sidebar {
+                width: 220px;
+            }
+
+            .main {
+                margin-left: 220px;
+            }
+
+            .content {
+                padding: 24px;
+            }
+        }
+
+        @media (max-width: 750px) {
+
+            .sidebar {
+                position: relative;
+
+                width: 100%;
+                height: auto;
+            }
+
+            .main {
+                margin-left: 0;
+            }
+
+            .logout-area {
+                margin-top: 10px;
+            }
+
+            .top-header {
+                padding: 0 20px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .page-header {
+                flex-direction: column;
+
+                gap: 15px;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-form {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-button-area {
+                grid-column: auto;
+            }
+        }
+
+        @media (max-width: 600px) {
+
+            .top-header {
+                height: auto;
+
+                padding: 15px 20px;
+
+                flex-direction: column;
+                align-items: flex-start;
+
+                gap: 10px;
+            }
+
+            .content {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+        <a href="{{ url_for('seller_dashboard') }}"
+           class="logo">
+            Women Empowerment
+        </a>
+
+        <div class="seller-label">
+            Seller Panel
+        </div>
+
+
+        <!-- MAIN -->
+
+        <div class="nav-section">
+
+            <div class="nav-title">
+                Main
+            </div>
+
+            <a href="{{ url_for('seller_dashboard') }}"
+               class="nav-link">
+
+                <span class="nav-icon">⌂</span>
+                Dashboard
+
+            </a>
+
+        </div>
+
+
+        <!-- MY PRODUCTS -->
+
+        <div class="nav-section">
+
+            <div class="nav-title">
+                My Products
+            </div>
+
+            <a href="{{ url_for('seller_products') }}"
+               class="nav-link">
+
+                <span class="nav-icon">▣</span>
+                All Products
+
+            </a>
+
+            <a href="{{ url_for('add_product') }}"
+               class="nav-link">
+
+                <span class="nav-icon">＋</span>
+                Add Product
+
+            </a>
+
+        </div>
+
+
+        <!-- CUSTOM REQUESTS -->
+
+        <div class="nav-section">
+
+            <div class="nav-title">
+                Requests
+            </div>
+
+            <a href="{{ url_for('seller_custom_requests') }}"
+               class="nav-link">
+
+                <span class="nav-icon">✦</span>
+                Custom Requests
+            </a>
+
+        </div>
+
+
+        <!-- ORDERS -->
+
+        <div class="nav-section">
+
+            <div class="nav-title">
+                Orders
+            </div>
+
+            <a href="{{ url_for('seller_orders') }}"
+               class="nav-link">
+
+                <span class="nav-icon">▤</span>
+                Customer Orders
+
+            </a>
+
+        </div>
+
+
+        <!-- REPORTS -->
+
+        <div class="nav-section">
+
+            <div class="nav-title">
+                Reports
+            </div>
+
+            <a href="{{ url_for('seller_sales') }}"
+               class="nav-link active">
+
+                <span class="nav-icon">▥</span>
+                Sales Reports
+
+            </a>
+
+            <a href="{{ url_for('seller_revenue') }}"
+               class="nav-link">
+
+                <span class="nav-icon">₹</span>
+                Revenue Analytics
+
+            </a>
+
+        </div>
+
+
+        <!-- AI TOOLS -->
+
+        <div class="nav-section">
+
+            <div class="nav-title">
+                AI Tools
+            </div>
+
+            <a href="{{ url_for('seller_ai_assistant') }}"
+               class="nav-link">
+
+                <span class="nav-icon">✧</span>
+                Business Assistant
+
+            </a>
+
+            <a href="{{ url_for('seller_marketing') }}"
+               class="nav-link">
+
+                Marketing Tool
+
+            </a>
+
+        </div>
+
+
+        <!-- ACCOUNT -->
+
+        <div class="nav-section">
+
+            <div class="nav-title">
+                Account
+            </div>
+
+            <a href="{{ url_for('seller_profile') }}"
+               class="nav-link">
+
+                <span class="nav-icon">◯</span>
+                Profile
+
+            </a>
+
+        </div>
+
+
+        <!-- LOGOUT -->
+
+        <div class="logout-area">
+
+            <a href="{{ url_for('logout') }}"
+               class="nav-link logout">
+
+                <span class="nav-icon">↪</span>
+                Logout
+
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+    ====================================================== -->
+
+    <main class="main">
+
+
+        <!-- TOP HEADER -->
+
+        <header class="top-header">
+
+            <div class="top-title">
+
+                Seller Panel /
+                <strong>Sales Reports</strong>
+
+            </div>
+
+            <div class="seller-badge">
+                Seller Account
+            </div>
+
+        </header>
+
+
+        <div class="content">
+
+
+            <!-- =================================================
+                 PAGE HEADER
+            ================================================== -->
+
+            <div class="page-header">
+
+                <div>
+
+                    <h1>
+                        Sales Reports
+                    </h1>
+
+                    <p>
+                        Track your sales transactions, orders,
+                        units sold, and product performance.
+                    </p>
+
+                </div>
+
+                <a href="{{ url_for('seller_dashboard') }}"
+                   class="back-btn">
+
+                    ← Back to Dashboard
+
+                </a>
+
+            </div>
+
+
+            <!-- =================================================
+                 SUMMARY
+            ================================================== -->
+
+            <div class="summary-grid">
+
+
+                <div class="summary-card">
+
+                    <div class="summary-label">
+                        Total Sales
+                    </div>
+
+                    <div class="summary-value">
+                        ₹{{ "%.2f"|format(total_sales|default(0)) }}
+                    </div>
+
+                    <div class="summary-description">
+                        Total sales amount
+                    </div>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <div class="summary-label">
+                        Total Orders
+                    </div>
+
+                    <div class="summary-value">
+                        {{ total_orders|default(0) }}
+                    </div>
+
+                    <div class="summary-description">
+                        Orders containing your products
+                    </div>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <div class="summary-label">
+                        Units Sold
+                    </div>
+
+                    <div class="summary-value">
+                        {{ total_units|default(0) }}
+                    </div>
+
+                    <div class="summary-description">
+                        Total product quantity sold
+                    </div>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <div class="summary-label">
+                        Average Order Value
+                    </div>
+
+                    <div class="summary-value">
+                        ₹{{ "%.2f"|format(average_order_value|default(0)) }}
+                    </div>
+
+                    <div class="summary-description">
+                        Average value per order
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 FILTERS
+            ================================================== -->
+
+            <div class="filter-card">
+
+                <div class="filter-title">
+                    Filter Sales
+                </div>
+
+                <form method="GET"
+                      action="{{ url_for('seller_sales') }}"
+                      class="filter-form">
+
+
+                    <!-- START DATE -->
+
+                    <div class="filter-group">
+
+                        <label for="start_date">
+                            Start Date
+                        </label>
+
+                        <input
+                            type="date"
+                            id="start_date"
+                            name="start_date"
+                            class="filter-control"
+                            value="{{ start_date|default('') }}"
+                        >
+
+                    </div>
+
+
+                    <!-- END DATE -->
+
+                    <div class="filter-group">
+
+                        <label for="end_date">
+                            End Date
+                        </label>
+
+                        <input
+                            type="date"
+                            id="end_date"
+                            name="end_date"
+                            class="filter-control"
+                            value="{{ end_date|default('') }}"
+                        >
+
+                    </div>
+
+
+                    <!-- STATUS -->
+
+                    <div class="filter-group">
+
+                        <label for="status">
+                            Order Status
+                        </label>
+
+                        <select
+                            id="status"
+                            name="status"
+                            class="filter-control"
+                        >
+
+                            <option value="">
+                                All Statuses
+                            </option>
+
+                            <option value="pending"
+                                {% if status|default('') == 'pending' %}
+                                    selected
+                                {% endif %}
+                            >
+                                Pending
+                            </option>
+
+                            <option value="confirmed"
+                                {% if status|default('') == 'confirmed' %}
+                                    selected
+                                {% endif %}
+                            >
+                                Confirmed
+                            </option>
+
+                            <option value="processing"
+                                {% if status|default('') == 'processing' %}
+                                    selected
+                                {% endif %}
+                            >
+                                Processing
+                            </option>
+
+                            <option value="shipped"
+                                {% if status|default('') == 'shipped' %}
+                                    selected
+                                {% endif %}
+                            >
+                                Shipped
+                            </option>
+
+                            <option value="delivered"
+                                {% if status|default('') == 'delivered' %}
+                                    selected
+                                {% endif %}
+                            >
+                                Delivered
+                            </option>
+
+                            <option value="cancelled"
+                                {% if status|default('') == 'cancelled' %}
+                                    selected
+                                {% endif %}
+                            >
+                                Cancelled
+                            </option>
+
+                            <option value="returned"
+                                {% if status|default('') == 'returned' %}
+                                    selected
+                                {% endif %}
+                            >
+                                Returned
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- BUTTON -->
+
+                    <div class="filter-button-area">
+
+                        <button type="submit"
+                                class="filter-btn">
+
+                            Apply Filter
+
+                        </button>
+
+                        <a href="{{ url_for('seller_sales') }}"
+                           class="clear-filter">
+
+                            Clear
+
+                        </a>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+
+            <!-- =================================================
+                 SALES TRANSACTIONS
+            ================================================== -->
+
+            <div class="section-card">
+
+                <div class="section-header">
+
+                    <h2>
+                        Sales Transactions
+                    </h2>
+
+                    <span>
+                        {{ sales|length }} transaction{% if sales|length != 1 %}s{% endif %}
+                    </span>
+
+                </div>
+
+
+                {% if sales %}
+
+                    <div class="table-wrapper">
+
+                        <table class="sales-table">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        Order
+                                    </th>
+
+                                    <th>
+                                        Date
+                                    </th>
+
+                                    <th>
+                                        Product
+                                    </th>
+
+                                    <th>
+                                        Quantity
+                                    </th>
+
+                                    <th>
+                                        Unit Price
+                                    </th>
+
+                                    <th>
+                                        Subtotal
+                                    </th>
+
+                                    <th>
+                                        Status
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody>
+
+                                {% for sale in sales %}
+
+                                    <tr>
+
+                                        <td>
+
+                                            <span class="order-id">
+                                                #{{ sale.order_id }}
+                                            </span>
+
+                                        </td>
+
+
+                                        <td>
+
+                                            <span class="date-text">
+
+                                                {% if sale.created_at %}
+                                                    {{ sale.created_at.strftime('%d %b %Y') }}
+                                                {% else %}
+                                                    —
+                                                {% endif %}
+
+                                            </span>
+
+                                        </td>
+
+
+                                        <td>
+
+                                            <span class="product-name">
+                                                {{ sale.product_name }}
+                                            </span>
+
+                                        </td>
+
+
+                                        <td>
+                                            {{ sale.quantity }}
+                                        </td>
+
+
+                                        <td>
+
+                                            <span class="money">
+                                                ₹{{ "%.2f"|format(sale.unit_price|default(0)) }}
+                                            </span>
+
+                                        </td>
+
+
+                                        <td>
+
+                                            <span class="money">
+                                                ₹{{ "%.2f"|format(sale.subtotal|default(0)) }}
+                                            </span>
+
+                                        </td>
+
+
+                                        <td>
+
+                                            <span class="status {{ sale.status|default('pending')|lower }}">
+                                                {{ sale.status|default('pending') }}
+                                            </span>
+
+                                        </td>
+
+                                    </tr>
+
+                                {% endfor %}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                {% else %}
+
+                    <div class="empty-state">
+
+                        <div class="empty-icon">
+                            ▥
+                        </div>
+
+                        <h3>
+                            No Sales Found
+                        </h3>
+
+                        <p>
+                            No sales transactions match the selected filters.
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- =================================================
+                 PRODUCT PERFORMANCE
+            ================================================== -->
+
+            <div class="section-card">
+
+                <div class="section-header">
+
+                    <h2>
+                        Product Performance
+                    </h2>
+
+                    <span>
+                        Sales by product
+                    </span>
+
+                </div>
+
+
+                {% if product_performance %}
+
+                    <div class="table-wrapper">
+
+                        <table class="performance-table">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        Product
+                                    </th>
+
+                                    <th>
+                                        Units Sold
+                                    </th>
+
+                                    <th>
+                                        Sales
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody>
+
+                                {% for product in product_performance %}
+
+                                    <tr>
+
+                                        <td>
+
+                                            <span class="performance-product">
+                                                {{ product.product_name }}
+                                            </span>
+
+                                        </td>
+
+
+                                        <td>
+                                            {{ product.total_units }}
+                                        </td>
+
+
+                                        <td>
+
+                                            <span class="money">
+                                                ₹{{ "%.2f"|format(product.total_sales|default(0)) }}
+                                            </span>
+
+                                        </td>
+
+                                    </tr>
+
+                                {% endfor %}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                {% else %}
+
+                    <div class="empty-state">
+
+                        <div class="empty-icon">
+                            ◫
+                        </div>
+
+                        <h3>
+                            No Product Data
+                        </h3>
+
+                        <p>
+                            Product performance information will appear
+                            after your products receive sales.
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- =================================================
+                 QUICK INSIGHTS
+            ================================================== -->
+
+            <div class="insights-grid">
+
+
+                <div class="insight-card">
+
+                    <div class="insight-label">
+                        Best Selling Product
+                    </div>
+
+                    <div class="insight-value">
+
+                        {% if best_selling_product %}
+                            {{ best_selling_product }}
+                        {% else %}
+                            No data yet
+                        {% endif %}
+
+                    </div>
+
+                    <div class="insight-subtext">
+                        Based on units sold
+                    </div>
+
+                </div>
+
+
+                <div class="insight-card">
+
+                    <div class="insight-label">
+                        Highest Product Sales
+                    </div>
+
+                    <div class="insight-value">
+
+                        ₹{{ "%.2f"|format(highest_product_sales|default(0)) }}
+
+                    </div>
+
+                    <div class="insight-subtext">
+                        Highest sales value for a product
+                    </div>
+
+                </div>
+
+
+                <div class="insight-card">
+
+                    <div class="insight-label">
+                        Completed Orders
+                    </div>
+
+                    <div class="insight-value">
+
+                        {{ completed_orders|default(0) }}
+
+                    </div>
+
+                    <div class="insight-subtext">
+                        Orders marked as delivered/completed
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Cart | SheRise</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+
+        /* =========================================================
+           BUYER CART
+           Existing filename: cart.html
+           Seller-side files are not affected.
+           ========================================================= */
+
+        .buyer-page {
+            margin: 0;
+            min-height: 100vh;
+            background: #faf7fa;
+        }
+
+        .buyer-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+
+        /* ================= SIDEBAR ================= */
+
+        .buyer-sidebar {
+            width: 250px;
+            min-width: 250px;
+            background: #ffffff;
+            border-right: 1px solid #eee5ed;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 100;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 22px 20px;
+            text-decoration: none;
+            border-bottom: 1px solid #f1e9ef;
+        }
+
+        .sidebar-brand-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: #b45f9b;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 19px;
+            font-weight: 700;
+        }
+
+        .sidebar-brand-text {
+            color: #a14f8b;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .buyer-sidebar-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 18px 20px;
+            border-bottom: 1px solid #f1e9ef;
+        }
+
+        .buyer-profile-avatar {
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0;
+            border-radius: 50%;
+            background: #f3e2ef;
+            color: #a14f8b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .buyer-profile-info {
+            min-width: 0;
+        }
+
+        .buyer-profile-info strong {
+            display: block;
+            color: #333;
+            font-size: 13px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .buyer-profile-info span {
+            display: block;
+            color: #999;
+            font-size: 11px;
+            margin-top: 2px;
+        }
+
+        .buyer-nav {
+            flex: 1;
+            padding: 18px 12px;
+            overflow-y: auto;
+        }
+
+        .buyer-nav-group {
+            margin-bottom: 20px;
+        }
+
+        .buyer-nav-title {
+            color: #aaa;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 12px 8px;
+        }
+
+        .buyer-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 11px 12px;
+            margin: 2px 0;
+            border-radius: 8px;
+            color: #666;
+            text-decoration: none;
+            font-size: 13px;
+            transition: 0.2s;
+        }
+
+        .buyer-nav-link:hover {
+            background: #faf1f8;
+            color: #a14f8b;
+        }
+
+        .buyer-nav-link.active {
+            background: #f5e8f2;
+            color: #a14f8b;
+            font-weight: 600;
+        }
+
+        .buyer-nav-icon {
+            width: 20px;
+            text-align: center;
+            font-size: 15px;
+            flex-shrink: 0;
+        }
+
+        .buyer-sidebar-bottom {
+            padding: 12px;
+            border-top: 1px solid #f1e9ef;
+        }
+
+        .buyer-logout-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 11px 12px;
+            border-radius: 8px;
+            color: #777;
+            text-decoration: none;
+            font-size: 13px;
+        }
+
+        .buyer-logout-link:hover {
+            background: #fff0f0;
+            color: #b33a3a;
+        }
+
+
+        /* ================= MAIN ================= */
+
+        .buyer-main {
+            flex: 1;
+            margin-left: 250px;
+            min-width: 0;
+        }
+
+        .buyer-topbar {
+            height: 70px;
+            background: #ffffff;
+            border-bottom: 1px solid #eee5ed;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+        }
+
+        .buyer-topbar-title {
+            color: #333;
+            font-size: 20px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .buyer-topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .buyer-topbar-btn {
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            background: #faf4f9;
+            color: #a14f8b;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        .buyer-topbar-btn:hover {
+            background: #f3e4f0;
+        }
+
+        .buyer-page-content {
+            padding: 30px;
+            max-width: 1350px;
+            margin: 0 auto;
+        }
+
+
+        /* ================= PAGE HEADER ================= */
+
+        .cart-header {
+            margin-bottom: 25px;
+        }
+
+        .cart-header h1 {
+            margin: 0 0 7px;
+            color: #292529;
+            font-size: 28px;
+        }
+
+        .cart-header p {
+            margin: 0;
+            color: #888;
+            font-size: 13px;
+        }
+
+
+        /* ================= CART LAYOUT ================= */
+
+        .cart-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 360px;
+            gap: 24px;
+            align-items: start;
+        }
+
+
+        /* ================= CART CARD ================= */
+
+        .cart-card {
+            background: #ffffff;
+            border: 1px solid #eee5ed;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 3px 15px rgba(60, 35, 55, 0.04);
+        }
+
+        .cart-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 22px;
+            border-bottom: 1px solid #eee8ed;
+        }
+
+        .cart-card-header h2 {
+            margin: 0;
+            color: #333;
+            font-size: 18px;
+        }
+
+        .cart-card-header span {
+            color: #999;
+            font-size: 12px;
+        }
+
+
+        /* ================= CART ITEM ================= */
+
+        .cart-item {
+            display: grid;
+            grid-template-columns: 90px minmax(150px, 1fr) 125px 95px 70px;
+            gap: 18px;
+            align-items: center;
+            padding: 20px 22px;
+            border-bottom: 1px solid #f0eaef;
+        }
+
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+
+
+        /* ================= IMAGE ================= */
+
+        .cart-item-image {
+            width: 90px;
+            height: 90px;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #f7f0f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cart-item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .no-cart-image {
+            color: #aaa;
+            font-size: 11px;
+            text-align: center;
+        }
+
+
+        /* ================= DETAILS ================= */
+
+        .cart-item-details {
+            min-width: 0;
+        }
+
+        .cart-item-details h3 {
+            margin: 0 0 7px;
+            color: #333;
+            font-size: 15px;
+            line-height: 1.35;
+        }
+
+        .cart-price {
+            margin: 0 0 5px;
+            color: #a14f8b;
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .cart-stock {
+            margin: 0;
+            color: #888;
+            font-size: 11px;
+        }
+
+
+        /* ================= QUANTITY ================= */
+
+        .cart-quantity label {
+            display: block;
+            margin-bottom: 6px;
+            color: #888;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .quantity-control {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .quantity-control input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 8px;
+            border: 1px solid #ddd8de;
+            border-radius: 6px;
+            color: #444;
+            font-size: 12px;
+            outline: none;
+        }
+
+        .quantity-control input:focus {
+            border-color: #b45f9b;
+        }
+
+        .quantity-control button {
+            width: 100%;
+            border: none;
+            background: #f3e4ef;
+            color: #a14f8b;
+            padding: 7px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .quantity-control button:hover {
+            background: #ead5e4;
+        }
+
+
+        /* ================= TOTAL ================= */
+
+        .cart-item-total {
+            text-align: right;
+        }
+
+        .cart-item-total strong {
+            color: #333;
+            font-size: 14px;
+        }
+
+
+        /* ================= REMOVE ================= */
+
+        .cart-item-remove {
+            text-align: right;
+        }
+
+        .remove-cart-btn {
+            border: none;
+            background: transparent;
+            color: #c75454;
+            padding: 5px;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        .remove-cart-btn:hover {
+            text-decoration: underline;
+        }
+
+
+        /* ================= SUMMARY ================= */
+
+        .cart-summary {
+            background: #ffffff;
+            border: 1px solid #eee5ed;
+            border-radius: 15px;
+            padding: 23px;
+            box-shadow: 0 3px 15px rgba(60, 35, 55, 0.04);
+            position: sticky;
+            top: 20px;
+        }
+
+        .cart-summary h2 {
+            margin: 0 0 20px;
+            color: #333;
+            font-size: 19px;
+        }
+
+        .summary-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 13px;
+            color: #777;
+            font-size: 13px;
+        }
+
+        .summary-row strong {
+            color: #333;
+        }
+
+        .summary-divider {
+            border-top: 1px solid #eee8ed;
+            margin: 18px 0;
+        }
+
+        .summary-total {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .summary-total strong {
+            color: #a14f8b;
+            font-size: 21px;
+        }
+
+
+        /* ================= CHECKOUT ================= */
+
+        .checkout-section {
+            margin-top: 24px;
+            padding-top: 21px;
+            border-top: 1px solid #eee8ed;
+        }
+
+        .checkout-section h3 {
+            margin: 0 0 5px;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .checkout-note {
+            color: #888;
+            font-size: 11px;
+            line-height: 1.5;
+            margin: 0 0 17px;
+        }
+
+        .checkout-form {
+            display: flex;
+            flex-direction: column;
+            gap: 13px;
+        }
+
+        .checkout-field label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .checkout-field input,
+        .checkout-field textarea {
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #ddd8de;
+            border-radius: 7px;
+            padding: 9px 10px;
+            background: #fff;
+            color: #333;
+            font-family: inherit;
+            font-size: 12px;
+            outline: none;
+        }
+
+        .checkout-field textarea {
+            resize: vertical;
+        }
+
+        .checkout-field input:focus,
+        .checkout-field textarea:focus {
+            border-color: #b45f9b;
+            box-shadow: 0 0 0 3px rgba(180, 95, 155, 0.08);
+        }
+
+
+        /* ================= PAYMENT ================= */
+
+        .payment-info {
+            background: #faf5f9;
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .payment-info strong {
+            display: block;
+            margin-bottom: 5px;
+            color: #444;
+            font-size: 11px;
+        }
+
+        .payment-info p {
+            margin: 0 0 4px;
+            color: #a14f8b;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .payment-info small {
+            display: block;
+            color: #999;
+            font-size: 10px;
+            line-height: 1.4;
+        }
+
+
+        /* ================= CHECKOUT BUTTON ================= */
+
+        .checkout-btn {
+            width: 100%;
+            border: none;
+            background: #b45f9b;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .checkout-btn:hover {
+            background: #a14f8b;
+        }
+
+
+        /* ================= EMPTY CART ================= */
+
+        .empty-cart {
+            background: #ffffff;
+            border: 1px solid #eee5ed;
+            border-radius: 15px;
+            padding: 65px 25px;
+            text-align: center;
+            box-shadow: 0 3px 15px rgba(60, 35, 55, 0.04);
+        }
+
+        .empty-cart-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 15px;
+            border-radius: 50%;
+            background: #f5e8f2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 27px;
+        }
+
+        .empty-cart h2 {
+            margin: 0 0 8px;
+            color: #333;
+            font-size: 21px;
+        }
+
+        .empty-cart p {
+            margin: 0 0 23px;
+            color: #888;
+            font-size: 13px;
+        }
+
+        .continue-shopping-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #b45f9b;
+            color: white;
+            text-decoration: none;
+            padding: 11px 20px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .continue-shopping-btn:hover {
+            background: #a14f8b;
+        }
+
+
+        /* ================= CONTINUE SHOPPING ================= */
+
+        .continue-shopping {
+            margin-top: 20px;
+        }
+
+        .continue-shopping a {
+            color: #a14f8b;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .continue-shopping a:hover {
+            text-decoration: underline;
+        }
+
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 1150px) {
+
+            .cart-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .cart-summary {
+                position: static;
+            }
+
+            .cart-item {
+                grid-template-columns: 90px minmax(150px, 1fr) 120px;
+            }
+
+            .cart-item-total {
+                text-align: left;
+            }
+
+            .cart-item-remove {
+                text-align: left;
+            }
+        }
+
+
+        @media (max-width: 750px) {
+
+            .buyer-sidebar {
+                width: 72px;
+                min-width: 72px;
+            }
+
+            .buyer-main {
+                margin-left: 72px;
+            }
+
+            .sidebar-brand {
+                justify-content: center;
+                padding: 18px 10px;
+            }
+
+            .sidebar-brand-text,
+            .buyer-profile-info,
+            .buyer-nav-title,
+            .buyer-nav-link span:not(.buyer-nav-icon) {
+                display: none;
+            }
+
+            .buyer-sidebar-profile {
+                justify-content: center;
+                padding: 15px 8px;
+            }
+
+            .buyer-nav {
+                padding: 15px 8px;
+            }
+
+            .buyer-nav-link {
+                justify-content: center;
+                padding: 12px 8px;
+            }
+
+            .buyer-nav-icon {
+                width: auto;
+            }
+
+            .buyer-sidebar-bottom {
+                padding: 8px;
+            }
+
+            .buyer-logout-link {
+                justify-content: center;
+            }
+
+            .buyer-page-content {
+                padding: 20px;
+            }
+
+            .buyer-topbar {
+                padding: 0 20px;
+            }
+
+            .cart-item {
+                grid-template-columns: 80px 1fr;
+                gap: 14px;
+            }
+
+            .cart-item-image {
+                width: 80px;
+                height: 80px;
+            }
+
+            .cart-quantity,
+            .cart-item-total,
+            .cart-item-remove {
+                grid-column: 2;
+                text-align: left;
+            }
+
+            .quantity-control {
+                flex-direction: row;
+                align-items: center;
+            }
+
+            .quantity-control input {
+                width: 80px;
+            }
+
+            .quantity-control button {
+                width: auto;
+                padding: 8px 12px;
+            }
+        }
+
+
+        @media (max-width: 520px) {
+
+            .buyer-topbar {
+                height: 62px;
+            }
+
+            .buyer-topbar-title {
+                font-size: 17px;
+            }
+
+            .buyer-topbar-btn {
+                width: 34px;
+                height: 34px;
+            }
+
+            .buyer-page-content {
+                padding: 15px;
+            }
+
+            .cart-header h1 {
+                font-size: 24px;
+            }
+
+            .cart-card-header {
+                padding: 16px;
+            }
+
+            .cart-item {
+                padding: 16px;
+            }
+
+            .cart-summary {
+                padding: 18px;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body class="buyer-page">
+
+<div class="buyer-layout">
+
+
+    <!-- =========================================================
+         SIDEBAR
+         ========================================================= -->
+
+    <aside class="buyer-sidebar">
+
+        <a href="{{ url_for('buyer_dashboard') }}"
+           class="sidebar-brand">
+
+            <div class="sidebar-brand-icon">
+                S
+            </div>
+
+            <div class="sidebar-brand-text">
+                SheRise
+            </div>
+
+        </a>
+
+
+        <div class="buyer-sidebar-profile">
+
+            <div class="buyer-profile-avatar">
+
+                {% if session.get('user_name') %}
+                    {{ session.get('user_name')[0]|upper }}
+                {% else %}
+                    B
+                {% endif %}
+
+            </div>
+
+            <div class="buyer-profile-info">
+
+                <strong>
+                    {{ session.get('user_name', 'Buyer') }}
+                </strong>
+
+                <span>
+                    Buyer
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <nav class="buyer-nav">
+
+            <div class="buyer-nav-group">
+
+                <div class="buyer-nav-title">
+                    MAIN
+                </div>
+
+                <a href="{{ url_for('buyer_dashboard') }}"
+                   class="buyer-nav-link">
+
+                    <span class="buyer-nav-icon">⌂</span>
+                    <span>Dashboard</span>
+
+                </a>
+
+            </div>
+
+
+            <div class="buyer-nav-group">
+
+                <div class="buyer-nav-title">
+                    SHOPPING
+                </div>
+
+                <a href="{{ url_for('buyer_products') }}"
+                   class="buyer-nav-link">
+
+                    <span class="buyer-nav-icon">🛍</span>
+                    <span>Marketplace</span>
+
+                </a>
+
+                <a href="{{ url_for('buyer_wishlist') }}"
+                   class="buyer-nav-link">
+
+                    <span class="buyer-nav-icon">♡</span>
+                    <span>Wishlist</span>
+
+                </a>
+
+                <a href="{{ url_for('buyer_cart') }}"
+                   class="buyer-nav-link active">
+
+                    <span class="buyer-nav-icon">🛒</span>
+                    <span>Cart</span>
+
+                </a>
+
+            </div>
+
+
+            <div class="buyer-nav-group">
+
+                <div class="buyer-nav-title">
+                    ORDERS
+                </div>
+
+                <a href="{{ url_for('buyer_orders') }}"
+                   class="buyer-nav-link">
+
+                    <span class="buyer-nav-icon">▣</span>
+                    <span>My Orders</span>
+
+                </a>
+
+                <a href="{{ url_for('buyer_custom_request') }}"
+                   class="buyer-nav-link">
+
+                    <span class="buyer-nav-icon">✦</span>
+                    <span>Custom Request</span>
+
+                </a>
+
+            </div>
+
+
+            <div class="buyer-nav-group">
+
+                <div class="buyer-nav-title">
+                    ACCOUNT
+                </div>
+
+                <a href="{{ url_for('buyer_profile') }}"
+                   class="buyer-nav-link">
+
+                    <span class="buyer-nav-icon">◉</span>
+                    <span>Profile</span>
+
+                </a>
+
+            </div>
+
+        </nav>
+
+
+        <div class="buyer-sidebar-bottom">
+
+            <a href="{{ url_for('logout') }}"
+               class="buyer-logout-link">
+
+                <span class="buyer-nav-icon">↪</span>
+                <span>Logout</span>
+
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =========================================================
+         MAIN
+         ========================================================= -->
+
+    <main class="buyer-main">
+
+
+        <header class="buyer-topbar">
+
+            <h1 class="buyer-topbar-title">
+                My Shopping Cart
+            </h1>
+
+            <div class="buyer-topbar-actions">
+
+                <a href="{{ url_for('buyer_wishlist') }}"
+                   class="buyer-topbar-btn"
+                   title="Wishlist">
+                    ♥
+                </a>
+
+                <a href="{{ url_for('buyer_cart') }}"
+                   class="buyer-topbar-btn"
+                   title="Cart">
+                    🛒
+                </a>
+
+            </div>
+
+        </header>
+
+
+        <div class="buyer-page-content">
+
+
+            <!-- ================= HEADER ================= -->
+
+            <section class="cart-header">
+
+                <h1>
+                    My Shopping Cart
+                </h1>
+
+                <p>
+                    Review your selected products before placing your order.
+                </p>
+
+            </section>
+
+
+            <!-- =================================================
+                 IMPORTANT:
+                 app.py sends "items", not "cart_items".
+                 ================================================= -->
+
+            {% if items %}
+
+
+            <div class="cart-layout">
+
+
+                <!-- ================= CART ITEMS ================= -->
+
+                <section class="cart-items-section">
+
+                    <div class="cart-card">
+
+
+                        <div class="cart-card-header">
+
+                            <h2>
+                                Cart Items
+                            </h2>
+
+                            <span>
+                                {{ items|length }}
+                                item{% if items|length != 1 %}s{% endif %}
+                            </span>
+
+                        </div>
+
+
+                        {% for item in items %}
+
+
+                        <div class="cart-item">
+
+
+                            <!-- Product Image -->
+
+                            <div class="cart-item-image">
+
+                                {% if item.image_url %}
+
+                                    <img
+                                        src="{{ item.image_url }}"
+                                        alt="{{ item.name }}"
+                                    >
+
+                                {% else %}
+
+                                    <div class="no-cart-image">
+                                        No Image
+                                    </div>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            <!-- Product Details -->
+
+                            <div class="cart-item-details">
+
+                                <h3>
+                                    {{ item.name }}
+                                </h3>
+
+                                <p class="cart-price">
+                                    ₹{{ "%.2f"|format(item.price) }}
+                                </p>
+
+                                <p class="cart-stock">
+                                    Available stock:
+                                    {{ item.stock }}
+                                </p>
+
+                            </div>
+
+
+                            <!-- Quantity -->
+
+                            <div class="cart-quantity">
+
+                                <form
+                                    method="POST"
+                                    action="{{ url_for(
+                                        'update_cart',
+                                        cart_item_id=item.cart_item_id
+                                    ) }}"
+                                >
+{% include "_csrf_field.html" %}
+
+                                    <label
+                                        for="quantity-{{ item.cart_item_id }}"
+                                    >
+                                        Quantity
+                                    </label>
+
+                                    <div class="quantity-control">
+
+                                        <input
+                                            id="quantity-{{ item.cart_item_id }}"
+                                            type="number"
+                                            name="quantity"
+                                            value="{{ item.quantity }}"
+                                            min="1"
+                                            max="{{ item.stock }}"
+                                            required
+                                        >
+
+                                        <button type="submit">
+                                            Update
+                                        </button>
+
+                                    </div>
+
+                                </form>
+
+                            </div>
+
+
+                            <!-- Item Total -->
+
+                            <div class="cart-item-total">
+
+                                <strong>
+                                    ₹{{ "%.2f"|format(item.subtotal) }}
+                                </strong>
+
+                            </div>
+
+
+                            <!-- Remove -->
+
+                            <div class="cart-item-remove">
+
+                                <form
+                                    method="POST"
+                                    action="{{ url_for(
+                                        'remove_from_cart',
+                                        cart_item_id=item.cart_item_id
+                                    ) }}"
+                                >
+{% include "_csrf_field.html" %}
+
+                                    <button
+                                        type="submit"
+                                        class="remove-cart-btn"
+                                    >
+                                        Remove
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+
+                        </div>
+
+
+                        {% endfor %}
+
+
+                    </div>
+
+                </section>
+
+
+                <!-- ================= ORDER SUMMARY ================= -->
+
+                <aside class="cart-summary">
+
+                    <h2>
+                        Order Summary
+                    </h2>
+
+
+                    <div class="summary-row">
+
+                        <span>
+                            Items
+                        </span>
+
+                        <span>
+                            {{ items|length }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="summary-row">
+
+                        <span>
+                            Subtotal
+                        </span>
+
+                        <strong>
+                            ₹{{ "%.2f"|format(total) }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="summary-row">
+
+                        <span>
+                            Delivery
+                        </span>
+
+                        <span>
+                            Free
+                        </span>
+
+                    </div>
+
+
+                    <div class="summary-divider"></div>
+
+
+                    <div class="summary-total">
+
+                        <span>
+                            Total
+                        </span>
+
+                        <strong>
+                            ₹{{ "%.2f"|format(total) }}
+                        </strong>
+
+                    </div>
+
+
+                    <!-- ================= CHECKOUT ================= -->
+
+                    <div class="checkout-section">
+
+                        <h3>
+                            Delivery Address
+                        </h3>
+
+                        <p class="checkout-note">
+                            Enter the address where you want your order
+                            delivered.
+                        </p>
+
+
+                        <form
+                            method="POST"
+                            action="{{ url_for('checkout') }}"
+                            class="checkout-form"
+                        >
+{% include "_csrf_field.html" %}
+
+
+                            <!-- Address -->
+
+                            <div class="checkout-field">
+
+                                <label for="address_line">
+                                    Address
+                                </label>
+
+                                <textarea
+                                    id="address_line"
+                                    name="address_line"
+                                    rows="3"
+                                    placeholder="House number, street, area"
+                                    required
+                                ></textarea>
+
+                            </div>
+
+
+                            <!-- City -->
+
+                            <div class="checkout-field">
+
+                                <label for="city">
+                                    City
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="city"
+                                    name="city"
+                                    placeholder="Enter city"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <!-- State -->
+
+                            <div class="checkout-field">
+
+                                <label for="state">
+                                    State
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="state"
+                                    name="state"
+                                    placeholder="Enter state"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <!-- PIN -->
+
+                            <div class="checkout-field">
+
+                                <label for="pincode">
+                                    PIN Code
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="pincode"
+                                    name="pincode"
+                                    placeholder="6-digit PIN code"
+                                    pattern="[0-9]{6}"
+                                    maxlength="6"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <!-- Payment -->
+
+                            <div class="payment-info">
+
+                                <strong>
+                                    Payment Method
+                                </strong>
+
+                                <p>
+                                    Cash on Delivery
+                                </p>
+
+                                <small>
+                                    No online payment service is used.
+                                    Payment is due when your order is delivered.
+                                </small>
+
+                            </div>
+
+
+                            <!-- Place Order -->
+
+                            <button
+                                type="submit"
+                                class="checkout-btn"
+                            >
+                                Place Order
+                            </button>
+
+
+                        </form>
+
+                    </div>
+
+
+                </aside>
+
+
+            </div>
+
+
+            <!-- ================= CONTINUE SHOPPING ================= -->
+
+            <section class="continue-shopping">
+
+                <a href="{{ url_for('buyer_products') }}">
+                    ← Continue Shopping
+                </a>
+
+            </section>
+
+
+            {% else %}
+
+
+            <!-- ================= EMPTY CART ================= -->
+
+            <section class="empty-cart">
+
+                <div class="empty-cart-icon">
+                    🛒
+                </div>
+
+                <h2>
+                    Your cart is empty
+                </h2>
+
+                <p>
+                    You haven't added any products to your cart yet.
+                </p>
+
+                <a
+                    href="{{ url_for('buyer_products') }}"
+                    class="continue-shopping-btn"
+                >
+                    Browse Marketplace
+                </a>
+
+            </section>
+
+
+            {% endif %}
+
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+
+</html>

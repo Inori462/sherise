@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Payment | SheRise</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f8f4f7;
+            color: #333;
+        }
+
+        /* -------------------------------------------------
+           Layout
+        ------------------------------------------------- */
+
+        .buyer-layout {
+            min-height: 100vh;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 245px;
+            min-height: 100vh;
+            background: #ffffff;
+            border-right: 1px solid #eadde5;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            padding: 25px 15px;
+            z-index: 10;
+        }
+
+        .brand {
+            text-decoration: none;
+            display: block;
+            padding: 5px 12px 28px;
+        }
+
+        .brand h2 {
+            color: #b45f9b;
+            font-size: 25px;
+            margin-bottom: 4px;
+        }
+
+        .brand span {
+            color: #888;
+            font-size: 12px;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .nav-menu a {
+            text-decoration: none;
+            color: #555;
+            padding: 12px 14px;
+            border-radius: 9px;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        .nav-menu a:hover,
+        .nav-menu a.active {
+            background: #f4e5ef;
+            color: #a84f8d;
+        }
+
+        .main-content {
+            margin-left: 245px;
+            width: calc(100% - 245px);
+            min-height: 100vh;
+            padding: 35px;
+        }
+
+        /* -------------------------------------------------
+           Header
+        ------------------------------------------------- */
+
+        .page-header {
+            margin-bottom: 28px;
+        }
+
+        .page-header h1 {
+            color: #444;
+            font-size: 30px;
+            margin-bottom: 7px;
+        }
+
+        .page-header p {
+            color: #777;
+            font-size: 14px;
+        }
+
+        /* -------------------------------------------------
+           Payment wrapper
+        ------------------------------------------------- */
+
+        .payment-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            gap: 24px;
+        }
+
+        .payment-card,
+        .summary-card {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 3px 16px rgba(0, 0, 0, 0.06);
+        }
+
+        .card-title {
+            font-size: 20px;
+            color: #444;
+            margin-bottom: 7px;
+        }
+
+        .card-subtitle {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        /* -------------------------------------------------
+           Payment methods
+        ------------------------------------------------- */
+
+        .payment-method {
+            border: 1px solid #e5d9e0;
+            border-radius: 11px;
+            padding: 17px;
+            margin-bottom: 13px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .payment-method:hover {
+            border-color: #c783ae;
+            background: #fffafd;
+        }
+
+        .payment-method.selected {
+            border-color: #b45f9b;
+            background: #fcf4f9;
+        }
+
+        .payment-method label {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .payment-method input {
+            margin-top: 4px;
+            accent-color: #b45f9b;
+        }
+
+        .method-content strong {
+            display: block;
+            color: #444;
+            font-size: 15px;
+            margin-bottom: 5px;
+        }
+
+        .method-content span {
+            color: #888;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        /* -------------------------------------------------
+           Payment information
+        ------------------------------------------------- */
+
+        .secure-box {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f2f6;
+            border-radius: 10px;
+            font-size: 12px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .secure-box strong {
+            color: #8e4a78;
+        }
+
+        /* -------------------------------------------------
+           Buttons
+        ------------------------------------------------- */
+
+        .payment-button {
+            width: 100%;
+            border: none;
+            background: #b45f9b;
+            color: white;
+            padding: 14px 18px;
+            border-radius: 9px;
+            margin-top: 22px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .payment-button:hover {
+            background: #a6538d;
+        }
+
+        .payment-button:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 14px;
+            color: #9b5685;
+            text-decoration: none;
+            font-size: 13px;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        /* -------------------------------------------------
+           Summary
+        ------------------------------------------------- */
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+
+        .summary-row:last-child {
+            border-bottom: none;
+        }
+
+        .summary-label {
+            color: #777;
+        }
+
+        .summary-value {
+            color: #444;
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .total-row {
+            margin-top: 10px;
+            padding-top: 18px;
+            border-top: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .total-row span:first-child {
+            color: #555;
+            font-size: 15px;
+        }
+
+        .total-amount {
+            color: #b45f9b;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .order-id {
+            display: inline-block;
+            margin-bottom: 18px;
+            padding: 7px 11px;
+            border-radius: 7px;
+            background: #f4e7ef;
+            color: #9c4f83;
+            font-size: 12px;
+        }
+
+        /* -------------------------------------------------
+           Status message
+        ------------------------------------------------- */
+
+        .message {
+            display: none;
+            margin-top: 15px;
+            padding: 12px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .message.error {
+            display: block;
+            background: #fff0f0;
+            color: #a94442;
+        }
+
+        .message.success {
+            display: block;
+            background: #eef9f1;
+            color: #39734a;
+        }
+
+        /* -------------------------------------------------
+           Responsive
+        ------------------------------------------------- */
+
+        @media (max-width: 900px) {
+
+            .payment-wrapper {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 700px) {
+
+            .sidebar {
+                position: static;
+                width: 100%;
+                min-height: auto;
+                border-right: none;
+                border-bottom: 1px solid #eadde5;
+            }
+
+            .buyer-layout {
+                display: block;
+            }
+
+            .nav-menu {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+
+            .nav-menu a {
+                padding: 9px 11px;
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                padding: 22px 16px;
+            }
+
+            .page-header h1 {
+                font-size: 26px;
+            }
+
+            .payment-card,
+            .summary-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="buyer-layout">
+
+    <!-- =================================================
+         Sidebar
+    ================================================== -->
+
+    <aside class="sidebar">
+
+        <a href="{{ url_for('buyer_dashboard') }}" class="brand">
+            <h2>SheRise</h2>
+            <span>Women Empowerment Platform</span>
+        </a>
+
+        <nav class="nav-menu">
+
+            <a href="{{ url_for('buyer_dashboard') }}">
+                Dashboard
+            </a>
+
+            <a href="{{ url_for('buyer_products') }}">
+                Marketplace
+            </a>
+
+            <a href="{{ url_for('buyer_cart') }}">
+                Cart
+            </a>
+
+            <a href="{{ url_for('buyer_wishlist') }}">
+                Wishlist
+            </a>
+
+            <a href="{{ url_for('buyer_orders') }}">
+                My Orders
+            </a>
+
+            <a href="{{ url_for('buyer_custom_request') }}">
+                Custom Request
+            </a>
+
+            <a href="{{ url_for('buyer_profile') }}">
+                Profile
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- =================================================
+         Main content
+    ================================================== -->
+
+    <main class="main-content">
+
+        <div class="page-header">
+
+            <h1>Cash on Delivery</h1>
+
+            <p>
+                Payment is collected in person when your order is delivered.
+            </p>
+
+        </div>
+
+
+        <div class="payment-wrapper">
+
+
+            <!-- =========================================
+                 Payment methods
+            ========================================== -->
+
+            <section class="payment-card">
+
+                <h2 class="card-title">
+                    Payment Method
+                </h2>
+
+                <p class="card-subtitle">
+                    Payments are collected in person when your order is delivered.
+                </p>
+
+                <div class="payment-method selected">
+                    <div class="method-content">
+                        <strong>Cash on Delivery</strong>
+                        <span>Pay when your order is delivered. No online payment service is used.</span>
+                    </div>
+                </div>
+
+                <a href="{{ url_for('buyer_order_details', order_id=order.id) }}"
+                   class="back-link">
+                    View Order Details
+                </a>
+
+            </section>
+
+
+            <!-- =========================================
+                 Order summary
+            ========================================== -->
+
+            <aside class="summary-card">
+
+                <h2 class="card-title">
+                    Order Summary
+                </h2>
+
+                {% if order is defined and order %}
+
+                    <span class="order-id">
+                        Order #{{ order.id }}
+                    </span>
+
+                {% elif order_id is defined %}
+
+                    <span class="order-id">
+                        Order #{{ order_id }}
+                    </span>
+
+                {% endif %}
+
+
+                {% if items is defined and items %}
+
+                    {% for item in items %}
+
+                        <div class="summary-row">
+
+                            <span class="summary-label">
+                                {{ item.name or item.product_name }}
+                                × {{ item.quantity }}
+                            </span>
+
+                            <span class="summary-value">
+                                ₹{{ "%.2f"|format(
+                                    item.subtotal
+                                    if item.subtotal is defined
+                                    else (
+                                        item.unit_price * item.quantity
+                                    )
+                                ) }}
+                            </span>
+
+                        </div>
+
+                    {% endfor %}
+
+                {% endif %}
+
+
+                <div class="summary-row">
+
+                    <span class="summary-label">
+                        Payment
+                    </span>
+
+                    <span
+                        class="summary-value"
+                        id="selected-payment"
+                    >
+                        Cash on Delivery
+                    </span>
+
+                </div>
+
+
+                <div class="total-row">
+
+                    <span>
+                        Total
+                    </span>
+
+                    <span class="total-amount">
+
+                        ₹{{ "%.2f"|format(
+                            order.total_amount
+                            if order is defined and order and order.total_amount is defined
+                            else (
+                                total
+                                if total is defined
+                                else (
+                                    amount
+                                    if amount is defined
+                                    else 0
+                                )
+                            )
+                        ) }}
+
+                    </span>
+
+                </div>
+
+            </aside>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+</body>
+</html>

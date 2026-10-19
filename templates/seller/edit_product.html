@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Edit Product | Women Empowerment</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f7f7fa;
+            color: #333;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* =====================================================
+           LAYOUT
+        ===================================================== */
+
+        .layout {
+            min-height: 100vh;
+        }
+
+        /* =====================================================
+           SIDEBAR
+        ===================================================== */
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+
+            width: 250px;
+            height: 100vh;
+
+            background: #ffffff;
+            border-right: 1px solid #e8e8ec;
+
+            display: flex;
+            flex-direction: column;
+
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .logo {
+            padding: 24px 22px 8px;
+
+            color: #b45f9b;
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .seller-label {
+            padding: 0 22px 22px;
+
+            color: #888;
+            font-size: 12px;
+            font-weight: 600;
+
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-section {
+            margin-bottom: 8px;
+        }
+
+        .nav-title {
+            padding: 10px 22px 7px;
+
+            color: #999;
+            font-size: 11px;
+            font-weight: 700;
+
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+
+            padding: 11px 22px;
+
+            color: #555;
+            font-size: 14px;
+            font-weight: 500;
+
+            transition: 0.2s ease;
+        }
+
+        .nav-link:hover {
+            background: #faf0f7;
+            color: #b45f9b;
+        }
+
+        .nav-link.active {
+            background: #f7eaf4;
+            color: #b45f9b;
+
+            font-weight: 600;
+
+            border-right: 3px solid #b45f9b;
+        }
+
+        .nav-icon {
+            width: 24px;
+            margin-right: 9px;
+
+            text-align: center;
+            font-size: 15px;
+        }
+
+        .sub-link {
+            padding-left: 55px;
+            font-size: 13px;
+        }
+
+        .disabled-link {
+            color: #aaa;
+            cursor: default;
+        }
+
+        .disabled-link:hover {
+            background: transparent;
+            color: #aaa;
+        }
+
+        .logout-area {
+            margin-top: auto;
+
+            padding: 15px 0;
+
+            border-top: 1px solid #eee;
+        }
+
+        .logout {
+            color: #d9534f;
+        }
+
+        .logout:hover {
+            background: #fff5f5;
+            color: #c9302c;
+        }
+
+        /* =====================================================
+           MAIN
+        ===================================================== */
+
+        .main {
+            margin-left: 250px;
+            min-height: 100vh;
+        }
+
+        .top-header {
+            height: 70px;
+
+            background: #ffffff;
+            border-bottom: 1px solid #e8e8ec;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 32px;
+        }
+
+        .top-title {
+            color: #777;
+            font-size: 14px;
+        }
+
+        .top-title strong {
+            color: #333;
+        }
+
+        .seller-badge {
+            background: #faf0f7;
+            color: #b45f9b;
+
+            padding: 8px 14px;
+
+            border-radius: 20px;
+
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .content {
+            max-width: 1200px;
+
+            margin: 0 auto;
+            padding: 32px;
+        }
+
+        /* =====================================================
+           PAGE HEADER
+        ===================================================== */
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+
+            margin-bottom: 25px;
+        }
+
+        .page-header h1 {
+            margin-bottom: 7px;
+
+            color: #333;
+            font-size: 28px;
+        }
+
+        .page-header p {
+            color: #777;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+
+            padding: 10px 16px;
+
+            background: #ffffff;
+
+            border: 1px solid #ddd;
+            border-radius: 8px;
+
+            color: #555;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .back-btn:hover {
+            border-color: #b45f9b;
+            color: #b45f9b;
+        }
+
+        /* =====================================================
+           FORM CARD
+        ===================================================== */
+
+        .form-card {
+            background: #ffffff;
+
+            border: 1px solid #e8e8ec;
+            border-radius: 13px;
+
+            padding: 30px;
+
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+        }
+
+        .form-heading {
+            margin-bottom: 25px;
+
+            padding-bottom: 18px;
+
+            border-bottom: 1px solid #eee;
+        }
+
+        .form-heading h2 {
+            margin-bottom: 5px;
+
+            color: #333;
+            font-size: 18px;
+        }
+
+        .form-heading p {
+            color: #888;
+            font-size: 13px;
+        }
+
+        /* =====================================================
+           FORM
+        ===================================================== */
+
+        .product-form {
+            display: grid;
+
+            grid-template-columns: 1fr 1fr;
+
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+
+            gap: 7px;
+        }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            color: #444;
+
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .required {
+            color: #d9534f;
+        }
+
+        .form-control {
+            width: 100%;
+
+            padding: 12px 13px;
+
+            background: #ffffff;
+
+            border: 1px solid #ddd;
+            border-radius: 8px;
+
+            color: #444;
+            font-family: inherit;
+            font-size: 13px;
+
+            outline: none;
+
+            transition: 0.2s ease;
+        }
+
+        .form-control:focus {
+            border-color: #b45f9b;
+
+            box-shadow: 0 0 0 3px rgba(180, 95, 155, 0.08);
+        }
+
+        textarea.form-control {
+            min-height: 140px;
+
+            resize: vertical;
+
+            line-height: 1.6;
+        }
+
+        select.form-control {
+            cursor: pointer;
+        }
+
+        .form-help {
+            color: #999;
+            font-size: 11px;
+            line-height: 1.4;
+        }
+
+        /* =====================================================
+           PRICE
+        ===================================================== */
+
+        .input-prefix {
+            position: relative;
+        }
+
+        .input-prefix span {
+            position: absolute;
+
+            left: 13px;
+            top: 50%;
+
+            transform: translateY(-50%);
+
+            color: #888;
+
+            font-size: 13px;
+            font-weight: 600;
+
+            z-index: 1;
+        }
+
+        .input-prefix .form-control {
+            padding-left: 30px;
+        }
+
+        /* =====================================================
+           STATUS
+        ===================================================== */
+
+        .status-options {
+            display: flex;
+            gap: 12px;
+        }
+
+        .status-option {
+            flex: 1;
+
+            position: relative;
+        }
+
+        .status-option input {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .status-option label {
+            display: block;
+
+            padding: 12px;
+
+            background: #ffffff;
+
+            border: 1px solid #ddd;
+            border-radius: 8px;
+
+            color: #555;
+
+            text-align: center;
+
+            font-size: 13px;
+
+            cursor: pointer;
+
+            transition: 0.2s ease;
+        }
+
+        .status-option input:checked + label {
+            background: #faf0f7;
+
+            border-color: #b45f9b;
+
+            color: #b45f9b;
+
+            font-weight: 600;
+        }
+
+        /* =====================================================
+           CURRENT IMAGE
+        ===================================================== */
+
+        .current-image-box {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+
+            margin-top: 5px;
+            margin-bottom: 8px;
+
+            padding: 12px;
+
+            background: #fafafa;
+
+            border: 1px solid #eee;
+            border-radius: 9px;
+        }
+
+        .current-image {
+            width: 90px;
+            height: 70px;
+
+            object-fit: cover;
+
+            border-radius: 7px;
+
+            border: 1px solid #ddd;
+        }
+
+        .no-image {
+            width: 90px;
+            height: 70px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #f0f0f2;
+
+            border-radius: 7px;
+
+            color: #999;
+
+            font-size: 11px;
+            text-align: center;
+        }
+
+        .current-image-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .current-image-title {
+            color: #555;
+
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .current-image-url {
+            max-width: 500px;
+
+            color: #999;
+
+            font-size: 11px;
+
+            word-break: break-all;
+        }
+
+        /* =====================================================
+           IMAGE PREVIEW
+        ===================================================== */
+
+        .image-preview {
+            display: none;
+
+            margin-top: 12px;
+
+            padding: 12px;
+
+            background: #fafafa;
+
+            border: 1px solid #eee;
+            border-radius: 8px;
+        }
+
+        .image-preview img {
+            max-width: 180px;
+            max-height: 130px;
+
+            display: block;
+
+            object-fit: cover;
+
+            border-radius: 7px;
+        }
+
+        .image-preview-text {
+            margin-top: 7px;
+
+            color: #999;
+            font-size: 11px;
+        }
+
+        /* =====================================================
+           FORM ACTIONS
+        ===================================================== */
+
+        .form-actions {
+            grid-column: 1 / -1;
+
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+
+            gap: 12px;
+
+            margin-top: 10px;
+
+            padding-top: 22px;
+
+            border-top: 1px solid #eee;
+        }
+
+        .cancel-btn {
+            padding: 11px 20px;
+
+            background: #ffffff;
+
+            border: 1px solid #ddd;
+            border-radius: 8px;
+
+            color: #666;
+
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .cancel-btn:hover {
+            border-color: #b45f9b;
+            color: #b45f9b;
+        }
+
+        .submit-btn {
+            padding: 11px 23px;
+
+            background: #b45f9b;
+            color: #ffffff;
+
+            border: none;
+            border-radius: 8px;
+
+            font-size: 13px;
+            font-weight: 600;
+
+            cursor: pointer;
+
+            transition: 0.2s ease;
+        }
+
+        .submit-btn:hover {
+            background: #9f5088;
+        }
+
+        /* =====================================================
+           INFO BOX
+        ===================================================== */
+
+        .info-box {
+            margin-top: 20px;
+
+            padding: 16px 18px;
+
+            background: #faf0f7;
+
+            border: 1px solid #f0ddec;
+            border-radius: 9px;
+
+            color: #666;
+
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .info-box strong {
+            color: #b45f9b;
+        }
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+
+        @media (max-width: 900px) {
+
+            .sidebar {
+                width: 220px;
+            }
+
+            .main {
+                margin-left: 220px;
+            }
+
+            .content {
+                padding: 24px;
+            }
+        }
+
+        @media (max-width: 750px) {
+
+            .sidebar {
+                position: relative;
+
+                width: 100%;
+                height: auto;
+            }
+
+            .main {
+                margin-left: 0;
+            }
+
+            .logout-area {
+                margin-top: 10px;
+            }
+
+            .top-header {
+                padding: 0 20px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .page-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .product-form {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group.full {
+                grid-column: auto;
+            }
+
+            .form-actions {
+                grid-column: auto;
+            }
+        }
+
+        @media (max-width: 600px) {
+
+            .top-header {
+                height: auto;
+
+                padding: 15px 20px;
+
+                gap: 10px;
+
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .content {
+                padding: 15px;
+            }
+
+            .form-card {
+                padding: 20px;
+            }
+
+            .status-options {
+                flex-direction: column;
+            }
+
+            .current-image-box {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .form-actions {
+                flex-direction: column-reverse;
+                align-items: stretch;
+            }
+
+            .cancel-btn,
+            .submit-btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+        <a href="{{ url_for('seller_dashboard') }}"
+           class="logo">
+            Women Empowerment
+        </a>
+
+        <div class="seller-label">
+            Seller Panel
+        </div>
+
+
+        <!-- MAIN -->
+
+        <div class="nav-section">
+
+            <div class="nav-title">
+                Main
+            </div>
+
+            <a href="{{ url_for('seller_dashboard') }}"
+               class="nav-link">
+
+                <span class="nav-icon">⌂</span>
+                Dashboard
+
+            </a>
+
+        </div>
+
+
+        <!-- MY PRODUCTS -->
+
+        <div class="nav-section">
+
+            <div class="nav-title">
+                My Products
+            </div>
+
+            <a href="{{ url_for('seller_products') }}"
+               class="nav-link active">
+
+                <span class="nav-icon">▣</span>
+                All Products
+
+            </a>
+
+            <a href="{{ url_for('add_product') }}"
+               class="nav-link">
+
+                <span class="nav-icon">＋</span>
+                Add Product
+
+            </a>
+
+        </div>
+
+
+        <!-- CUSTOM REQUESTS -->
+
+        <div class="nav-section">
+
+            <div class="nav-title">
+                Requests
+            </div>
+
+            <a href="{{ url_for('seller_custom_requests') }}"
+               class="nav-link">
+
+                <span class="nav-icon">✦</span>
+                Custom Requests
+            </a>
+
+        </div>
+
+
+        <!-- ORDERS -->
+
+        <div class="nav-section">
+
+            <div class="nav-title">
+                Orders
+            </div>
+
+            <a href="{{ url_for('seller_orders') }}"
+               class="nav-link">
+
+                <span class="nav-icon">▤</span>
+                Customer Orders
+
+            </a>
+
+        </div>
+
+
+        <!-- REPORTS -->
+
+        <div class="nav-section">
+
+            <div class="nav-title">
+                Reports
+            </div>
+
+            <a href="{{ url_for('seller_sales') }}"
+               class="nav-link">
+
+                <span class="nav-icon">▥</span>
+                Sales Reports
+
+            </a>
+
+            <a href="{{ url_for('seller_revenue') }}"
+               class="nav-link">
+
+                <span class="nav-icon">₹</span>
+                Revenue Analytics
+
+            </a>
+
+        </div>
+
+
+        <!-- AI TOOLS -->
+
+        <div class="nav-section">
+
+            <div class="nav-title">
+                AI Tools
+            </div>
+
+            <a href="{{ url_for('seller_ai_assistant') }}"
+               class="nav-link">
+
+                <span class="nav-icon">✧</span>
+                Business Assistant
+
+            </a>
+
+            <a href="{{ url_for('seller_marketing') }}"
+               class="nav-link">
+
+                Marketing Tool
+
+            </a>
+
+        </div>
+
+
+        <!-- ACCOUNT -->
+
+        <div class="nav-section">
+
+            <div class="nav-title">
+                Account
+            </div>
+
+            <a href="{{ url_for('seller_profile') }}"
+               class="nav-link">
+
+                <span class="nav-icon">◯</span>
+                Profile
+
+            </a>
+
+        </div>
+
+
+        <!-- LOGOUT -->
+
+        <div class="logout-area">
+
+            <a href="{{ url_for('logout') }}"
+               class="nav-link logout">
+
+                <span class="nav-icon">↪</span>
+                Logout
+
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+    ====================================================== -->
+
+    <main class="main">
+
+
+        <!-- TOP HEADER -->
+
+        <header class="top-header">
+
+            <div class="top-title">
+
+                Seller Panel /
+                <strong>Edit Product</strong>
+
+            </div>
+
+            <div class="seller-badge">
+                Seller Account
+            </div>
+
+        </header>
+
+
+        <div class="content">
+
+
+            <!-- =================================================
+                 PAGE HEADER
+            ================================================== -->
+
+            <div class="page-header">
+
+                <div>
+
+                    <h1>
+                        Edit Product
+                    </h1>
+
+                    <p>
+                        Update your product information, pricing,
+                        inventory, image, or availability status.
+                    </p>
+
+                </div>
+
+                <a href="{{ url_for('seller_products') }}"
+                   class="back-btn">
+
+                    ← Back to Products
+
+                </a>
+
+            </div>
+
+
+            <!-- =================================================
+                 FORM CARD
+            ================================================== -->
+
+            <div class="form-card">
+
+
+                <div class="form-heading">
+
+                    <h2>
+                        Product Information
+                    </h2>
+
+                    <p>
+                        Update the details below and save your changes.
+                    </p>
+
+                </div>
+
+
+                <form method="POST"
+                      action="{{ url_for('edit_product', product_id=product.id) }}"
+                      class="product-form">
+{% include "_csrf_field.html" %}
+
+
+                    <!-- =================================================
+                         PRODUCT NAME
+                    ================================================== -->
+
+                    <div class="form-group full">
+
+                        <label for="name">
+
+                            Product Name
+                            <span class="required">*</span>
+
+                        </label>
+
+                        <input
+                            type="text"
+                            id="name"
+                            name="name"
+                            class="form-control"
+                            value="{{ product.name }}"
+                            placeholder="Enter product name"
+                            maxlength="150"
+                            required
+                        >
+
+                        <span class="form-help">
+                            Use a clear and descriptive name for your product.
+                        </span>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         CATEGORY
+                    ================================================== -->
+
+                    <div class="form-group">
+
+                        <label for="category_id">
+
+                            Category
+                            <span class="required">*</span>
+
+                        </label>
+
+                        <select
+                            id="category_id"
+                            name="category_id"
+                            class="form-control"
+                            required
+                        >
+
+                            <option value="">
+                                Select a category
+                            </option>
+
+                            {% for category in categories %}
+
+                                <option
+                                    value="{{ category.id }}"
+                                    {% if category.id == product.category_id %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    {{ category.name }}
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                        <span class="form-help">
+                            Select the category that best matches this product.
+                        </span>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         PRICE
+                    ================================================== -->
+
+                    <div class="form-group">
+
+                        <label for="price">
+
+                            Price
+                            <span class="required">*</span>
+
+                        </label>
+
+                        <div class="input-prefix">
+
+                            <span>₹</span>
+
+                            <input
+                                type="number"
+                                id="price"
+                                name="price"
+                                class="form-control"
+                                value="{{ product.price }}"
+                                placeholder="0.00"
+                                min="0"
+                                step="0.01"
+                                required
+                            >
+
+                        </div>
+
+                        <span class="form-help">
+                            Enter the current selling price in Indian Rupees.
+                        </span>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         STOCK
+                    ================================================== -->
+
+                    <div class="form-group">
+
+                        <label for="stock">
+
+                            Stock Quantity
+                            <span class="required">*</span>
+
+                        </label>
+
+                        <input
+                            type="number"
+                            id="stock"
+                            name="stock"
+                            class="form-control"
+                            value="{{ product.stock }}"
+                            placeholder="Enter stock quantity"
+                            min="0"
+                            step="1"
+                            required
+                        >
+
+                        <span class="form-help">
+                            Update the number of units currently available.
+                        </span>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         STATUS
+                    ================================================== -->
+
+                    <div class="form-group">
+
+                        <label>
+                            Product Status
+                            <span class="required">*</span>
+                        </label>
+
+                        <div class="status-options">
+
+
+                            <div class="status-option">
+
+                                <input
+                                    type="radio"
+                                    id="status_active"
+                                    name="status"
+                                    value="active"
+                                    {% if product.status == 'active' %}
+                                        checked
+                                    {% endif %}
+                                >
+
+                                <label for="status_active">
+                                    Active
+                                </label>
+
+                            </div>
+
+
+                            <div class="status-option">
+
+                                <input
+                                    type="radio"
+                                    id="status_inactive"
+                                    name="status"
+                                    value="inactive"
+                                    {% if product.status == 'inactive' %}
+                                        checked
+                                    {% endif %}
+                                >
+
+                                <label for="status_inactive">
+                                    Inactive
+                                </label>
+
+                            </div>
+
+
+                        </div>
+
+                        <span class="form-help">
+                            Active products can be displayed to buyers.
+                        </span>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         DESCRIPTION
+                    ================================================== -->
+
+                    <div class="form-group full">
+
+                        <label for="description">
+                            Product Description
+                        </label>
+
+                        <textarea
+                            id="description"
+                            name="description"
+                            class="form-control"
+                            placeholder="Describe your product..."
+                            maxlength="2000"
+                        >{{ product.description or '' }}</textarea>
+
+                        <span class="form-help">
+                            Include useful details such as materials,
+                            features, size, color, and customization options.
+                        </span>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         IMAGE URL
+                    ================================================== -->
+
+                    <div class="form-group full">
+
+                        <label for="image_url">
+                            Product Image URL
+                        </label>
+
+
+                        <!-- CURRENT IMAGE -->
+
+                        {% if product.image_url %}
+
+                            <div class="current-image-box">
+
+                                <img
+                                    src="{{ product.image_url }}"
+                                    alt="{{ product.name }}"
+                                    class="current-image"
+                                    onerror="this.style.display='none'; document.getElementById('imageError').style.display='block';"
+                                >
+
+                                <div
+                                    id="imageError"
+                                    class="no-image"
+                                    style="display:none;"
+                                >
+                                    Image unavailable
+                                </div>
+
+                                <div class="current-image-info">
+
+                                    <div class="current-image-title">
+                                        Current Product Image
+                                    </div>
+
+                                    <div class="current-image-url">
+                                        {{ product.image_url }}
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        {% else %}
+
+                            <div class="current-image-box">
+
+                                <div class="no-image">
+                                    No Image
+                                </div>
+
+                                <div class="current-image-info">
+
+                                    <div class="current-image-title">
+                                        No product image added
+                                    </div>
+
+                                    <div class="current-image-url">
+                                        Add an image URL below.
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        {% endif %}
+
+
+                        <input
+                            type="url"
+                            id="image_url"
+                            name="image_url"
+                            class="form-control"
+                            value="{{ product.image_url or '' }}"
+                            placeholder="https://example.com/product-image.jpg"
+                        >
+
+                        <span class="form-help">
+                            Paste a publicly accessible image URL.
+                        </span>
+
+
+                        <!-- NEW IMAGE PREVIEW -->
+
+                        <div
+                            class="image-preview"
+                            id="imagePreview"
+                        >
+
+                            <img
+                                id="previewImage"
+                                src=""
+                                alt="New product image preview"
+                            >
+
+                            <div class="image-preview-text">
+                                New image preview
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         FORM ACTIONS
+                    ================================================== -->
+
+                    <div class="form-actions">
+
+                        <a href="{{ url_for('seller_products') }}"
+                           class="cancel-btn">
+
+                            Cancel
+
+                        </a>
+
+
+                        <button type="submit"
+                                class="submit-btn">
+
+                            Save Changes
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+
+                <!-- =================================================
+                     INFORMATION
+                ================================================== -->
+
+                <div class="info-box">
+
+                    <strong>Note:</strong>
+                    Changes will be applied to this product immediately
+                    after you save them. You can change the price,
+                    inventory, description, image URL, category, and
+                    active/inactive status.
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<!-- =========================================================
+     IMAGE URL PREVIEW
+========================================================== -->
+
+<script>
+
+    const imageUrlInput =
+        document.getElementById("image_url");
+
+    const imagePreview =
+        document.getElementById("imagePreview");
+
+    const previewImage =
+        document.getElementById("previewImage");
+
+
+    function showImagePreview() {
+
+        const url = imageUrlInput.value.trim();
+
+        /*
+         * If the URL is empty, hide the new image preview.
+         */
+        if (!url) {
+
+            imagePreview.style.display = "none";
+            previewImage.src = "";
+
+            return;
+        }
+
+
+        /*
+         * Show preview only when the image loads successfully.
+         */
+        previewImage.onload = function () {
+
+            imagePreview.style.display = "block";
+
+        };
+
+
+        /*
+         * Hide preview if URL is not a valid/loadable image.
+         */
+        previewImage.onerror = function () {
+
+            imagePreview.style.display = "none";
+
+        };
+
+
+        previewImage.src = url;
+    }
+
+
+    imageUrlInput.addEventListener(
+        "input",
+        showImagePreview
+    );
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Confirm Logout | SheRise</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        body { font-family: Arial, sans-serif; background: #f8f4f7; color: #333; }
+        main { max-width: 420px; margin: 15vh auto; padding: 28px; background: white; border-radius: 10px; text-align: center; }
+        a, button { display: inline-block; margin: 8px; padding: 10px 16px; border: 0; border-radius: 6px; text-decoration: none; cursor: pointer; }
+        a { color: #7b2cbf; background: #f0e5f8; }
+        button { color: white; background: #b33b3b; }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Log out?</h1>
+        <p>Are you sure you want to end this session?</p>
+        <form method="post" action="{{ url_for('logout') }}">
+            {% include "_csrf_field.html" %}
+            <button type="submit">Log out</button>
+        </form>
+        <a href="{{ url_for('home') }}">Stay signed in</a>
+    </main>
+</body>
+</html>

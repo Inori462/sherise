@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Business Assistant | SheRise</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/seller-workspace.css') }}">
+    <style>
+        .shortcuts { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+        .shortcuts button { background: #f4e5ef; color: #7b356b; padding: 8px 10px; }
+        #answer { white-space: pre-wrap; line-height: 1.6; }
+        #status.error { color: #a33; }
+        #status { min-height: 1.5em; }
+    </style>
+</head>
+<body>
+<div class="seller-layout">
+    <aside class="sidebar">
+        <div class="brand"><h2>SheRise</h2><p>Seller workspace</p></div>
+        <div class="nav-title">Workspace</div>
+        <a class="nav-link" href="{{ url_for('seller_dashboard') }}">Dashboard</a>
+        <a class="nav-link" href="{{ url_for('seller_products') }}">Products</a>
+        <a class="nav-link" href="{{ url_for('seller_orders') }}">Orders</a>
+        <a class="nav-link" href="{{ url_for('seller_custom_requests') }}">Custom Requests</a>
+        <a class="nav-link active" href="{{ url_for('seller_ai_assistant') }}" aria-current="page">Business Assistant</a>
+        <a class="nav-link" href="{{ url_for('seller_marketing') }}">Marketing Tool</a>
+        <div class="nav-title">Account</div>
+        <a class="nav-link" href="{{ url_for('seller_profile') }}">Profile</a>
+        <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+    </aside>
+    <main class="main-content">
+        <div class="page">
+            <h1>Business Assistant</h1>
+            <p>Get practical help based on your question, optional business context, and a product you own.</p>
+            <section class="card">
+                <div class="shortcuts" aria-label="Suggested business topics">
+                    <button type="button" data-category="pricing">Pricing</button>
+                    <button type="button" data-category="inventory">Inventory</button>
+                    <button type="button" data-category="customer_service">Customer replies</button>
+                    <button type="button" data-category="government_schemes">Government schemes</button>
+                    <button type="button" data-category="roadmap">Roadmap</button>
+                    <button type="button" data-category="finance">Financial planning</button>
+                    <button type="button" data-category="business_plan">Business plan</button>
+                    <button type="button" data-category="marketing">Marketing</button>
+                </div>
+                <form id="assistant-form">
+                    <div class="grid">
+                        <div>
+                            <label for="category">What do you need help with?</label>
+                            <select id="category" name="category">
+                                <option value="pricing">Pricing strategies</option>
+                                <option value="inventory">Inventory tips</option>
+                                <option value="customer_service">Customer handling</option>
+                                <option value="government_schemes">Government schemes</option>
+                                <option value="roadmap">Business roadmap</option>
+                                <option value="finance">Financial guidance</option>
+                                <option value="business_plan">Business planning</option>
+                                <option value="marketing">Marketing advice</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="product_id">Use one of your products (optional)</label>
+                            <select id="product_id" name="product_id">
+                                <option value="">No product selected</option>
+                                {% for product in products %}
+                                    <option value="{{ product.id }}">{{ product.name }} — ₹{{ product.price }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <label for="assistant-input">Your business question</label>
+                    <textarea id="assistant-input" maxlength="2000" required placeholder="For pricing, include your costs and target margin. For inventory, share sales pace and supplier lead time."></textarea>
+                    <label for="context">Optional context</label>
+                    <textarea id="context" maxlength="5000" placeholder="Budget, labour or packaging costs, business stage, sales pace, goals, audience, etc."></textarea>
+                    <button id="send-button" type="submit">Generate advice</button>
+                    <button id="retry-button" type="button" hidden>Retry last question</button>
+                    <p id="status" role="status" aria-live="polite"></p>
+                </form>
+            </section>
+            <section class="card" aria-labelledby="answer-heading">
+                <h2 id="answer-heading">Assistant response</h2>
+                <div id="answer" aria-live="polite">{% if latest_answer %}{{ latest_answer }}{% else %}Your generated guidance will appear here.{% endif %}</div>
+                {% if latest_answer %}<p>Showing your latest successful response from your account history.</p>{% endif %}
+            </section>
+        </div>
+    </main>
+</div>
+<script>
+const form = document.getElementById("assistant-form");
+const input = document.getElementById("assistant-input");
+const category = document.getElementById("category");
+const contextInput = document.getElementById("context");
+const productInput = document.getElementById("product_id");
+const answer = document.getElementById("answer");
+const statusMessage = document.getElementById("status");
+const sendButton = document.getElementById("send-button");
+const retryButton = document.getElementById("retry-button");
+const csrfToken = {{ csrf_token()|tojson }};
+let lastRequest = null;
+
+document.querySelectorAll("[data-category]").forEach((button) => {
+    button.addEventListener("click", () => { category.value = button.dataset.category; });
+});
+
+async function generate(requestData) {
+    lastRequest = requestData;
+    sendButton.disabled = true;
+    retryButton.hidden = true;
+    statusMessage.className = "";
+    statusMessage.textContent = "Generating with the local AI model…";
+    try {
+        const response = await fetch("{{ url_for('seller_ai_assistant_chat') }}", {
+            method: "POST",
+            credentials: "same-origin",
+            headers: { "Content-Type": "application/json", "X-CSRF-Token": csrfToken },
+            body: JSON.stringify(requestData)
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "The assistant could not complete this request.");
+        answer.textContent = data.response;
+        statusMessage.textContent = "Response generated by the local model.";
+    } catch (error) {
+        statusMessage.className = "error";
+        statusMessage.textContent = error.message || "Assistant unavailable.";
+        retryButton.hidden = false;
+    } finally {
+        sendButton.disabled = false;
+    }
+}
+
+form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const message = input.value.trim();
+    if (!message) {
+        statusMessage.className = "error";
+        statusMessage.textContent = "Enter a business question first.";
+        input.focus();
+        return;
+    }
+    generate({
+        message,
+        category: category.value,
+        context: contextInput.value.trim(),
+        product_id: productInput.value
+    });
+});
+
+retryButton.addEventListener("click", () => {
+    if (lastRequest) generate(lastRequest);
+});
+</script>
+</body>
+</html>

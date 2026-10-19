@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Admin Dashboard | SheRise</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+    <style>
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f7f5fa;
+            color: #333;
+        }
+
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* -----------------------------------------
+           SIDEBAR
+        ----------------------------------------- */
+
+        .admin-sidebar {
+            width: 250px;
+            background: #ffffff;
+            border-right: 1px solid #e6e1eb;
+            padding: 25px 18px;
+            box-sizing: border-box;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            overflow-y: auto;
+        }
+
+        .admin-role-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 20px 18px;
+            border-bottom: 1px solid #e6e1eb;
+            margin-bottom: 20px;
+        }
+
+        .admin-role-avatar {
+            width: 42px;
+            height: 42px;
+            min-width: 42px;
+            border-radius: 50%;
+            background: #7b2cbf;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .admin-role-info strong {
+            display: block;
+            color: #333;
+            font-size: 13px;
+        }
+
+        .admin-role-info span {
+            display: block;
+            margin-top: 2px;
+            color: #777;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .admin-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .admin-nav a {
+            text-decoration: none;
+            color: #555;
+            padding: 13px 15px;
+            border-radius: 9px;
+            font-size: 14px;
+            display: block;
+            transition: 0.2s;
+        }
+
+        .admin-nav a:hover,
+        .admin-nav a.active {
+            background: #f0e5f8;
+            color: #7b2cbf;
+            font-weight: 600;
+        }
+
+        .admin-nav .logout-link {
+            margin-top: 18px;
+            color: #c62828;
+            background: #fff3f3;
+        }
+
+        .admin-nav .logout-link:hover {
+            background: #ffe2e2;
+            color: #b71c1c;
+        }
+
+        /* -----------------------------------------
+           MAIN CONTENT
+        ----------------------------------------- */
+
+        .admin-main {
+            margin-left: 250px;
+            width: calc(100% - 250px);
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .admin-header {
+            background: #ffffff;
+            border-bottom: 1px solid #e6e1eb;
+            padding: 22px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .admin-header h1 {
+            margin: 0;
+            font-size: 25px;
+            color: #333;
+        }
+
+        .admin-header p {
+            margin: 5px 0 0;
+            color: #777;
+            font-size: 14px;
+        }
+
+        .admin-user {
+            text-align: right;
+        }
+
+        .admin-user strong {
+            display: block;
+            color: #333;
+        }
+
+        .admin-user span {
+            color: #777;
+            font-size: 13px;
+        }
+
+        .admin-content {
+            padding: 30px;
+        }
+
+        /* -----------------------------------------
+           STAT CARDS
+        ----------------------------------------- */
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: #ffffff;
+            border: 1px solid #e7e2eb;
+            border-radius: 12px;
+            padding: 22px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+        }
+
+        .stat-card .stat-title {
+            color: #777;
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .stat-value {
+            font-size: 29px;
+            font-weight: 700;
+            color: #7b2cbf;
+        }
+
+        .stat-card .stat-description {
+            margin-top: 8px;
+            color: #888;
+            font-size: 12px;
+        }
+
+        /* -----------------------------------------
+           DASHBOARD GRID
+        ----------------------------------------- */
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 22px;
+        }
+
+        .admin-card {
+            background: #ffffff;
+            border: 1px solid #e7e2eb;
+            border-radius: 12px;
+            padding: 22px;
+            margin-bottom: 22px;
+        }
+
+        .admin-card h2 {
+            margin: 0 0 7px;
+            font-size: 19px;
+            color: #333;
+        }
+
+        .admin-card-description {
+            margin: 0 0 18px;
+            color: #777;
+            font-size: 13px;
+        }
+
+        /* -----------------------------------------
+           QUICK ACTIONS
+        ----------------------------------------- */
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .quick-action {
+            text-decoration: none;
+            border: 1px solid #e6e0ea;
+            border-radius: 9px;
+            padding: 15px;
+            color: #444;
+            background: #fcfbfd;
+            transition: 0.2s;
+        }
+
+        .quick-action:hover {
+            border-color: #c9a8dc;
+            background: #f8f0fb;
+        }
+
+        .quick-action strong {
+            display: block;
+            color: #7b2cbf;
+            margin-bottom: 5px;
+        }
+
+        .quick-action span {
+            font-size: 12px;
+            color: #777;
+        }
+
+        /* -----------------------------------------
+           SYSTEM SUMMARY
+        ----------------------------------------- */
+
+        .summary-list {
+            display: flex;
+            flex-direction: column;
+            gap: 13px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .summary-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .summary-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .summary-value {
+            font-weight: 700;
+            color: #333;
+        }
+
+        /* -----------------------------------------
+           STATUS
+        ----------------------------------------- */
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-good {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status-warning {
+            background: #fff8e1;
+            color: #f57f17;
+        }
+
+        /* -----------------------------------------
+           RECENT ACTIVITY
+        ----------------------------------------- */
+
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .activity-item {
+            padding: 14px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-title {
+            font-size: 14px;
+            color: #444;
+            margin-bottom: 4px;
+        }
+
+        .activity-time {
+            font-size: 11px;
+            color: #999;
+        }
+
+        .activity-type {
+            font-size: 11px;
+            color: #7b2cbf;
+            background: #f2eafa;
+            padding: 5px 8px;
+            border-radius: 15px;
+            white-space: nowrap;
+            height: fit-content;
+        }
+
+        /* -----------------------------------------
+           EMPTY STATE
+        ----------------------------------------- */
+
+        .empty-state {
+            text-align: center;
+            padding: 25px 10px;
+            color: #888;
+            font-size: 13px;
+        }
+
+        /* -----------------------------------------
+           RESPONSIVE
+        ----------------------------------------- */
+
+        @media (max-width: 1100px) {
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+        @media (max-width: 700px) {
+
+            .admin-sidebar {
+                position: relative;
+                width: 100%;
+                min-height: auto;
+                border-right: none;
+                border-bottom: 1px solid #e6e1eb;
+            }
+
+            .admin-layout {
+                display: block;
+            }
+
+            .admin-main {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .admin-header {
+                padding: 18px;
+                display: block;
+            }
+
+            .admin-user {
+                text-align: left;
+                margin-top: 12px;
+            }
+
+            .admin-content {
+                padding: 18px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="admin-layout">
+
+    <!-- =========================================
+         ADMIN SIDEBAR
+    ========================================== -->
+
+    <aside class="admin-sidebar">
+
+        <div class="admin-role-header">
+
+            <div class="admin-role-avatar">
+                {{ session.get('full_name', 'A')[0]|upper }}
+            </div>
+
+            <div class="admin-role-info">
+                <strong>{{ session.get('full_name', 'Administrator') }}</strong>
+                <span>Admin</span>
+            </div>
+
+        </div>
+
+
+        <nav class="admin-nav">
+
+            <a
+                href="{{ url_for('admin_dashboard') }}"
+                class="active"
+            >
+                Dashboard
+            </a>
+
+            <a href="{{ url_for('admin_users') }}">
+                Users
+            </a>
+
+            <a href="{{ url_for('admin_sellers') }}">
+                Seller Approvals
+            </a>
+
+            <a href="{{ url_for('admin_products') }}">
+                Products
+            </a>
+
+            <a href="{{ url_for('admin_complaints') }}">
+                Complaints
+            </a>
+
+            <a href="{{ url_for('admin_returns') }}">
+                Return Requests
+            </a>
+
+            <a href="{{ url_for('admin_analytics') }}">
+                Analytics
+            </a>
+
+            <a href="{{ url_for('admin_ai_usage') }}">
+                AI Usage
+            </a>
+
+            <a
+                href="{{ url_for('logout') }}"
+                class="logout-link"
+            >
+                Logout
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- =========================================
+         MAIN CONTENT
+    ========================================== -->
+
+    <main class="admin-main">
+
+
+        <!-- HEADER -->
+
+        <header class="admin-header">
+
+            <div>
+
+                <h1>Admin Dashboard</h1>
+
+                <p>
+                    Monitor and manage the SheRise platform.
+                </p>
+
+            </div>
+
+
+            <div class="admin-user">
+
+                <strong>
+                    {{ session.get('full_name', 'Administrator') }}
+                </strong>
+
+                <span>
+                    Administrator
+                </span>
+
+            </div>
+
+        </header>
+
+
+        <!-- CONTENT -->
+
+        <section class="admin-content">
+
+
+            <!-- =====================================
+                 STATISTICS
+            ====================================== -->
+
+            <div class="stats-grid">
+
+
+                <div class="stat-card">
+
+                    <div class="stat-title">
+                        Total Users
+                    </div>
+
+                    <div class="stat-value">
+                        {{ total_users|default(0) }}
+                    </div>
+
+                    <div class="stat-description">
+                        Registered platform users
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-title">
+                        Sellers
+                    </div>
+
+                    <div class="stat-value">
+                        {{ total_sellers|default(0) }}
+                    </div>
+
+                    <div class="stat-description">
+                        Registered sellers
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-title">
+                        Products
+                    </div>
+
+                    <div class="stat-value">
+                        {{ total_products|default(0) }}
+                    </div>
+
+                    <div class="stat-description">
+                        Products listed on platform
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-title">
+                        Orders
+                    </div>
+
+                    <div class="stat-value">
+                        {{ total_orders|default(0) }}
+                    </div>
+
+                    <div class="stat-description">
+                        Orders placed by buyers
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+            <!-- =====================================
+                 MAIN DASHBOARD AREA
+            ====================================== -->
+
+            <div class="dashboard-grid">
+
+
+                <!-- LEFT COLUMN -->
+
+                <div>
+
+
+                    <!-- QUICK ACTIONS -->
+
+                    <div class="admin-card">
+
+                        <h2>
+                            Administration
+                        </h2>
+
+                        <p class="admin-card-description">
+                            Access the main administration functions.
+                        </p>
+
+
+                        <div class="quick-actions">
+
+
+                            <a
+                                href="{{ url_for('admin_users') }}"
+                                class="quick-action"
+                            >
+
+                                <strong>
+                                    Manage Users
+                                </strong>
+
+                                <span>
+                                    View and manage buyer, seller and mentor accounts.
+                                </span>
+
+                            </a>
+
+
+                            <a
+                                href="{{ url_for('admin_sellers') }}"
+                                class="quick-action"
+                            >
+
+                                <strong>
+                                    Seller Approvals
+                                </strong>
+
+                                <span>
+                                    Review seller registrations and approval status.
+                                </span>
+
+                            </a>
+
+
+                            <a
+                                href="{{ url_for('admin_products') }}"
+                                class="quick-action"
+                            >
+
+                                <strong>
+                                    Monitor Products
+                                </strong>
+
+                                <span>
+                                    Review products listed by sellers.
+                                </span>
+
+                            </a>
+
+
+                            <a
+                                href="{{ url_for('admin_complaints') }}"
+                                class="quick-action"
+                            >
+
+                                <strong>
+                                    Complaints
+                                </strong>
+
+                                <span>
+                                    Review and manage platform complaints.
+                                </span>
+
+                            </a>
+
+
+                            <a
+                                href="{{ url_for('admin_analytics') }}"
+                                class="quick-action"
+                            >
+
+                                <strong>
+                                    Analytics
+                                </strong>
+
+                                <span>
+                                    View platform activity and performance information.
+                                </span>
+
+                            </a>
+
+
+                            <a
+                                href="{{ url_for('admin_ai_usage') }}"
+                                class="quick-action"
+                            >
+
+                                <strong>
+                                    AI Usage
+                                </strong>
+
+                                <span>
+                                    Monitor usage of AI-powered platform features.
+                                </span>
+
+                            </a>
+
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- RECENT ACTIVITY -->
+
+                    <div class="admin-card">
+
+                        <h2>
+                            Recent Activity
+                        </h2>
+
+                        <p class="admin-card-description">
+                            Latest activity recorded on the platform.
+                        </p>
+
+
+                        {% if recent_activity %}
+
+                            <div class="activity-list">
+
+                                {% for activity in recent_activity %}
+
+                                    <div class="activity-item">
+
+                                        <div>
+
+                                            <div class="activity-title">
+
+                                                {{ activity.description }}
+
+                                            </div>
+
+                                            <div class="activity-time">
+
+                                                {{ activity.created_at }}
+
+                                            </div>
+
+                                        </div>
+
+
+                                        <div class="activity-type">
+
+                                            {{ activity.type|default('Activity') }}
+
+                                        </div>
+
+                                    </div>
+
+                                {% endfor %}
+
+                            </div>
+
+                        {% else %}
+
+                            <div class="empty-state">
+
+                                No recent activity available.
+
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- RIGHT COLUMN -->
+
+                <div>
+
+
+                    <!-- PLATFORM SUMMARY -->
+
+                    <div class="admin-card">
+
+                        <h2>
+                            Platform Summary
+                        </h2>
+
+                        <p class="admin-card-description">
+                            Current platform overview.
+                        </p>
+
+
+                        <div class="summary-list">
+
+
+                            <div class="summary-row">
+
+                                <span class="summary-label">
+                                    Buyers
+                                </span>
+
+                                <span class="summary-value">
+                                    {{ total_buyers|default(0) }}
+                                </span>
+
+                            </div>
+
+
+                            <div class="summary-row">
+
+                                <span class="summary-label">
+                                    Mentors
+                                </span>
+
+                                <span class="summary-value">
+                                    {{ total_mentors|default(0) }}
+                                </span>
+
+                            </div>
+
+
+                            <div class="summary-row">
+
+                                <span class="summary-label">
+                                    Pending Sellers
+                                </span>
+
+                                <span class="summary-value">
+                                    {{ pending_sellers|default(0) }}
+                                </span>
+
+                            </div>
+
+
+                            <div class="summary-row">
+
+                                <span class="summary-label">
+                                    Pending Complaints
+                                </span>
+
+                                <span class="summary-value">
+                                    {{ pending_complaints|default(0) }}
+                                </span>
+
+                            </div>
+
+
+                            <div class="summary-row">
+
+                                <span class="summary-label">
+                                    AI Requests
+                                </span>
+
+                                <span class="summary-value">
+                                    {{ total_ai_requests|default(0) }}
+                                </span>
+
+                            </div>
+
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- SYSTEM STATUS -->
+
+                    <div class="admin-card">
+
+                        <h2>
+                            System Status
+                        </h2>
+
+                        <p class="admin-card-description">
+                            Basic platform service status.
+                        </p>
+
+
+                        <div class="summary-list">
+
+
+                            <div class="summary-row">
+
+                                <span class="summary-label">
+                                    Platform
+                                </span>
+
+                                <span class="status-badge status-good">
+                                    Active
+                                </span>
+
+                            </div>
+
+
+                            <div class="summary-row">
+
+                                <span class="summary-label">
+                                    Database
+                                </span>
+
+                                <span class="status-badge status-good">
+                                    Connected
+                                </span>
+
+                            </div>
+
+
+                            <div class="summary-row">
+
+                                <span class="summary-label">
+                                    Admin Access
+                                </span>
+
+                                <span class="status-badge status-good">
+                                    Protected
+                                </span>
+
+                            </div>
+
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- SELLER APPROVAL NOTICE -->
+
+                    <div class="admin-card">
+
+                        <h2>
+                            Seller Management
+                        </h2>
+
+                        <p class="admin-card-description">
+                            Seller registrations requiring administrative review.
+                        </p>
+
+
+                        {% if pending_sellers|default(0) > 0 %}
+
+                            <p>
+                                <strong>
+                                    {{ pending_sellers }}
+                                </strong>
+
+                                seller registration(s) require review.
+                            </p>
+
+                            <a
+                                href="{{ url_for('admin_sellers') }}"
+                                style="
+                                    display:inline-block;
+                                    margin-top:8px;
+                                    padding:10px 15px;
+                                    background:#7b2cbf;
+                                    color:#ffffff;
+                                    text-decoration:none;
+                                    border-radius:7px;
+                                    font-size:13px;
+                                "
+                            >
+                                Review Sellers
+                            </a>
+
+                        {% else %}
+
+                            <div class="empty-state">
+                                No pending seller registrations.
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+</div>
+
+
+</body>
+
+</html>

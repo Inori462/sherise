@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Seller Details | SheRise Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        body { margin: 0; font-family: Arial, sans-serif; background: #f7f5fa; color: #333; }
+        nav { display: flex; gap: 16px; padding: 18px 24px; background: white; }
+        nav a { color: #7b2cbf; text-decoration: none; }
+        main { max-width: 1000px; margin: 30px auto; padding: 0 18px; }
+        section { background: white; border: 1px solid #e6e1eb; border-radius: 10px; padding: 20px; margin: 16px 0; }
+        dl { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+        dt { color: #777; font-size: 13px; }
+        dd { margin: 4px 0 0; font-weight: 600; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { text-align: left; padding: 10px; border-bottom: 1px solid #eee; }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('admin_sellers') }}">Seller Approvals</a>
+        <a href="{{ url_for('admin_returns') }}">Return Requests</a>
+    </nav>
+    <main>
+        <h1>{{ seller.full_name }}</h1>
+        <section>
+            <h2>Account</h2>
+            <dl>
+                <div><dt>Email</dt><dd>{{ seller.email }}</dd></div>
+                <div><dt>Mobile</dt><dd>{{ seller.mobile }}</dd></div>
+                <div><dt>Approval</dt><dd>{{ seller.approval_status|title }}</dd></div>
+                <div><dt>Account</dt><dd>{{ seller.account_status|title }}</dd></div>
+                <div><dt>Products</dt><dd>{{ seller.product_count }}</dd></div>
+                <div><dt>Paid orders</dt><dd>{{ seller.order_count }}</dd></div>
+                <div><dt>Paid revenue</dt><dd>₹{{ "%.2f"|format(seller.revenue|float) }}</dd></div>
+            </dl>
+            {% if seller.review_note %}<p><strong>Review note:</strong> {{ seller.review_note }}</p>{% endif %}
+        </section>
+        <section>
+            <h2>Products</h2>
+            {% if products %}
+                <table>
+                    <thead><tr><th>Name</th><th>Price</th><th>Stock</th><th>Status</th></tr></thead>
+                    <tbody>
+                        {% for product in products %}
+                            <tr>
+                                <td>{{ product.name }}</td>
+                                <td>₹{{ "%.2f"|format(product.price|float) }}</td>
+                                <td>{{ product.stock }}</td>
+                                <td>{{ product.status|title }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No products listed.</p>
+            {% endif %}
+        </section>
+    </main>
+</body>
+</html>

@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Analytics - SheRise</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f7f4f8;
+            color: #333;
+        }
+
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #ffffff;
+            border-right: 1px solid #e5e5e5;
+            padding: 24px 16px;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            overflow-y: auto;
+        }
+
+        .brand {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .brand h2 {
+            margin: 0;
+            color: #7b3f98;
+            font-size: 25px;
+        }
+
+        .brand p {
+            margin: 5px 0 0;
+            color: #777;
+            font-size: 13px;
+        }
+
+        .nav-title {
+            font-size: 11px;
+            font-weight: bold;
+            color: #999;
+            text-transform: uppercase;
+            margin: 20px 10px 8px;
+        }
+
+        .nav-link {
+            display: block;
+            text-decoration: none;
+            color: #444;
+            padding: 12px 14px;
+            margin-bottom: 5px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .nav-link:hover {
+            background: #f3eaf7;
+            color: #7b3f98;
+        }
+
+        .nav-link.active {
+            background: #7b3f98;
+            color: #fff;
+        }
+
+        .logout-link {
+            margin-top: 25px;
+            color: #c0392b;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            width: calc(100% - 250px);
+            padding: 30px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .page-header h1 {
+            margin: 0;
+            font-size: 28px;
+            color: #333;
+        }
+
+        .page-header p {
+            margin: 7px 0 0;
+            color: #777;
+        }
+
+        .period-form {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .period-form select,
+        .period-form button {
+            padding: 10px 13px;
+            border-radius: 7px;
+            border: 1px solid #ddd;
+            background: #fff;
+        }
+
+        .period-form button {
+            background: #7b3f98;
+            color: #fff;
+            border-color: #7b3f98;
+            cursor: pointer;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: #fff;
+            border: 1px solid #e8e8e8;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .stat-label {
+            color: #777;
+            font-size: 13px;
+            margin-bottom: 9px;
+        }
+
+        .stat-value {
+            font-size: 25px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .stat-subtitle {
+            margin-top: 6px;
+            color: #999;
+            font-size: 12px;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .panel {
+            background: #fff;
+            border: 1px solid #e8e8e8;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .panel.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 18px;
+        }
+
+        .panel-header h2 {
+            margin: 0;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .panel-header span {
+            color: #888;
+            font-size: 12px;
+        }
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 12px 10px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+            font-size: 13px;
+        }
+
+        th {
+            background: #faf8fb;
+            color: #555;
+            font-weight: 600;
+        }
+
+        td {
+            color: #444;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px 15px;
+            color: #888;
+            font-size: 14px;
+        }
+
+        .status-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .status-name {
+            min-width: 120px;
+            font-size: 13px;
+        }
+
+        .progress-container {
+            flex: 1;
+            height: 9px;
+            background: #eee;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: #7b3f98;
+            border-radius: 10px;
+        }
+
+        .status-count {
+            min-width: 45px;
+            text-align: right;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+        }
+
+        .metric-box {
+            border: 1px solid #eee;
+            border-radius: 9px;
+            padding: 15px;
+            background: #fcfbfd;
+        }
+
+        .metric-box .label {
+            color: #777;
+            font-size: 12px;
+            margin-bottom: 7px;
+        }
+
+        .metric-box .value {
+            color: #333;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 20px;
+            font-size: 11px;
+            background: #f0e7f4;
+            color: #7b3f98;
+        }
+
+        .money {
+            font-weight: 600;
+        }
+
+        .footer-note {
+            margin-top: 20px;
+            color: #999;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        @media (max-width: 1100px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .panel.full-width {
+                grid-column: auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 210px;
+            }
+
+            .main-content {
+                margin-left: 210px;
+                width: calc(100% - 210px);
+                padding: 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .admin-layout {
+                display: block;
+            }
+
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .metric-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="admin-layout">
+
+    <!-- =========================
+         ADMIN SIDEBAR
+    ========================== -->
+    <aside class="sidebar">
+
+        <div class="admin-role-header">
+            <div class="admin-role-avatar">A</div>
+            <div class="admin-role-info">
+                <strong>Administrator</strong>
+                <span>Admin</span>
+            </div>
+        </div>
+
+        <div class="nav-title">Main</div>
+
+        <a href="{{ url_for('admin_dashboard') }}"
+           class="nav-link">
+            Dashboard
+        </a>
+
+        <a href="{{ url_for('admin_users') }}"
+           class="nav-link">
+            Users
+        </a>
+
+        <a href="{{ url_for('admin_sellers') }}"
+           class="nav-link">
+            Sellers
+        </a>
+
+        <a href="{{ url_for('admin_products') }}"
+           class="nav-link">
+            Products
+        </a>
+
+        <div class="nav-title">Monitoring</div>
+
+        <a href="{{ url_for('admin_complaints') }}"
+           class="nav-link">
+            Complaints
+        </a>
+
+        <a href="{{ url_for('admin_analytics') }}"
+           class="nav-link active">
+            Analytics
+        </a>
+
+        <a href="{{ url_for('admin_ai_usage') }}"
+           class="nav-link">
+            AI Usage
+        </a>
+
+        <a href="{{ url_for('logout') }}"
+           class="nav-link logout-link">
+            Logout
+        </a>
+
+    </aside>
+
+
+    <!-- =========================
+         MAIN CONTENT
+    ========================== -->
+    <main class="main-content">
+
+        <div class="page-header">
+
+            <div>
+                <h1>Analytics Dashboard</h1>
+                <p>Monitor platform performance and business activity.</p>
+            </div>
+
+            <form method="GET"
+                  action="{{ url_for('admin_analytics') }}"
+                  class="period-form">
+
+                <select name="period">
+                    <option value="7d"
+                        {% if period|default('30d') == '7d' %}selected{% endif %}>
+                        Last 7 Days
+                    </option>
+
+                    <option value="30d"
+                        {% if period|default('30d') == '30d' %}selected{% endif %}>
+                        Last 30 Days
+                    </option>
+
+                    <option value="90d"
+                        {% if period|default('30d') == '90d' %}selected{% endif %}>
+                        Last 90 Days
+                    </option>
+
+                    <option value="1y"
+                        {% if period|default('30d') == '1y' %}selected{% endif %}>
+                        Last 1 Year
+                    </option>
+                </select>
+
+                <button type="submit">
+                    Apply
+                </button>
+
+            </form>
+
+        </div>
+
+
+        <!-- =========================
+             STATISTICS
+        ========================== -->
+
+        <section class="stats-grid">
+
+            <div class="stat-card">
+                <div class="stat-label">Total Users</div>
+                <div class="stat-value">
+                    {{ total_users|default(0) }}
+                </div>
+                <div class="stat-subtitle">
+                    Registered platform users
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">Sellers</div>
+                <div class="stat-value">
+                    {{ total_sellers|default(0) }}
+                </div>
+                <div class="stat-subtitle">
+                    Registered sellers
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">Buyers</div>
+                <div class="stat-value">
+                    {{ total_buyers|default(0) }}
+                </div>
+                <div class="stat-subtitle">
+                    Registered buyers
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">Mentors</div>
+                <div class="stat-value">
+                    {{ total_mentors|default(0) }}
+                </div>
+                <div class="stat-subtitle">
+                    Registered mentors
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">Products</div>
+                <div class="stat-value">
+                    {{ total_products|default(0) }}
+                </div>
+                <div class="stat-subtitle">
+                    Products listed
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">Orders</div>
+                <div class="stat-value">
+                    {{ total_orders|default(0) }}
+                </div>
+                <div class="stat-subtitle">
+                    Total orders
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">Revenue</div>
+                <div class="stat-value money">
+                    ₹{{ "%.2f"|format(total_revenue|default(0)|float) }}
+                </div>
+                <div class="stat-subtitle">
+                    Platform revenue
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">Pending Orders</div>
+                <div class="stat-value">
+                    {{ pending_orders|default(0) }}
+                </div>
+                <div class="stat-subtitle">
+                    Orders awaiting processing
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             SALES + ORDER STATUS
+        ========================== -->
+
+        <section class="content-grid">
+
+            <!-- SALES -->
+            <div class="panel">
+
+                <div class="panel-header">
+                    <h2>Sales & Revenue</h2>
+
+                    <span>
+                        {{ period|default('30d') }}
+                    </span>
+                </div>
+
+                <div class="table-wrapper">
+
+                    <table>
+
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Orders</th>
+                                <th>Revenue</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                        {% if sales_data|default([]) %}
+
+                            {% for row in sales_data %}
+
+                            <tr>
+                                <td>
+                                    {{ row.date|default(row.day|default('-')) }}
+                                </td>
+
+                                <td>
+                                    {{ row.orders|default(row.order_count|default(0)) }}
+                                </td>
+
+                                <td class="money">
+                                    ₹{{ "%.2f"|format(
+                                        row.revenue|default(0)|float
+                                    ) }}
+                                </td>
+                            </tr>
+
+                            {% endfor %}
+
+                        {% else %}
+
+                            <tr>
+                                <td colspan="3">
+                                    <div class="empty-state">
+                                        No sales data available for this period.
+                                    </div>
+                                </td>
+                            </tr>
+
+                        {% endif %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+            <!-- ORDER STATUS -->
+            <div class="panel">
+
+                <div class="panel-header">
+                    <h2>Order Status</h2>
+                    <span>Current distribution</span>
+                </div>
+
+                <div class="status-list">
+
+                    {% set order_status_data = order_status|default([]) %}
+
+                    {% if order_status_data %}
+
+                        {% set max_status_count = namespace(value=1) %}
+
+                        {% for item in order_status_data %}
+
+                            {% if item.count|default(0)|int > max_status_count.value %}
+                                {% set max_status_count.value = item.count|default(0)|int %}
+                            {% endif %}
+
+                        {% endfor %}
+
+                        {% for item in order_status_data %}
+
+                        <div class="status-item">
+
+                            <div class="status-name">
+                                {{ item.status|default('Unknown')|replace('_', ' ')|title }}
+                            </div>
+
+                            <div class="progress-container">
+
+                                {% set current_count = item.count|default(0)|int %}
+                                {% set percentage =
+                                    ((current_count / max_status_count.value) * 100)
+                                    if max_status_count.value > 0
+                                    else 0
+                                %}
+
+                                <div class="progress-bar"
+                                    <span class="progress-value"> {{ percentage|round(0) }} </span>
+                                </div>
+
+                            </div>
+
+                            <div class="status-count">
+                                {{ current_count }}
+                            </div>
+
+                        </div>
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <div class="empty-state">
+                            No order-status data available.
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             USER ACTIVITY + PRODUCT METRICS
+        ========================== -->
+
+        <section class="content-grid">
+
+            <div class="panel">
+
+                <div class="panel-header">
+                    <h2>User Activity</h2>
+                    <span>Platform engagement</span>
+                </div>
+
+                <div class="metric-grid">
+
+                    <div class="metric-box">
+                        <div class="label">Active Users</div>
+                        <div class="value">
+                            {{ active_users|default(0) }}
+                        </div>
+                    </div>
+
+                    <div class="metric-box">
+                        <div class="label">New Users</div>
+                        <div class="value">
+                            {{ new_users|default(0) }}
+                        </div>
+                    </div>
+
+                    <div class="metric-box">
+                        <div class="label">Active Sellers</div>
+                        <div class="value">
+                            {{ active_sellers|default(0) }}
+                        </div>
+                    </div>
+
+                    <div class="metric-box">
+                        <div class="label">Active Buyers</div>
+                        <div class="value">
+                            {{ active_buyers|default(0) }}
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="panel">
+
+                <div class="panel-header">
+                    <h2>Product Metrics</h2>
+                    <span>Marketplace inventory</span>
+                </div>
+
+                <div class="metric-grid">
+
+                    <div class="metric-box">
+                        <div class="label">Total Products</div>
+                        <div class="value">
+                            {{ total_products|default(0) }}
+                        </div>
+                    </div>
+
+                    <div class="metric-box">
+                        <div class="label">Active Products</div>
+                        <div class="value">
+                            {{ active_products|default(0) }}
+                        </div>
+                    </div>
+
+                    <div class="metric-box">
+                        <div class="label">Low Stock</div>
+                        <div class="value">
+                            {{ low_stock_products|default(0) }}
+                        </div>
+                    </div>
+
+                    <div class="metric-box">
+                        <div class="label">Inactive Products</div>
+                        <div class="value">
+                            {{ inactive_products|default(0) }}
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             TOP PRODUCTS
+        ========================== -->
+
+        <section class="panel">
+
+            <div class="panel-header">
+                <h2>Top Products</h2>
+                <span>Based on available sales data</span>
+            </div>
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Product</th>
+                            <th>Seller</th>
+                            <th>Orders</th>
+                            <th>Quantity Sold</th>
+                            <th>Revenue</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                    {% if top_products|default([]) %}
+
+                        {% for product in top_products %}
+
+                        <tr>
+
+                            <td>
+                                {{ loop.index }}
+                            </td>
+
+                            <td>
+                                {{ product.name|default(product.product_name|default('-')) }}
+                            </td>
+
+                            <td>
+                                {{ product.seller_name|default('-') }}
+                            </td>
+
+                            <td>
+                                {{ product.orders|default(product.order_count|default(0)) }}
+                            </td>
+
+                            <td>
+                                {{ product.quantity|default(product.quantity_sold|default(0)) }}
+                            </td>
+
+                            <td class="money">
+                                ₹{{ "%.2f"|format(
+                                    product.revenue|default(0)|float
+                                ) }}
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <tr>
+                            <td colspan="6">
+                                <div class="empty-state">
+                                    No product sales data available.
+                                </div>
+                            </td>
+                        </tr>
+
+                    {% endif %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             SELLER PERFORMANCE
+        ========================== -->
+
+        <section class="panel" style="margin-top: 20px;">
+
+            <div class="panel-header">
+                <h2>Seller Performance</h2>
+                <span>Marketplace seller activity</span>
+            </div>
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Seller</th>
+                            <th>Products</th>
+                            <th>Orders</th>
+                            <th>Revenue</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                    {% if seller_performance|default([]) %}
+
+                        {% for seller in seller_performance %}
+
+                        <tr>
+
+                            <td>
+                                {{ loop.index }}
+                            </td>
+
+                            <td>
+                                {{ seller.full_name|default(
+                                    seller.seller_name|default('-')
+                                ) }}
+                            </td>
+
+                            <td>
+                                {{ seller.product_count|default(
+                                    seller.products|default(0)
+                                ) }}
+                            </td>
+
+                            <td>
+                                {{ seller.order_count|default(
+                                    seller.orders|default(0)
+                                ) }}
+                            </td>
+
+                            <td class="money">
+                                ₹{{ "%.2f"|format(
+                                    seller.revenue|default(0)|float
+                                ) }}
+                            </td>
+
+                            <td>
+
+                                <span class="badge">
+                                    {{ seller.status|default('active')|title }}
+                                </span>
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <tr>
+                            <td colspan="6">
+                                <div class="empty-state">
+                                    No seller performance data available.
+                                </div>
+                            </td>
+                        </tr>
+
+                    {% endif %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             PLATFORM SUMMARY
+        ========================== -->
+
+        <section class="panel" style="margin-top: 20px;">
+
+            <div class="panel-header">
+                <h2>Platform Summary</h2>
+                <span>Overview</span>
+            </div>
+
+            <div class="metric-grid">
+
+                <div class="metric-box">
+                    <div class="label">Pending Orders</div>
+                    <div class="value">
+                        {{ pending_orders|default(0) }}
+                    </div>
+                </div>
+
+                <div class="metric-box">
+                    <div class="label">Open Complaints</div>
+                    <div class="value">
+                        {{ open_complaints|default(0) }}
+                    </div>
+                </div>
+
+                <div class="metric-box">
+                    <div class="label">Pending Sellers</div>
+                    <div class="value">
+                        {{ pending_sellers|default(0) }}
+                    </div>
+                </div>
+
+                <div class="metric-box">
+                    <div class="label">Total Revenue</div>
+                    <div class="value">
+                        ₹{{ "%.2f"|format(
+                            total_revenue|default(0)|float
+                        ) }}
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <div class="footer-note">
+            SheRise Admin Analytics • Women Empowerment Platform
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+</html>

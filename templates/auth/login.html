@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Login - Women Empowerment</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+    <div class="auth-container">
+
+        <div class="auth-box">
+
+            <h1>Welcome Back</h1>
+
+            <p class="auth-subtitle">
+                Login to continue to your account.
+            </p>
+
+            {% if error %}
+                <p class="alert alert-danger" role="alert">{{ error }}</p>
+            {% endif %}
+            {% if message %}
+                <p class="alert alert-success" role="status">{{ message }}</p>
+            {% endif %}
+
+            <form method="POST"
+                  action="{{ url_for('login') }}">
+{% include "_csrf_field.html" %}
+
+                <label>Email</label>
+
+                <input
+                    type="email"
+                    name="email"
+                    value="{{ email|default('') }}"
+                    placeholder="Enter your email"
+                    required
+                >
+
+
+                <label>Password</label>
+
+                <input
+                    type="password"
+                    name="password"
+                    placeholder="Enter your password"
+                    required
+                >
+
+
+                <button type="submit"
+                        class="auth-btn">
+
+                    Login
+
+                </button>
+
+            </form>
+
+            <div style="text-align:center; margin:18px 0 12px; opacity:.75;">
+                or
+            </div>
+
+            <a href="{{ url_for('login_google') }}"
+               class="auth-btn"
+               style="display:block; text-align:center; text-decoration:none;">
+                Continue with Google
+            </a>
+
+            <p class="auth-footer">
+
+                Don't have an account?
+
+                <a href="{{ url_for('register') }}">
+                    Create Account
+                </a>
+
+            </p>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

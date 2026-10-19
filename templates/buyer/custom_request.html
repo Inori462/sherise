@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Custom Request | SheRise</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #faf7fa;
+            color: #333;
+        }
+
+        /* =========================
+           BUYER LAYOUT
+        ========================== */
+
+        .buyer-layout {
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* =========================
+           SIDEBAR
+        ========================== */
+
+        .sidebar {
+            width: 245px;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #7b2f6d, #a84d91);
+            color: white;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            padding: 28px 18px;
+            z-index: 1000;
+        }
+
+        .sidebar-brand {
+            display: block;
+            color: white;
+            text-decoration: none;
+            font-size: 25px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .sidebar-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .sidebar-menu a {
+            color: white;
+            text-decoration: none;
+            padding: 12px 15px;
+            border-radius: 9px;
+            font-size: 14px;
+            transition: 0.2s ease;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.18);
+        }
+
+        .sidebar-menu .logout {
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.10);
+        }
+
+        /* =========================
+           MAIN CONTENT
+        ========================== */
+
+        .main-content {
+            margin-left: 245px;
+            width: calc(100% - 245px);
+            min-height: 100vh;
+            padding: 35px 45px;
+        }
+
+        .custom-request-page {
+            max-width: 850px;
+            margin: 0 auto;
+        }
+
+        /* =========================
+           PAGE HEADER
+        ========================== */
+
+        .custom-request-header {
+            margin-bottom: 30px;
+        }
+
+        .custom-request-header h1 {
+            margin: 0 0 10px;
+            color: #222;
+            font-size: 30px;
+            font-weight: 700;
+        }
+
+        .custom-request-header p {
+            margin: 0;
+            max-width: 700px;
+            color: #777;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        /* =========================
+           REQUEST CARD
+        ========================== */
+
+        .custom-request-card {
+            background: #ffffff;
+            border: 1px solid #e8e8ee;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+        }
+
+        /* =========================
+           INTRO
+        ========================== */
+
+        .request-intro {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding-bottom: 25px;
+            margin-bottom: 25px;
+            border-bottom: 1px solid #eeeeee;
+        }
+
+        .request-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
+            background: #faf0f7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .request-intro h2 {
+            margin: 0 0 5px;
+            color: #333;
+            font-size: 20px;
+        }
+
+        .request-intro p {
+            margin: 0;
+            color: #888;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        /* =========================
+           FORM
+        ========================== */
+
+        .custom-request-form {
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 8px;
+            color: #444;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .form-group label span {
+            color: #d9534f;
+        }
+
+        /* =========================
+           INPUTS
+        ========================== */
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 13px;
+            border: 1px solid #dddde4;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #333;
+            font-family: inherit;
+            font-size: 13px;
+            outline: none;
+            transition: 0.2s ease;
+        }
+
+        .form-group input {
+            height: 44px;
+        }
+
+        .form-group textarea {
+            min-height: 150px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: #b45f9b;
+            box-shadow: 0 0 0 3px rgba(180, 95, 155, 0.08);
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: #aaa;
+        }
+
+        .form-group small {
+            margin-top: 7px;
+            color: #999;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        /* =========================
+           BUDGET
+        ========================== */
+
+        .budget-input {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .budget-input span {
+            position: absolute;
+            left: 13px;
+            color: #777;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 1;
+        }
+
+        .budget-input input {
+            padding-left: 32px;
+        }
+
+        /* =========================
+           INFORMATION BOX
+        ========================== */
+
+        .request-info {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            background: #faf7fa;
+            border: 1px solid #f0e2ed;
+            border-radius: 10px;
+        }
+
+        .info-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #b45f9b;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .request-info strong {
+            display: block;
+            margin-bottom: 5px;
+            color: #444;
+            font-size: 13px;
+        }
+
+        .request-info p {
+            margin: 0;
+            color: #777;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        /* =========================
+           ACTIONS
+        ========================== */
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 12px;
+            padding-top: 5px;
+        }
+
+        .cancel-btn,
+        .submit-request-btn {
+            min-width: 120px;
+            padding: 11px 18px;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .cancel-btn {
+            background: #ffffff;
+            color: #666;
+            border: 1px solid #dddde4;
+        }
+
+        .cancel-btn:hover {
+            background: #f7f7f7;
+        }
+
+        .submit-request-btn {
+            border: none;
+            background: #b45f9b;
+            color: #ffffff;
+        }
+
+        .submit-request-btn:hover {
+            background: #9f5088;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================== */
+
+        @media (max-width: 850px) {
+
+            .sidebar {
+                width: 220px;
+            }
+
+            .main-content {
+                margin-left: 220px;
+                width: calc(100% - 220px);
+                padding: 30px 25px;
+            }
+
+        }
+
+        @media (max-width: 700px) {
+
+            .sidebar {
+                position: relative;
+                width: 100%;
+                min-height: auto;
+                padding: 18px;
+            }
+
+            .buyer-layout {
+                display: block;
+            }
+
+            .sidebar-brand {
+                margin-bottom: 15px;
+            }
+
+            .sidebar-menu {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .sidebar-menu a {
+                padding: 9px 11px;
+                font-size: 13px;
+            }
+
+            .sidebar-menu .logout {
+                margin-top: 0;
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                padding: 25px 15px 35px;
+            }
+
+            .custom-request-header h1 {
+                font-size: 25px;
+            }
+
+            .custom-request-card {
+                padding: 22px;
+            }
+
+            .request-intro {
+                align-items: flex-start;
+            }
+
+        }
+
+        @media (max-width: 500px) {
+
+            .custom-request-card {
+                padding: 18px;
+                border-radius: 12px;
+            }
+
+            .request-intro {
+                gap: 10px;
+            }
+
+            .request-icon {
+                width: 45px;
+                height: 45px;
+                font-size: 20px;
+            }
+
+            .request-intro h2 {
+                font-size: 17px;
+            }
+
+            .form-actions {
+                flex-direction: column-reverse;
+                width: 100%;
+            }
+
+            .cancel-btn,
+            .submit-request-btn {
+                width: 100%;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="buyer-layout">
+
+    <!-- =========================
+         SIDEBAR
+    ========================== -->
+
+    <aside class="sidebar">
+
+        <a href="{{ url_for('buyer_dashboard') }}"
+           class="sidebar-brand">
+            SheRise
+        </a>
+
+        <nav class="sidebar-menu">
+
+            <a href="{{ url_for('buyer_dashboard') }}">
+                🏠 Dashboard
+            </a>
+
+            <a href="{{ url_for('buyer_products') }}">
+                🛍️ Marketplace
+            </a>
+
+            <a href="{{ url_for('buyer_wishlist') }}">
+                ❤️ Wishlist
+            </a>
+
+            <a href="{{ url_for('buyer_cart') }}">
+                🛒 Cart
+            </a>
+
+            <a href="{{ url_for('buyer_orders') }}">
+                📦 Orders
+            </a>
+
+            <a href="{{ url_for('buyer_profile') }}">
+                👤 Profile
+            </a>
+
+            <a href="{{ url_for('buyer_custom_request') }}"
+               class="active">
+                ✨ Custom Request
+            </a>
+
+            <a href="{{ url_for('logout') }}"
+               class="logout">
+                🚪 Logout
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- =========================
+         MAIN CONTENT
+    ========================== -->
+
+    <main class="main-content">
+
+        <section class="custom-request-page">
+
+            <!-- =========================
+                 PAGE HEADER
+            ========================== -->
+
+            <div class="custom-request-header">
+
+                <h1>
+                    Request a Custom Product
+                </h1>
+
+                <p>
+                    Can't find exactly what you are looking for?
+                    Tell our sellers what you need and they can respond
+                    with a suitable quotation.
+                </p>
+
+            </div>
+
+
+            <!-- =========================
+                 REQUEST CARD
+            ========================== -->
+
+            <div class="custom-request-card">
+
+                <div class="request-intro">
+
+                    <div class="request-icon">
+                        ✨
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Tell Us What You Need
+                        </h2>
+
+                        <p>
+                            Provide as much information as possible so sellers
+                            can understand your requirements.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =========================
+                     FORM
+                ========================== -->
+
+                <form method="POST"
+                      action="{{ url_for('buyer_custom_request') }}"
+                      class="custom-request-form">
+{% include "_csrf_field.html" %}
+
+                    <!-- Product Name -->
+
+                    <div class="form-group">
+
+                        <label for="product_name">
+
+                            Product Name
+                            <span>*</span>
+
+                        </label>
+
+                        <input
+                            type="text"
+                            id="product_name"
+                            name="product_name"
+                            placeholder="Example: Handmade Gift Basket"
+                            maxlength="150"
+                            required
+                        >
+
+                        <small>
+                            Enter the product you want to request.
+                        </small>
+
+                    </div>
+
+
+                    <!-- Description -->
+
+                    <div class="form-group">
+
+                        <label for="description">
+
+                            Product Requirements
+                            <span>*</span>
+
+                        </label>
+
+                        <textarea
+                            id="description"
+                            name="description"
+                            rows="7"
+                            maxlength="2000"
+                            placeholder="Describe the product, size, colour, design, quantity, customization, or any other requirements..."
+                            required></textarea>
+
+                        <small>
+                            Include important details such as colour,
+                            size, design, quantity, customization, etc.
+                        </small>
+
+                    </div>
+
+
+                    <!-- Budget -->
+
+                    <div class="form-group">
+
+                        <label for="budget">
+                            Your Budget
+                        </label>
+
+                        <div class="budget-input">
+
+                            <span>
+                                ₹
+                            </span>
+
+                            <input
+                                type="number"
+                                id="budget"
+                                name="budget"
+                                placeholder="Enter your maximum budget"
+                                min="0"
+                                step="0.01"
+                            >
+
+                        </div>
+
+                        <small>
+                            Optional. This helps sellers provide a suitable
+                            quotation.
+                        </small>
+
+                    </div>
+
+
+                    <!-- Information Box -->
+
+                    <div class="request-info">
+
+                        <div class="info-icon">
+                            ℹ
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                What happens next?
+                            </strong>
+
+                            <p>
+                                Your request will be submitted to the
+                                marketplace. A seller can review your
+                                requirements and respond with a quotation.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Buttons -->
+
+                    <div class="form-actions">
+
+                        <a href="{{ url_for('buyer_dashboard') }}"
+                           class="cancel-btn">
+                            Cancel
+                        </a>
+
+                        <button type="submit"
+                                class="submit-request-btn">
+                            Submit Request
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+
+</html>
