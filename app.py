@@ -117,18 +117,20 @@ def _get_db_pool():
     if mysql is None or MySQLConnectionPool is None:
         raise RuntimeError("mysql-connector-python is required to access the database.")
     if _db_pool is None:
-        with _db_pool_lock:
-            if _db_pool is None:
-                _db_pool = MySQLConnectionPool(
-                    pool_name="sherise_pool",
-                    pool_size=MYSQL_POOL_SIZE,
-                    pool_reset_session=True,
-                    host=MYSQL_HOST,
-                    user=MYSQL_USER,
-                    password=MYSQL_PASSWORD,
-                    database=MYSQL_DB
-                )
-    return _db_pool
+            with _db_pool_lock:
+                if _db_pool is None:
+                    _db_pool = MySQLConnectionPool(
+                        pool_name="sherise_pool",
+                        pool_size=MYSQL_POOL_SIZE,
+                        pool_reset_session=True,
+                        host=MYSQL_HOST,
+                        port=MYSQL_PORT,
+                        user=MYSQL_USER,
+                        password=MYSQL_PASSWORD,
+                        database=MYSQL_DB
+                    )
+            return _db_pool
+    
 
 
 def _get_db_connection():
