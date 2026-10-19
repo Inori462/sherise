@@ -102,11 +102,11 @@ GOOGLE_OAUTH_ENABLED = bool(GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET)
 # MYSQL CONNECTION
 # =========================================================
 
-MYSQL_HOST = os.getenv("MYSQL_HOST", "localhost")
-MYSQL_PORT = int(os.getenv("MYSQL_PORT", "3306"))
-MYSQL_USER = os.getenv("MYSQL_USER", "root")
-MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD", "")
-MYSQL_DB = os.getenv("MYSQL_DB", "women_empowerment")
+MYSQL_HOST = os.getenv("MYSQLHOST", "localhost")
+MYSQL_PORT = int(os.getenv("MYSQLPORT", "3306"))
+MYSQL_USER = os.getenv("MYSQLUSER", "root")
+MYSQL_PASSWORD = os.getenv("MYSQLPASSWORD", "")
+MYSQL_DB = os.getenv("MYSQLDATABASE", "women_empowerment")
 
 
 MYSQL_POOL_SIZE = int(os.getenv("MYSQL_POOL_SIZE", "5"))
