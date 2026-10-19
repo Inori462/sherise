@@ -12,26 +12,38 @@
 <body>
 
     <!-- Navigation Bar -->
-    <nav class="navbar">
+   
+<!-- Navigation Bar -->
+<nav class="navbar">
+    <div class="logo">
+        Women<span>Empower</span>
+    </div>
 
-        <div class="logo">
-            Women<span>Empower</span>
-        </div>
+    <div class="nav-links">
+        <a href="{{ url_for('index') }}">Home</a>
+        <a href="{{ url_for('buyer_dashboard') }}">Shop</a>
+        <a href="{{ url_for('seller_dashboard') }}">Become a Seller</a>
+        <a href="{{ url_for('mentorship') }}">Mentorship</a>
+        <a href="{{ url_for('ai_assistant') }}">AI Assistant</a>
+    </div>
 
-        <div class="nav-links">
-            <a href="/">Home</a>
-            <a href="#">Shop</a>
-            <a href="#">Become a Seller</a>
-            <a href="#">Mentorship</a>
-            <a href="#">AI Assistant</a>
-        </div>
+    <div class="nav-buttons">
+        <a href="{{ url_for('login') }}" class="login-btn">Login</a>
+        <a href="{{ url_for('register') }}" class="signup-btn">Register</a>
+    </div>
+</nav>
 
-        <div class="nav-buttons">
-            <a href="/login" class="login-btn">Login</a>
-            <a href="/register" class="signup-btn">Register</a>
-        </div>
+<!-- Hero Buttons -->
+<div class="hero-buttons">
+    <a href="{{ url_for('buyer_dashboard') }}" class="primary-btn">
+        Explore Products
+    </a>
 
-    </nav>
+    <a href="{{ url_for('seller_dashboard') }}" class="secondary-btn">
+        Start Your Business
+    </a>
+</div>
+
 
 
     <!-- Hero Section -->
