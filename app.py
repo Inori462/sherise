@@ -14,7 +14,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 try:
-import psycopg2
+    import psycopg2
+except ImportError:
+    psycopg2 = None
 from psycopg2 import IntegrityError
 from psycopg2.pool import ThreadedConnectionPool
 from psycopg2.extras import RealDictCursor
