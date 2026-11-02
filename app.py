@@ -239,6 +239,37 @@ class DatabaseProxy:
 db = DatabaseProxy()
 
 
+def initialize_database_schema():
+    pool = _get_db_pool()
+    connection = pool.getconn()
+
+    try:
+        schema_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "database",
+            "she_rise_database.sql"
+        )
+
+        with open(schema_path, "r", encoding="utf-8") as file:
+            schema_sql = file.read()
+
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT pg_advisory_xact_lock(4815162342)")
+            cursor.execute(schema_sql)
+
+        connection.commit()
+        app.logger.info("Sherise database schema initialized successfully.")
+
+    except Exception:
+        connection.rollback()
+        app.logger.exception("Sherise database initialization failed.")
+        raise
+
+    finally:
+        pool.putconn(connection)
+
+
+
 @app.cli.command("create-admin")
 @click.option(
     "--email",
@@ -9006,7 +9037,12 @@ def logout():
 
     session.clear()
     return redirect(url_for("login"))
+    
+# =========================================================
+# DATABASE INITIALIZATION
+# =========================================================
 
+initialize_database_schema()
 
 # =========================================================
 # RUN APPLICATION
@@ -9017,3 +9053,4 @@ if __name__ == "__main__":
         debug=os.getenv("FLASK_DEBUG", "false").strip().lower()
         in {"1", "true", "yes", "on"}
     )
+
