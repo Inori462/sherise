@@ -5719,7 +5719,7 @@ def admin_sellers():
 
     try:
         ensure_db_connection()
-        cursor = db.cursor(dictionary=True)
+        cursor = db.cursor(cursor_factory=RealDictCursor)
 
         status_filter = request.args.get(
             "status", ""
@@ -5760,10 +5760,13 @@ def admin_sellers():
                 FROM order_items oi
                 INNER JOIN orders o
                     ON o.id = oi.order_id
-                INNER JOIN payments pay
-                    ON pay.order_id = o.id
-                WHERE pay.payment_status = 'paid'
-                  AND o.status NOT IN ('cancelled', 'returned')
+                WHERE o.status NOT IN ('cancelled', 'returned')
+                  AND EXISTS (
+                      SELECT 1
+                      FROM payments pay
+                      WHERE pay.order_id = o.id
+                        AND pay.payment_status = 'paid'
+                  )
                 GROUP BY oi.seller_id
             ) seller_stats
                 ON seller_stats.seller_id = u.id
@@ -5797,7 +5800,6 @@ def admin_sellers():
             query += """
                 AND COALESCE(sa.status, 'pending') = %s
             """
-
             params.append(status_filter)
 
         if account_status_filter in (
@@ -5807,7 +5809,6 @@ def admin_sellers():
             query += """
                 AND COALESCE(sa.account_status, 'active') = %s
             """
-
             params.append(account_status_filter)
 
         query += """
@@ -5868,7 +5869,6 @@ def admin_sellers():
         if cursor:
             cursor.close()
 
-
 # =========================================================
 # ADMIN SELLER DETAILS
 # =========================================================
@@ -5882,9 +5882,10 @@ def admin_seller_details(user_id):
 
     try:
         ensure_db_connection()
-        cursor = db.cursor(dictionary=True)
+        cursor = db.cursor(cursor_factory=RealDictCursor)
 
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT
                 u.id,
                 u.full_name,
@@ -5911,10 +5912,13 @@ def admin_seller_details(user_id):
                 FROM order_items oi
                 INNER JOIN orders o
                     ON o.id = oi.order_id
-                INNER JOIN payments pay
-                    ON pay.order_id = o.id
-                WHERE pay.payment_status = 'paid'
-                  AND o.status NOT IN ('cancelled', 'returned')
+                WHERE o.status NOT IN ('cancelled', 'returned')
+                  AND EXISTS (
+                      SELECT 1
+                      FROM payments pay
+                      WHERE pay.order_id = o.id
+                        AND pay.payment_status = 'paid'
+                  )
                 GROUP BY oi.seller_id
             ) seller_stats
                 ON seller_stats.seller_id = u.id
@@ -5932,14 +5936,17 @@ def admin_seller_details(user_id):
                 sa.reviewed_at,
                 seller_stats.order_count,
                 seller_stats.revenue
-        """, (user_id,))
+            """,
+            (user_id,)
+        )
 
         seller = cursor.fetchone()
 
         if not seller:
             return "Seller not found.", 404
 
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT
                 id,
                 name,
@@ -5950,7 +5957,9 @@ def admin_seller_details(user_id):
             FROM products
             WHERE seller_id = %s
             ORDER BY created_at DESC, id DESC
-        """, (user_id,))
+            """,
+            (user_id,)
+        )
 
         products = cursor.fetchall()
 
@@ -5969,7 +5978,6 @@ def admin_seller_details(user_id):
     finally:
         if cursor:
             cursor.close()
-
 
 # =========================================================
 # ADMIN SELLER APPROVE
@@ -6030,20 +6038,25 @@ def admin_seller_status(user_id):
 
     try:
         ensure_db_connection()
-        cursor = db.cursor(dictionary=True)
+        cursor = db.cursor(cursor_factory=RealDictCursor)
 
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT id
             FROM users
             WHERE id = %s
               AND role = 'seller'
             FOR UPDATE
-        """, (user_id,))
+            """,
+            (user_id,)
+        )
 
         if not cursor.fetchone():
+            db.rollback()
             return "Seller not found.", 404
 
-        cursor.execute("""
+        cursor.execute(
+            """
             INSERT INTO seller_approvals (
                 seller_id,
                 status,
@@ -6057,13 +6070,16 @@ def admin_seller_status(user_id):
                 reviewed_by = EXCLUDED.reviewed_by,
                 reviewed_at = NOW(),
                 updated_at = CURRENT_TIMESTAMP
-        """, (
-            user_id,
-            new_status,
-            session["user_id"]
-        ))
+            """,
+            (
+                user_id,
+                new_status,
+                session["user_id"]
+            )
+        )
 
-        cursor.execute("""
+        cursor.execute(
+            """
             INSERT INTO admin_activity_logs (
                 admin_id,
                 action,
@@ -6071,16 +6087,23 @@ def admin_seller_status(user_id):
                 target_id,
                 description
             )
-            VALUES (%s, 'seller_account_status', 'seller', %s, %s)
-        """, (
-            session["user_id"],
-            user_id,
-            f"Seller account status changed to {new_status}"
-        ))
+            VALUES (%s, %s, %s, %s, %s)
+            """,
+            (
+                session["user_id"],
+                "seller_account_status",
+                "seller",
+                user_id,
+                f"Seller account status changed to {new_status}"
+            )
+        )
 
         db.commit()
 
-        flash("Seller account status updated successfully.", "success")
+        flash(
+            "Seller account status updated successfully.",
+            "success"
+        )
 
         return redirect(url_for("admin_sellers"))
 
@@ -6104,20 +6127,27 @@ def admin_seller_status(user_id):
 def admin_update_seller_approval(user_id, status):
     cursor = None
 
+    if status not in ("approved", "rejected"):
+        return "Invalid seller approval status.", 400
+
     try:
         ensure_db_connection()
-        cursor = db.cursor(dictionary=True)
+        cursor = db.cursor(cursor_factory=RealDictCursor)
 
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT id, role
             FROM users
             WHERE id = %s
             FOR UPDATE
-        """, (user_id,))
+            """,
+            (user_id,)
+        )
 
         seller = cursor.fetchone()
 
         if not seller or seller["role"] != "seller":
+            db.rollback()
             return "Seller not found.", 404
 
         review_note = request.form.get(
@@ -6125,9 +6155,11 @@ def admin_update_seller_approval(user_id, status):
         ).strip()
 
         if len(review_note) > 5000:
+            db.rollback()
             return "Review note is too long.", 400
 
-        cursor.execute("""
+        cursor.execute(
+            """
             INSERT INTO seller_approvals (
                 seller_id,
                 status,
@@ -6142,14 +6174,17 @@ def admin_update_seller_approval(user_id, status):
                 review_note = EXCLUDED.review_note,
                 reviewed_at = NOW(),
                 updated_at = CURRENT_TIMESTAMP
-        """, (
-            user_id,
-            status,
-            session["user_id"],
-            review_note or None
-        ))
+            """,
+            (
+                user_id,
+                status,
+                session["user_id"],
+                review_note or None
+            )
+        )
 
-        cursor.execute("""
+        cursor.execute(
+            """
             INSERT INTO admin_activity_logs (
                 admin_id,
                 action,
@@ -6157,13 +6192,16 @@ def admin_update_seller_approval(user_id, status):
                 target_id,
                 description
             )
-            VALUES (%s, %s, 'seller', %s, %s)
-        """, (
-            session["user_id"],
-            f"seller_{status}",
-            user_id,
-            f"Seller registration {status}"
-        ))
+            VALUES (%s, %s, %s, %s, %s)
+            """,
+            (
+                session["user_id"],
+                f"seller_{status}",
+                "seller",
+                user_id,
+                f"Seller registration {status}"
+            )
+        )
 
         db.commit()
 
@@ -6187,7 +6225,6 @@ def admin_update_seller_approval(user_id, status):
             cursor.close()
 
 
-
 # =========================================================
 # ADMIN - MENTOR APPROVAL
 # =========================================================
@@ -6202,10 +6239,15 @@ def admin_mentors():
     try:
         ensure_db_connection()
         ensure_mentor_tables()
-        cursor = db.cursor(dictionary=True)
+        cursor = db.cursor(cursor_factory=RealDictCursor)
 
-        status_filter = request.args.get("status", "").strip().lower()
-        search = request.args.get("search", "").strip()
+        status_filter = request.args.get(
+            "status", ""
+        ).strip().lower()
+
+        search = request.args.get(
+            "search", ""
+        ).strip()
 
         query = """
             SELECT
@@ -6310,6 +6352,10 @@ def admin_mentor_reject(user_id):
     return admin_update_mentor_approval(user_id, "rejected")
 
 
+# =========================================================
+# ADMIN MENTOR APPROVAL HELPER
+# =========================================================
+
 def admin_update_mentor_approval(user_id, status):
     if status not in ("approved", "rejected"):
         return "Invalid mentor approval status.", 400
@@ -6319,7 +6365,7 @@ def admin_update_mentor_approval(user_id, status):
     try:
         ensure_db_connection()
         ensure_mentor_tables()
-        cursor = db.cursor(dictionary=True)
+        cursor = db.cursor(cursor_factory=RealDictCursor)
 
         cursor.execute(
             """
@@ -6334,11 +6380,15 @@ def admin_update_mentor_approval(user_id, status):
         mentor = cursor.fetchone()
 
         if not mentor or mentor["role"] != "mentor":
+            db.rollback()
             return "Mentor not found.", 404
 
-        review_note = request.form.get("review_note", "").strip()
+        review_note = request.form.get(
+            "review_note", ""
+        ).strip()
 
         if len(review_note) > 5000:
+            db.rollback()
             return "Review note must be 5,000 characters or fewer.", 400
 
         cursor.execute(
@@ -6356,7 +6406,8 @@ def admin_update_mentor_approval(user_id, status):
                 status = EXCLUDED.status,
                 reviewed_by = EXCLUDED.reviewed_by,
                 review_note = EXCLUDED.review_note,
-                reviewed_at = NOW()
+                reviewed_at = NOW(),
+                updated_at = CURRENT_TIMESTAMP
             """,
             (
                 user_id,
@@ -6375,11 +6426,12 @@ def admin_update_mentor_approval(user_id, status):
                 target_id,
                 description
             )
-            VALUES (%s, %s, 'mentor', %s, %s)
+            VALUES (%s, %s, %s, %s, %s)
             """,
             (
                 session["user_id"],
                 f"mentor_{status}",
+                "mentor",
                 user_id,
                 f"Mentor profile {status}"
             )
@@ -6387,11 +6439,16 @@ def admin_update_mentor_approval(user_id, status):
 
         db.commit()
 
-        flash(f"Mentor application {status} successfully.", "success")
+        flash(
+            f"Mentor application {status} successfully.",
+            "success"
+        )
+
         return redirect(url_for("admin_mentors"))
 
     except Exception as e:
         db.rollback()
+
         return _internal_error_response(
             e,
             "Unable to update mentor approval."
@@ -6415,7 +6472,7 @@ def admin_products():
 
     try:
         ensure_db_connection()
-        cursor = db.cursor(dictionary=True)
+        cursor = db.cursor(cursor_factory=RealDictCursor)
 
         search = request.args.get("search", "").strip()
         category = request.args.get("category", "").strip()
@@ -6476,21 +6533,35 @@ def admin_products():
         cursor.execute(query, tuple(params))
         products = cursor.fetchall()
 
-        cursor.execute("SELECT COUNT(*) AS total FROM products")
+        cursor.execute(
+            "SELECT COUNT(*) AS total FROM products"
+        )
         total_products = cursor.fetchone()["total"] or 0
 
         cursor.execute(
-            "SELECT COUNT(*) AS total FROM products WHERE status = 'active'"
+            """
+            SELECT COUNT(*) AS total
+            FROM products
+            WHERE status = 'active'
+            """
         )
         active_products = cursor.fetchone()["total"] or 0
 
         cursor.execute(
-            "SELECT COUNT(*) AS total FROM products WHERE status <> 'active'"
+            """
+            SELECT COUNT(*) AS total
+            FROM products
+            WHERE status <> 'active'
+            """
         )
         inactive_products = cursor.fetchone()["total"] or 0
 
         cursor.execute(
-            "SELECT COUNT(*) AS total FROM products WHERE stock <= 5"
+            """
+            SELECT COUNT(*) AS total
+            FROM products
+            WHERE stock <= 5
+            """
         )
         low_stock_products = cursor.fetchone()["total"] or 0
 
@@ -6524,6 +6595,10 @@ def admin_products():
             cursor.close()
 
 
+# =========================================================
+# ADMIN PRODUCT DETAILS
+# =========================================================
+
 @app.route("/admin/products/<int:product_id>")
 def admin_product_details(product_id):
     if not admin_required():
@@ -6533,7 +6608,7 @@ def admin_product_details(product_id):
 
     try:
         ensure_db_connection()
-        cursor = db.cursor(dictionary=True)
+        cursor = db.cursor(cursor_factory=RealDictCursor)
 
         cursor.execute(
             """
@@ -6553,6 +6628,7 @@ def admin_product_details(product_id):
         product = cursor.fetchone()
 
         if not product:
+            db.rollback()
             return "Product not found.", 404
 
         return render_template(
@@ -6560,8 +6636,12 @@ def admin_product_details(product_id):
             products=[product],
             categories=[],
             total_products=1,
-            active_products=1 if product.get("status") == "active" else 0,
-            inactive_products=1 if product.get("status") != "active" else 0,
+            active_products=(
+                1 if product.get("status") == "active" else 0
+            ),
+            inactive_products=(
+                1 if product.get("status") != "active" else 0
+            ),
             low_stock_products=(
                 1 if (product.get("stock") or 0) <= 5 else 0
             ),
@@ -6583,12 +6663,18 @@ def admin_product_details(product_id):
             cursor.close()
 
 
+# =========================================================
+# ADMIN PRODUCT STATUS
+# =========================================================
+
 @app.route("/admin/products/<int:product_id>/status", methods=["POST"])
 def admin_product_status(product_id):
     if not admin_required():
         return redirect(url_for("login"))
 
-    status = request.form.get("status", "").strip().lower()
+    status = request.form.get(
+        "status", ""
+    ).strip().lower()
 
     if status not in ("active", "inactive"):
         return "Invalid product status.", 400
@@ -6597,20 +6683,30 @@ def admin_product_status(product_id):
 
     try:
         ensure_db_connection()
-        cursor = db.cursor(dictionary=True)
+        cursor = db.cursor(cursor_factory=RealDictCursor)
 
         cursor.execute(
-            "SELECT id, name FROM products WHERE id = %s",
+            """
+            SELECT id, name
+            FROM products
+            WHERE id = %s
+            FOR UPDATE
+            """,
             (product_id,)
         )
 
         product = cursor.fetchone()
 
         if not product:
+            db.rollback()
             return "Product not found.", 404
 
         cursor.execute(
-            "UPDATE products SET status = %s WHERE id = %s",
+            """
+            UPDATE products
+            SET status = %s
+            WHERE id = %s
+            """,
             (status, product_id)
         )
 
@@ -6623,10 +6719,12 @@ def admin_product_status(product_id):
                 target_id,
                 description
             )
-            VALUES (%s, 'product_status_update', 'product', %s, %s)
+            VALUES (%s, %s, %s, %s, %s)
             """,
             (
                 session["user_id"],
+                "product_status_update",
+                "product",
                 product_id,
                 f"Product '{product['name']}' status changed to {status}"
             )
@@ -6634,11 +6732,16 @@ def admin_product_status(product_id):
 
         db.commit()
 
-        flash("Product status updated successfully.", "success")
+        flash(
+            "Product status updated successfully.",
+            "success"
+        )
+
         return redirect(url_for("admin_products"))
 
     except Exception as e:
         db.rollback()
+
         return _internal_error_response(
             e,
             "Unable to update product status."
@@ -6647,6 +6750,7 @@ def admin_product_status(product_id):
     finally:
         if cursor:
             cursor.close()
+
 
 
 # =========================================================
@@ -6662,7 +6766,7 @@ def admin_complaints():
 
     try:
         ensure_db_connection()
-        cursor = db.cursor(dictionary=True)
+        cursor = db.cursor(cursor_factory=RealDictCursor)
 
         search = request.args.get("search", "").strip()
         status_filter = request.args.get("status", "").strip().lower()
@@ -6730,11 +6834,17 @@ def admin_complaints():
         cursor.execute(query, tuple(params))
         complaints = cursor.fetchall()
 
-        cursor.execute("SELECT COUNT(*) AS total FROM complaints")
+        cursor.execute(
+            "SELECT COUNT(*) AS total FROM complaints"
+        )
         total_complaints = cursor.fetchone()["total"] or 0
 
         cursor.execute(
-            "SELECT COUNT(*) AS total FROM complaints WHERE status = 'open'"
+            """
+            SELECT COUNT(*) AS total
+            FROM complaints
+            WHERE status = 'open'
+            """
         )
         open_complaints = cursor.fetchone()["total"] or 0
 
@@ -6782,6 +6892,10 @@ def admin_complaints():
             cursor.close()
 
 
+# =========================================================
+# ADMIN COMPLAINT DETAILS
+# =========================================================
+
 @app.route("/admin/complaints/<int:complaint_id>")
 def admin_complaint_details(complaint_id):
     if not admin_required():
@@ -6791,7 +6905,7 @@ def admin_complaint_details(complaint_id):
 
     try:
         ensure_db_connection()
-        cursor = db.cursor(dictionary=True)
+        cursor = db.cursor(cursor_factory=RealDictCursor)
 
         cursor.execute(
             """
@@ -6846,6 +6960,10 @@ def admin_complaint_details(complaint_id):
             cursor.close()
 
 
+# =========================================================
+# ADMIN COMPLAINT STATUS
+# =========================================================
+
 @app.route(
     "/admin/complaints/<int:complaint_id>/status",
     methods=["POST"]
@@ -6854,8 +6972,13 @@ def admin_complaint_status(complaint_id):
     if not admin_required():
         return redirect(url_for("login"))
 
-    status = request.form.get("status", "").strip().lower()
-    response_text = request.form.get("admin_response", "").strip()
+    status = request.form.get(
+        "status", ""
+    ).strip().lower()
+
+    response_text = request.form.get(
+        "admin_response", ""
+    ).strip()
 
     allowed_statuses = {
         "open", "in_progress", "resolved", "closed"
@@ -6871,7 +6994,7 @@ def admin_complaint_status(complaint_id):
 
     try:
         ensure_db_connection()
-        cursor = db.cursor(dictionary=True)
+        cursor = db.cursor(cursor_factory=RealDictCursor)
 
         cursor.execute(
             """
@@ -6886,6 +7009,7 @@ def admin_complaint_status(complaint_id):
         complaint = cursor.fetchone()
 
         if not complaint:
+            db.rollback()
             return "Complaint not found.", 404
 
         cursor.execute(
@@ -6923,16 +7047,12 @@ def admin_complaint_status(complaint_id):
                 target_id,
                 description
             )
-            VALUES (
-                %s,
-                'complaint_status_update',
-                'complaint',
-                %s,
-                %s
-            )
+            VALUES (%s, %s, %s, %s, %s)
             """,
             (
                 session["user_id"],
+                "complaint_status_update",
+                "complaint",
                 complaint_id,
                 f"Complaint status changed to {status}"
             )
@@ -6945,6 +7065,7 @@ def admin_complaint_status(complaint_id):
 
     except Exception as e:
         db.rollback()
+
         return _internal_error_response(
             e,
             "Unable to update complaint status."
@@ -6968,7 +7089,7 @@ def admin_returns():
 
     try:
         ensure_db_connection()
-        cursor = db.cursor(dictionary=True)
+        cursor = db.cursor(cursor_factory=RealDictCursor)
 
         cursor.execute(
             """
@@ -7016,6 +7137,10 @@ def admin_returns():
             cursor.close()
 
 
+# =========================================================
+# ADMIN RETURN STATUS
+# =========================================================
+
 @app.route(
     "/admin/returns/<int:return_id>/status",
     methods=["POST"]
@@ -7024,8 +7149,13 @@ def admin_return_status(return_id):
     if not admin_required():
         return redirect(url_for("login"))
 
-    status = request.form.get("status", "").strip().lower()
-    decision_note = request.form.get("decision_note", "").strip()
+    status = request.form.get(
+        "status", ""
+    ).strip().lower()
+
+    decision_note = request.form.get(
+        "decision_note", ""
+    ).strip()
 
     if status not in {"approved", "rejected"}:
         return "Return status must be approved or rejected.", 400
@@ -7037,7 +7167,7 @@ def admin_return_status(return_id):
 
     try:
         ensure_db_connection()
-        cursor = db.cursor(dictionary=True)
+        cursor = db.cursor(cursor_factory=RealDictCursor)
 
         cursor.execute(
             """
@@ -7052,9 +7182,11 @@ def admin_return_status(return_id):
         return_request = cursor.fetchone()
 
         if not return_request:
+            db.rollback()
             return "Return request not found.", 404
 
         if return_request["status"] != "requested":
+            db.rollback()
             return "This return request has already been reviewed.", 409
 
         cursor.execute(
@@ -7098,16 +7230,12 @@ def admin_return_status(return_id):
                 target_id,
                 description
             )
-            VALUES (
-                %s,
-                'return_request_review',
-                'return_request',
-                %s,
-                %s
-            )
+            VALUES (%s, %s, %s, %s, %s)
             """,
             (
                 session["user_id"],
+                "return_request_review",
+                "return_request",
                 return_id,
                 f"Return request {status}"
             )
@@ -7115,11 +7243,16 @@ def admin_return_status(return_id):
 
         db.commit()
 
-        flash(f"Return request {status} successfully.", "success")
+        flash(
+            f"Return request {status} successfully.",
+            "success"
+        )
+
         return redirect(url_for("admin_returns"))
 
     except Exception as e:
         db.rollback()
+
         return _internal_error_response(
             e,
             "Unable to review return request."
@@ -7143,7 +7276,7 @@ def admin_analytics():
 
     try:
         ensure_db_connection()
-        cursor = db.cursor(dictionary=True)
+        cursor = db.cursor(cursor_factory=RealDictCursor)
 
         period = request.args.get("period", "30d").strip().lower()
 
@@ -7156,7 +7289,6 @@ def admin_analytics():
             "90d": 90,
             "1y": 365
         }
-
         days = days_map[period]
 
         cursor.execute("SELECT COUNT(*) AS total_users FROM users")
@@ -7172,14 +7304,10 @@ def admin_analytics():
         )
         total_buyers = cursor.fetchone()["total_buyers"] or 0
 
-        cursor.execute(
-            "SELECT COUNT(*) AS total_products FROM products"
-        )
+        cursor.execute("SELECT COUNT(*) AS total_products FROM products")
         total_products = cursor.fetchone()["total_products"] or 0
 
-        cursor.execute(
-            "SELECT COUNT(*) AS total_orders FROM orders"
-        )
+        cursor.execute("SELECT COUNT(*) AS total_orders FROM orders")
         total_orders = cursor.fetchone()["total_orders"] or 0
 
         cursor.execute(
@@ -7248,15 +7376,12 @@ def admin_analytics():
 
         cursor.execute(
             """
-            SELECT
-                status,
-                COUNT(*) AS count
+            SELECT status, COUNT(*) AS count
             FROM orders
             GROUP BY status
             ORDER BY count DESC
             """
         )
-
         order_status_data = cursor.fetchall()
 
         cursor.execute(
@@ -7314,247 +7439,6 @@ def admin_analytics():
                 u.full_name,
                 u.email,
                 COUNT(DISTINCT p.id) AS product_count,
-                COALESCE(seller_revenue.order_count, 0) AS order_count,
-                COALESCE(seller_revenue.revenue, 0) AS revenue
-            FROM users u
-            LEFT JOIN products p ON p.seller_id = u.id
-            LEFT JOIN (
-                SELECT
-                    oi.seller_id,
-                    COUNT(DISTINCT oi.order_id) AS order_count,
-                    SUM(oi.subtotal) AS revenue
-                FROM order_items oi
-                INNER JOIN orders o ON o.id = oi.order_id
-                WHERE o.status NOT IN ('cancelled', 'returned')
-                  AND EXISTS (
-                      SELECT 1
-                      FROM payments pay
-                      WHERE pay.order_id = o.id
-                        AND pay.payment_status = 'paid'
-                  )
-                GROUP BY oi.seller_id
-            ) seller_revenue
-                ON seller_revenue.seller_id = u.id
-            WHERE u.role = 'seller'
-            GROUP BY
-                u.id,
-                u.full_name,
-                u.email,
-                seller_revenue.order_count,
-                seller_revenue.revenue
-            ORDER BY revenue DESC
-            LIMIT 10
-            """
-        )
-
-        seller_performance = cursor.fetchall()
-
-        for row in seller_performance:
-            row["revenue"] = float(row["revenue"] or 0)
-
-        cursor.execute(
-            """
-            SELECT
-                COUNT(*) AS total_orders,
-                SUM(
-                    CASE WHEN status = 'delivered'
-                    THEN 1 ELSE 0 END
-                ) AS delivered_orders,
-                SUM(
-                    CASE WHEN status = 'cancelled'
-                    THEN 1 ELSE 0 END
-                ) AS cancelled_orders,
-                SUM(
-                    CASE WHEN status = 'pending'
-                    THEN 1 ELSE 0 END
-                ) AS pending_orders
-            FROM orders
-            """
-        )
-
-        order_metrics = cursor.fetchone() or {}
-
-        cursor.execute(
-            """
-            SELECT
-                COUNT(*) AS total_users,
-                COUNT(
-                    DISTINCT CASE WHEN role = 'buyer' THEN id END
-                ) AS buyer_count,
-                COUNT(
-                    DISTINCT CASE WHEN role = 'seller' THEN id END
-                ) AS seller_count,
-                COUNT(
-                    DISTINCT CASE WHEN role = 'mentor' THEN id END
-                ) AS mentor_count
-            FROM users
-            """
-        )
-
-        user_metrics = cursor.fetchone() or {}
-
-        # Your original code ends here.
-        # Send the remaining part of admin_analytics() so I can
-        # complete its calculations and render_template() call.
-
-    except Exception as e:
-        return _internal_error_response(
-            e,
-            "Unable to load admin analytics."
-        )
-
-    finally:
-        if cursor:
-            cursor.close()
-
-  
-@app.route("/admin/analytics")
-def admin_analytics():
-    if not admin_required():
-        return redirect(url_for("login"))
-
-    cursor = None
-
-    try:
-        ensure_db_connection()
-        cursor = db.cursor(dictionary=True)
-
-        period = request.args.get("period", "30d").strip().lower()
-
-        if period not in ("7d", "30d", "90d", "1y"):
-            period = "30d"
-
-        days_map = {"7d": 7, "30d": 30, "90d": 90, "1y": 365}
-        days = days_map[period]
-
-        cursor.execute("SELECT COUNT(*) AS total_users FROM users")
-        total_users = cursor.fetchone()["total_users"] or 0
-
-        cursor.execute(
-            "SELECT COUNT(*) AS total_sellers FROM users WHERE role = 'seller'"
-        )
-        total_sellers = cursor.fetchone()["total_sellers"] or 0
-
-        cursor.execute(
-            "SELECT COUNT(*) AS total_buyers FROM users WHERE role = 'buyer'"
-        )
-        total_buyers = cursor.fetchone()["total_buyers"] or 0
-
-        cursor.execute("SELECT COUNT(*) AS total_products FROM products")
-        total_products = cursor.fetchone()["total_products"] or 0
-
-        cursor.execute("SELECT COUNT(*) AS total_orders FROM orders")
-        total_orders = cursor.fetchone()["total_orders"] or 0
-
-        cursor.execute("""
-            SELECT COALESCE(SUM(oi.subtotal), 0) AS revenue
-            FROM order_items oi
-            INNER JOIN orders o ON o.id = oi.order_id
-            WHERE o.created_at >= NOW() - MAKE_INTERVAL(days => %s)
-              AND o.status NOT IN ('cancelled', 'returned')
-              AND EXISTS (
-                  SELECT 1
-                  FROM payments pay
-                  WHERE pay.order_id = o.id
-                    AND pay.payment_status = 'paid'
-              )
-        """, (days,))
-
-        revenue = float(cursor.fetchone()["revenue"] or 0)
-
-        cursor.execute("""
-            SELECT COUNT(*) AS total
-            FROM orders
-            WHERE status IN ('pending', 'processing')
-        """)
-        pending_orders = cursor.fetchone()["total"] or 0
-
-        cursor.execute("""
-            SELECT COUNT(*) AS total
-            FROM seller_approvals
-            WHERE status = 'approved'
-        """)
-        active_sellers = cursor.fetchone()["total"] or 0
-
-        cursor.execute("""
-            SELECT
-                DATE(o.created_at) AS sale_date,
-                COUNT(DISTINCT o.id) AS order_count,
-                COALESCE(SUM(oi.subtotal), 0) AS revenue
-            FROM orders o
-            INNER JOIN order_items oi ON oi.order_id = o.id
-            WHERE o.created_at >= NOW() - MAKE_INTERVAL(days => %s)
-              AND o.status NOT IN ('cancelled', 'returned')
-              AND EXISTS (
-                  SELECT 1
-                  FROM payments pay
-                  WHERE pay.order_id = o.id
-                    AND pay.payment_status = 'paid'
-              )
-            GROUP BY DATE(o.created_at)
-            ORDER BY sale_date DESC
-        """, (days,))
-
-        sales_data = cursor.fetchall()
-
-        for row in sales_data:
-            row["revenue"] = float(row["revenue"] or 0)
-
-        cursor.execute("""
-            SELECT status, COUNT(*) AS count
-            FROM orders
-            GROUP BY status
-            ORDER BY count DESC
-        """)
-
-        order_status_data = cursor.fetchall()
-
-        cursor.execute("""
-            SELECT
-                p.id,
-                p.name,
-                u.full_name AS seller_name,
-                COALESCE(SUM(
-                    CASE
-                        WHEN o.status NOT IN ('cancelled', 'returned')
-                             AND pay.order_id IS NOT NULL
-                        THEN oi.quantity
-                        ELSE 0
-                    END
-                ), 0) AS units_sold,
-                COALESCE(SUM(
-                    CASE
-                        WHEN o.status NOT IN ('cancelled', 'returned')
-                             AND pay.order_id IS NOT NULL
-                        THEN oi.subtotal
-                        ELSE 0
-                    END
-                ), 0) AS revenue
-            FROM products p
-            INNER JOIN users u ON u.id = p.seller_id
-            LEFT JOIN order_items oi ON oi.product_id = p.id
-            LEFT JOIN orders o ON o.id = oi.order_id
-            LEFT JOIN (
-                SELECT DISTINCT order_id
-                FROM payments
-                WHERE payment_status = 'paid'
-            ) pay ON pay.order_id = o.id
-            GROUP BY p.id, p.name, u.full_name
-            ORDER BY revenue DESC
-            LIMIT 10
-        """)
-
-        top_products = cursor.fetchall()
-
-        for row in top_products:
-            row["revenue"] = float(row["revenue"] or 0)
-
-        cursor.execute("""
-            SELECT
-                u.id,
-                u.full_name,
-                u.email,
-                COUNT(DISTINCT p.id) AS product_count,
                 COALESCE(sr.order_count, 0) AS order_count,
                 COALESCE(sr.revenue, 0) AS revenue
             FROM users u
@@ -7577,18 +7461,23 @@ def admin_analytics():
             ) sr ON sr.seller_id = u.id
             WHERE u.role = 'seller'
             GROUP BY
-                u.id, u.full_name, u.email,
-                sr.order_count, sr.revenue
+                u.id,
+                u.full_name,
+                u.email,
+                sr.order_count,
+                sr.revenue
             ORDER BY revenue DESC
             LIMIT 10
-        """)
+            """
+        )
 
         seller_performance = cursor.fetchall()
 
         for row in seller_performance:
             row["revenue"] = float(row["revenue"] or 0)
 
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT
                 COUNT(*) AS total_orders,
                 SUM(CASE WHEN status = 'delivered' THEN 1 ELSE 0 END)
@@ -7598,11 +7487,12 @@ def admin_analytics():
                 SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END)
                     AS pending_orders
             FROM orders
-        """)
-
+            """
+        )
         order_metrics = cursor.fetchone() or {}
 
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT
                 COUNT(*) AS total_users,
                 COUNT(DISTINCT CASE WHEN role = 'buyer' THEN id END)
@@ -7612,8 +7502,8 @@ def admin_analytics():
                 COUNT(DISTINCT CASE WHEN role = 'mentor' THEN id END)
                     AS mentor_count
             FROM users
-        """)
-
+            """
+        )
         user_metrics = cursor.fetchone() or {}
 
         return render_template(
@@ -7648,223 +7538,6 @@ def admin_analytics():
         if cursor:
             cursor.close()
 
-@app.route("/admin/ai-usage")
-def admin_ai_usage():
-    if not admin_required():
-        return redirect(url_for("login"))
-
-    cursor = None
-
-    try:
-        ensure_db_connection()
-        cursor = db.cursor(dictionary=True)
-
-        period = request.args.get("period", "30d").strip().lower()
-        feature = request.args.get("feature", "").strip()
-
-        if period not in ("7d", "30d", "90d", "1y"):
-            period = "30d"
-
-        days_map = {"7d": 7, "30d": 30, "90d": 90, "1y": 365}
-        days = days_map[period]
-
-        conditions = [
-            "created_at >= NOW() - MAKE_INTERVAL(days => %s)"
-        ]
-        params = [days]
-
-        if feature:
-            conditions.append("feature = %s")
-            params.append(feature)
-
-        where_clause = " AND ".join(conditions)
-
-        cursor.execute(
-            f"""
-            SELECT COUNT(*) AS total
-            FROM ai_usage_logs
-            WHERE {where_clause}
-            """,
-            tuple(params)
-        )
-        total_requests = cursor.fetchone()["total"] or 0
-
-        cursor.execute(
-            f"""
-            SELECT COUNT(DISTINCT user_id) AS total
-            FROM ai_usage_logs
-            WHERE {where_clause}
-              AND user_id IS NOT NULL
-            """,
-            tuple(params)
-        )
-        active_ai_users = cursor.fetchone()["total"] or 0
-
-        cursor.execute(
-            f"""
-            SELECT COUNT(*) AS total
-            FROM ai_usage_logs
-            WHERE {where_clause}
-              AND response_status = 'success'
-            """,
-            tuple(params)
-        )
-        successful_requests = cursor.fetchone()["total"] or 0
-
-        cursor.execute(
-            f"""
-            SELECT COUNT(*) AS total
-            FROM ai_usage_logs
-            WHERE {where_clause}
-              AND response_status <> 'success'
-            """,
-            tuple(params)
-        )
-        failed_requests = cursor.fetchone()["total"] or 0
-
-        cursor.execute(
-            f"""
-            SELECT
-                feature,
-                COUNT(*) AS request_count
-            FROM ai_usage_logs
-            WHERE {where_clause}
-            GROUP BY feature
-            ORDER BY request_count DESC
-            """,
-            tuple(params)
-        )
-
-        feature_usage = cursor.fetchall()
-
-        for row in feature_usage:
-            row["percentage"] = (
-                row["request_count"] / total_requests * 100
-                if total_requests else 0
-            )
-
-        cursor.execute(
-            f"""
-            SELECT
-                COUNT(*) AS total_requests,
-                COALESCE(AVG(response_time_ms), 0) AS avg_response_time,
-                SUM(
-                    CASE WHEN feature = 'business_assistant'
-                    THEN 1 ELSE 0 END
-                ) AS business_assistant_requests,
-                SUM(
-                    CASE WHEN feature IN ('marketing', 'marketing_tool')
-                    THEN 1 ELSE 0 END
-                ) AS marketing_requests
-            FROM ai_usage_logs
-            WHERE {where_clause}
-            """,
-            tuple(params)
-        )
-
-        performance = cursor.fetchone() or {}
-
-        cursor.execute(
-            f"""
-            SELECT
-                DATE(created_at) AS usage_date,
-                COUNT(*) AS request_count,
-                SUM(
-                    CASE WHEN response_status = 'success'
-                    THEN 1 ELSE 0 END
-                ) AS success_count,
-                SUM(
-                    CASE WHEN response_status <> 'success'
-                    THEN 1 ELSE 0 END
-                ) AS failure_count
-            FROM ai_usage_logs
-            WHERE {where_clause}
-            GROUP BY DATE(created_at)
-            ORDER BY usage_date DESC
-            """,
-            tuple(params)
-        )
-
-        daily_usage = cursor.fetchall()
-
-        recent_conditions = [
-            "l.created_at >= NOW() - MAKE_INTERVAL(days => %s)"
-        ]
-        recent_params = [days]
-
-        if feature:
-            recent_conditions.append("l.feature = %s")
-            recent_params.append(feature)
-
-        recent_where = " AND ".join(recent_conditions)
-
-        cursor.execute(
-            f"""
-            SELECT
-                l.id,
-                l.user_id,
-                COALESCE(u.full_name, 'Deleted user') AS user_name,
-                COALESCE(l.user_role, u.role, 'unknown') AS user_role,
-                l.feature,
-                l.request_text,
-                l.response_status,
-                l.response_time_ms,
-                l.created_at
-            FROM ai_usage_logs l
-            LEFT JOIN users u ON u.id = l.user_id
-            WHERE {recent_where}
-            ORDER BY l.created_at DESC
-            LIMIT 100
-            """,
-            tuple(recent_params)
-        )
-
-        recent_activity = cursor.fetchall()
-
-        success_rate = (
-            successful_requests / total_requests * 100
-            if total_requests else 0
-        )
-
-        failure_rate = (
-            failed_requests / total_requests * 100
-            if total_requests else 0
-        )
-
-        return render_template(
-            "admin/ai_usage.html",
-            period=period,
-            feature=feature,
-            total_requests=total_requests,
-            active_ai_users=active_ai_users,
-            successful_requests=successful_requests,
-            failed_requests=failed_requests,
-            feature_usage=feature_usage,
-            performance=performance,
-            daily_usage=daily_usage,
-            recent_activity=recent_activity,
-            success_rate=success_rate,
-            failure_rate=failure_rate,
-            avg_response_time=(
-                performance.get("avg_response_time", 0) or 0
-            ),
-            business_assistant_requests=(
-                performance.get("business_assistant_requests", 0) or 0
-            ),
-            marketing_requests=(
-                performance.get("marketing_requests", 0) or 0
-            ),
-        )
-
-    except Exception as e:
-        return _internal_error_response(
-            e,
-            "Unable to load AI usage records."
-        )
-
-    finally:
-        if cursor:
-            cursor.close()
 
 # =========================================================
 # SELLER DASHBOARD
