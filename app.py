@@ -972,20 +972,22 @@ def google_callback():
         ensure_db_connection()
         cursor = db.cursor(dictionary=True)
 
-        cursor.execute("""
-            SELECT id, full_name, email, password, role
-            FROM users
-            WHERE email = %s
-        """, (google_email,))
-
-        user = cursor.fetchone()
+    cursor.execute("""
+        SELECT id, full_name, email, password, role
+        FROM users
+        WHERE LOWER(TRIM(email)) = %s
+        LIMIT 1
+    """, (google_email,))
+    
+    user = cursor.fetchone()
 
         if mode == "register":
             pending = session.pop("pending_registration", None)
 
             if not pending:
                 return redirect(url_for("register"))
-
+                
+pending_email = (pending.get("email") or "").strip().lower()
             if pending["email"] != google_email:
                 return render_template(
                     "auth/register.html",
@@ -1055,25 +1057,34 @@ def google_callback():
 
         return redirect_after_login(user)
 
-    except IntegrityError:
-        db.rollback()
+    except IntegrityError as error:
+    db.rollback()
 
-        current_app.logger.exception(
-            "Google account creation conflict."
-        )
+    constraint_name = getattr(
+        getattr(error, "diag", None),
+        "constraint_name",
+        "unknown"
+    )
 
-        template = (
-            "auth/register.html"
-            if mode == "register"
-            else "auth/login.html"
-        )
+    current_app.logger.exception(
+        "Google account creation conflict. Constraint: %s",
+        constraint_name
+    )
 
-        return render_template(
-            template,
-            error="An account with these details already exists. Please try again.",
-            email=google_email
-        ), 409
+    template = (
+        "auth/register.html"
+        if mode == "register"
+        else "auth/login.html"
+    )
 
+    return render_template(
+        template,
+        error=(
+            "We could not create your account because some details "
+            "may already exist. Please try logging in or contact support."
+        ),
+        email=google_email
+    ), 409
     except Exception:
         db.rollback()
 
