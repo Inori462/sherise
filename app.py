@@ -967,7 +967,7 @@ def google_callback():
             email=""
         ), 400
 
-    cursor = None
+        cursor = None
 
     try:
         ensure_db_connection()
@@ -996,39 +996,49 @@ def google_callback():
                 return render_template(
                     "auth/register.html",
                     error=(
-                        "The Google email does not match the email entered in "
-                        "the registration form. Please use the same email."
+                        "The Google email does not match the email entered "
+                        "in the registration form. Please use the same email."
                     ),
                     form_data={
-                        "full_name": pending["full_name"],
+                        "full_name": pending.get("full_name", ""),
                         "email": pending_email,
-                        "role": pending["role"]
+                        "role": pending.get("role", "")
                     }
                 ), 400
-
 
             if user:
                 return render_template(
                     "auth/register.html",
-                    error="An account with this Google email already exists. Please log in instead.",
-                    form_data={
-                        "full_name": pending["full_name"],
-                        "email": pending["email"],
-                        "role": pending["role"]
-                    }
-                )
+                    error=(
+                        "An account with this email already exists. "
+                        "Please log in instead."
+                    ),
+                    email=google_email
+                ), 409
 
-        cursor.execute("""
-            INSERT INTO users (full_name, email, mobile, password, role)
-            VALUES (%s, %s, %s, %s, %s)
-            RETURNING id
-        """, (
-            pending["full_name"],
-            google_email,
-            pending["mobile"],
-            pending["password_hash"],
-            pending["role"]
-        ))
+            mobile = (pending.get("mobile") or "").strip()
+
+            if not mobile:
+                return render_template(
+                    "auth/register.html",
+                    error="Mobile number is required. Please register again.",
+                    email=google_email
+                ), 400
+
+            cursor.execute("""
+                INSERT INTO users (
+                    full_name, email, mobile, password, role
+                )
+                VALUES (%s, %s, %s, %s, %s)
+                RETURNING id
+            """, (
+                pending["full_name"],
+                google_email,
+                mobile,
+                pending["password_hash"],
+                pending["role"]
+            ))
+
             row = cursor.fetchone()
             user_id = row["id"]
 
@@ -1052,7 +1062,10 @@ def google_callback():
             if not user:
                 return render_template(
                     "auth/login.html",
-                    error="No account was found for this Google email. Please register first.",
+                    error=(
+                        "No account was found for this Google email. "
+                        "Please register first."
+                    ),
                     email=google_email
                 )
 
@@ -1089,6 +1102,7 @@ def google_callback():
             ),
             email=google_email
         ), 409
+
     except Exception:
         db.rollback()
 
@@ -1104,15 +1118,16 @@ def google_callback():
 
         return render_template(
             template,
-            error="Google authentication could not be completed. Please try again.",
+            error=(
+                "Google authentication could not be completed. "
+                "Please try again."
+            ),
             email=google_email
         ), 500
 
     finally:
         if cursor:
             cursor.close()
-
-
 
 # =========================================================
 # LOGIN SESSION + ROLE REDIRECT
