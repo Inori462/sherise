@@ -1029,7 +1029,6 @@ def google_callback():
             pending["password_hash"],
             pending["role"]
         ))
-
             row = cursor.fetchone()
             user_id = row["id"]
 
@@ -1063,33 +1062,33 @@ def google_callback():
         return redirect_after_login(user)
 
     except IntegrityError as error:
-    db.rollback()
+        db.rollback()
 
-    constraint_name = getattr(
-        getattr(error, "diag", None),
-        "constraint_name",
-        "unknown"
-    )
+        constraint_name = getattr(
+            getattr(error, "diag", None),
+            "constraint_name",
+            "unknown"
+        )
 
-    current_app.logger.exception(
-        "Google account creation conflict. Constraint: %s",
-        constraint_name
-    )
+        current_app.logger.exception(
+            "Google account creation conflict. Constraint: %s",
+            constraint_name
+        )
 
-    template = (
-        "auth/register.html"
-        if mode == "register"
-        else "auth/login.html"
-    )
+        template = (
+            "auth/register.html"
+            if mode == "register"
+            else "auth/login.html"
+        )
 
-    return render_template(
-        template,
-        error=(
-            "We could not create your account because some details "
-            "may already exist. Please try logging in or contact support."
-        ),
-        email=google_email
-    ), 409
+        return render_template(
+            template,
+            error=(
+                "We could not create your account because some details "
+                "may already exist. Please try logging in or contact support."
+            ),
+            email=google_email
+        ), 409
     except Exception:
         db.rollback()
 
