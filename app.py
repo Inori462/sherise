@@ -30,10 +30,10 @@ app = Flask(__name__)
 APP_ENV = os.getenv("APP_ENV", "development").strip().lower()
 configured_secret = (os.getenv("APP_SECRET_KEY") or os.getenv("SECRET_KEY") or "").strip()
 if APP_ENV == "production" and (
-len(configured_secret) < 32
-or configured_secret == "change-me-to-a-long-random-secret"
+    len(configured_secret) < 32
+    or configured_secret == "change-me-to-a-long-random-secret"
 ):
-raise RuntimeError("APP_SECRET_KEY must contain at least 32 characters in production.")
+    raise RuntimeError("APP_SECRET_KEY must contain at least 32 characters in production.")
 app.config\["SECRET_KEY"\] = configured_secret or os.urandom(32).hex()
 app.config\["SESSION_COOKIE_HTTPONLY"\] = True
 app.config\["SESSION_COOKIE_SAMESITE"\] = "Lax"
