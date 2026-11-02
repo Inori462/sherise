@@ -309,7 +309,7 @@ def create_admin(email, full_name, password):
 
     try:
         ensure_db_connection()
-        cursor = db.cursor(dictionary=True)
+        cursor = db.cursor(cursor_factory=RealDictCursor)
 
         cursor.execute(
             "SELECT id, role FROM users WHERE email = %s",
