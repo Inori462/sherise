@@ -973,23 +973,26 @@ def google_callback():
         ensure_db_connection()
         cursor = db.cursor(dictionary=True)
 
-    cursor.execute("""
-        SELECT id, full_name, email, password, role
-        FROM users
-        WHERE LOWER(TRIM(email)) = %s
-        LIMIT 1
-    """, (google_email,))
-    
-    user = cursor.fetchone()
+        cursor.execute("""
+            SELECT id, full_name, email, password, role
+            FROM users
+            WHERE LOWER(TRIM(email)) = %s
+            LIMIT 1
+        """, (google_email,))
+
+        user = cursor.fetchone()
 
         if mode == "register":
             pending = session.pop("pending_registration", None)
 
             if not pending:
                 return redirect(url_for("register"))
-                
-     pending_email = (pending.get("email") or "").strip().lower()
-            if pending["email"] != google_email:
+
+            pending_email = (
+                pending.get("email") or ""
+            ).strip().lower()
+
+            if pending_email != google_email:
                 return render_template(
                     "auth/register.html",
                     error=(
@@ -998,10 +1001,11 @@ def google_callback():
                     ),
                     form_data={
                         "full_name": pending["full_name"],
-                        "email": pending["email"],
+                        "email": pending_email,
                         "role": pending["role"]
                     }
                 ), 400
+
 
             if user:
                 return render_template(
