@@ -637,7 +637,8 @@ def register():
 
             session["pending_registration"] = {
                 "full_name": full_name,
-                "email": email,
+                "email": email.strip().lower(),
+                "mobile": mobile.strip(),
                 "password_hash": generate_password_hash(password),
                 "role": role
             }
@@ -987,7 +988,7 @@ def google_callback():
             if not pending:
                 return redirect(url_for("register"))
                 
-pending_email = (pending.get("email") or "").strip().lower()
+     pending_email = (pending.get("email") or "").strip().lower()
             if pending["email"] != google_email:
                 return render_template(
                     "auth/register.html",
@@ -1013,17 +1014,17 @@ pending_email = (pending.get("email") or "").strip().lower()
                     }
                 )
 
-            cursor.execute("""
-                INSERT INTO users (full_name, email, mobile, password, role)
-                VALUES (%s, %s, %s, %s, %s)
-                RETURNING id
-            """, (
-                pending["full_name"],
-                google_email,
-                None,
-                pending["password_hash"],
-                pending["role"]
-            ))
+        cursor.execute("""
+            INSERT INTO users (full_name, email, mobile, password, role)
+            VALUES (%s, %s, %s, %s, %s)
+            RETURNING id
+        """, (
+            pending["full_name"],
+            google_email,
+            pending["mobile"],
+            pending["password_hash"],
+            pending["role"]
+        ))
 
             row = cursor.fetchone()
             user_id = row["id"]
