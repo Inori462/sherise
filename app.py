@@ -4,37 +4,28 @@ import os
 import secrets
 import hmac
 import threading
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlsplit
 from datetime import datetime, timedelta
-from urllib.parse import urlsplit
 from decimal import Decimal, InvalidOperation
 import click
 from dotenv import load_dotenv
+import requests
+from werkzeug.security import generate_password_hash, check_password_hash
 
 load_dotenv()
 
 try:
     import psycopg2
+    from psycopg2 import IntegrityError
+    from psycopg2.pool import ThreadedConnectionPool
+    from psycopg2.extras import RealDictCursor
 except ImportError:
     psycopg2 = None
-from psycopg2 import IntegrityError
-from psycopg2.pool import ThreadedConnectionPool
-from psycopg2.extras import RealDictCursor
-except ImportError:
-psycopg2 = None
-ThreadedConnectionPool = None
-RealDictCursor = None
+    IntegrityError = Exception
+    ThreadedConnectionPool = None
+    RealDictCursor = None
 
-```
-class IntegrityError(Exception):
-    pass
-
-```
-
-from werkzeug.security import generate_password_hash, check_password_hash
-import requests
-
-app = Flask(**name**)
+app = Flask(__name__)
 
 APP_ENV = os.getenv("APP_ENV", "development").strip().lower()
 configured_secret = (os.getenv("APP_SECRET_KEY") or os.getenv("SECRET_KEY") or "").strip()
