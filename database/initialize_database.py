@@ -1,12 +1,14 @@
 
-import os
+import getpass
 from pathlib import Path
 import psycopg2
 
-DATABASE_URL = os.getenv("DATABASE_URL")
+DATABASE_URL = getpass.getpass(
+    "Paste your Render External Database URL: "
+).strip()
 
 if not DATABASE_URL:
-    raise RuntimeError("DATABASE_URL is not configured.")
+    raise RuntimeError("Database URL is required.")
 
 schema_path = Path(__file__).parent / "database" / "she_rise_database.sql"
 
@@ -27,7 +29,8 @@ try:
         cursor.execute(sql)
 
     connection.commit()
-    print("Sherise database schema initialized successfully.")
+
+    print("Sherise database initialized successfully!")
 
 except Exception as error:
     if connection:
