@@ -35,7 +35,7 @@ if APP_ENV == "production" and (
 ):
     raise RuntimeError("APP_SECRET_KEY must contain at least 32 characters in production.")
 app.config["SECRET_KEY"] = configured_secret or os.urandom(32).hex()
-app.config\["SESSION_COOKIE_HTTPONLY"\] = True
+app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config\["SESSION_COOKIE_SAMESITE"\] = "Lax"
 secure_cookie_default = "true" if APP_ENV == "production" else "false"
 app.config\["SESSION_COOKIE_SECURE"\] = os.getenv(
