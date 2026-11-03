@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,39 +25,26 @@
             color: inherit;
         }
 
-        /* =====================================================
-           LAYOUT
-        ===================================================== */
-
         .layout {
             min-height: 100vh;
         }
-
-        /* =====================================================
-           SIDEBAR
-        ===================================================== */
 
         .sidebar {
             position: fixed;
             left: 0;
             top: 0;
-
             width: 250px;
             height: 100vh;
-
             background: #ffffff;
             border-right: 1px solid #e8e8ec;
-
             display: flex;
             flex-direction: column;
-
             overflow-y: auto;
             z-index: 1000;
         }
 
         .logo {
             padding: 24px 22px 8px;
-
             color: #b45f9b;
             font-size: 22px;
             font-weight: 700;
@@ -64,11 +52,9 @@
 
         .seller-label {
             padding: 0 22px 22px;
-
             color: #888;
             font-size: 12px;
             font-weight: 600;
-
             text-transform: uppercase;
             letter-spacing: 1px;
         }
@@ -79,11 +65,9 @@
 
         .nav-title {
             padding: 10px 22px 7px;
-
             color: #999;
             font-size: 11px;
             font-weight: 700;
-
             text-transform: uppercase;
             letter-spacing: 0.8px;
         }
@@ -91,13 +75,10 @@
         .nav-link {
             display: flex;
             align-items: center;
-
             padding: 11px 22px;
-
             color: #555;
             font-size: 14px;
             font-weight: 500;
-
             transition: 0.2s ease;
         }
 
@@ -109,40 +90,20 @@
         .nav-link.active {
             background: #f7eaf4;
             color: #b45f9b;
-
             font-weight: 600;
-
             border-right: 3px solid #b45f9b;
         }
 
         .nav-icon {
             width: 24px;
             margin-right: 9px;
-
             text-align: center;
             font-size: 15px;
         }
 
-        .sub-link {
-            padding-left: 55px;
-            font-size: 13px;
-        }
-
-        .disabled-link {
-            color: #aaa;
-            cursor: default;
-        }
-
-        .disabled-link:hover {
-            background: transparent;
-            color: #aaa;
-        }
-
         .logout-area {
             margin-top: auto;
-
             padding: 15px 0;
-
             border-top: 1px solid #eee;
         }
 
@@ -155,10 +116,6 @@
             color: #c9302c;
         }
 
-        /* =====================================================
-           MAIN
-        ===================================================== */
-
         .main {
             margin-left: 250px;
             min-height: 100vh;
@@ -166,14 +123,11 @@
 
         .top-header {
             height: 70px;
-
             background: #ffffff;
             border-bottom: 1px solid #e8e8ec;
-
             display: flex;
             align-items: center;
             justify-content: space-between;
-
             padding: 0 32px;
         }
 
@@ -189,37 +143,27 @@
         .seller-badge {
             background: #faf0f7;
             color: #b45f9b;
-
             padding: 8px 14px;
-
             border-radius: 20px;
-
             font-size: 12px;
             font-weight: 600;
         }
 
         .content {
             max-width: 1200px;
-
             margin: 0 auto;
             padding: 32px;
         }
-
-        /* =====================================================
-           PAGE HEADER
-        ===================================================== */
 
         .page-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-
             margin-bottom: 25px;
         }
 
         .page-header h1 {
             margin-bottom: 7px;
-
             color: #333;
             font-size: 28px;
         }
@@ -234,14 +178,10 @@
             display: inline-flex;
             align-items: center;
             gap: 7px;
-
             padding: 10px 16px;
-
             background: #ffffff;
-
             border: 1px solid #ddd;
             border-radius: 8px;
-
             color: #555;
             font-size: 13px;
             font-weight: 600;
@@ -252,32 +192,22 @@
             color: #b45f9b;
         }
 
-        /* =====================================================
-           FORM CARD
-        ===================================================== */
-
         .form-card {
             background: #ffffff;
-
             border: 1px solid #e8e8ec;
             border-radius: 13px;
-
             padding: 30px;
-
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
         }
 
         .form-heading {
             margin-bottom: 25px;
-
             padding-bottom: 18px;
-
             border-bottom: 1px solid #eee;
         }
 
         .form-heading h2 {
             margin-bottom: 5px;
-
             color: #333;
             font-size: 18px;
         }
@@ -287,22 +217,15 @@
             font-size: 13px;
         }
 
-        /* =====================================================
-           FORM
-        ===================================================== */
-
         .product-form {
             display: grid;
-
             grid-template-columns: 1fr 1fr;
-
             gap: 20px;
         }
 
         .form-group {
             display: flex;
             flex-direction: column;
-
             gap: 7px;
         }
 
@@ -312,7 +235,6 @@
 
         .form-group label {
             color: #444;
-
             font-size: 13px;
             font-weight: 600;
         }
@@ -323,34 +245,25 @@
 
         .form-control {
             width: 100%;
-
             padding: 12px 13px;
-
             background: #ffffff;
-
             border: 1px solid #ddd;
             border-radius: 8px;
-
             color: #444;
             font-family: inherit;
             font-size: 13px;
-
             outline: none;
-
             transition: 0.2s ease;
         }
 
         .form-control:focus {
             border-color: #b45f9b;
-
             box-shadow: 0 0 0 3px rgba(180, 95, 155, 0.08);
         }
 
         textarea.form-control {
             min-height: 130px;
-
             resize: vertical;
-
             line-height: 1.6;
         }
 
@@ -364,24 +277,16 @@
             line-height: 1.4;
         }
 
-        /* =====================================================
-           PRICE / STOCK
-        ===================================================== */
-
         .input-prefix {
             position: relative;
         }
 
         .input-prefix span {
             position: absolute;
-
             left: 13px;
             top: 50%;
-
             transform: translateY(-50%);
-
             color: #888;
-
             font-size: 13px;
             font-weight: 600;
         }
@@ -390,10 +295,6 @@
             padding-left: 30px;
         }
 
-        /* =====================================================
-           STATUS
-        ===================================================== */
-
         .status-options {
             display: flex;
             gap: 12px;
@@ -401,7 +302,6 @@
 
         .status-option {
             flex: 1;
-
             position: relative;
         }
 
@@ -412,48 +312,31 @@
 
         .status-option label {
             display: block;
-
             padding: 12px;
-
             background: #ffffff;
-
             border: 1px solid #ddd;
             border-radius: 8px;
-
             color: #555;
-
             text-align: center;
-
             font-size: 13px;
-
             cursor: pointer;
-
             transition: 0.2s ease;
         }
 
         .status-option input:checked + label {
             background: #faf0f7;
-
             border-color: #b45f9b;
-
             color: #b45f9b;
-
             font-weight: 600;
         }
 
-        /* =====================================================
-           IMAGE URL PREVIEW
-        ===================================================== */
+        /* IMAGE UPLOAD AND PREVIEW */
 
         .image-preview {
             display: none;
-
             margin-top: 12px;
-
             padding: 12px;
-
             background: #fafafa;
-
             border: 1px solid #eee;
             border-radius: 8px;
         }
@@ -461,51 +344,34 @@
         .image-preview img {
             max-width: 160px;
             max-height: 120px;
-
             display: block;
-
             object-fit: cover;
-
             border-radius: 7px;
         }
 
         .image-preview-text {
             margin-top: 7px;
-
             color: #999;
             font-size: 11px;
         }
 
-        /* =====================================================
-           FORM ACTIONS
-        ===================================================== */
-
         .form-actions {
             grid-column: 1 / -1;
-
             display: flex;
             align-items: center;
             justify-content: flex-end;
-
             gap: 12px;
-
             margin-top: 10px;
-
             padding-top: 22px;
-
             border-top: 1px solid #eee;
         }
 
         .cancel-btn {
             padding: 11px 20px;
-
             background: #ffffff;
-
             border: 1px solid #ddd;
             border-radius: 8px;
-
             color: #666;
-
             font-size: 13px;
             font-weight: 600;
         }
@@ -517,18 +383,13 @@
 
         .submit-btn {
             padding: 11px 23px;
-
             background: #b45f9b;
             color: #ffffff;
-
             border: none;
             border-radius: 8px;
-
             font-size: 13px;
             font-weight: 600;
-
             cursor: pointer;
-
             transition: 0.2s ease;
         }
 
@@ -536,22 +397,13 @@
             background: #9f5088;
         }
 
-        /* =====================================================
-           INFO BOX
-        ===================================================== */
-
         .info-box {
             margin-top: 20px;
-
             padding: 16px 18px;
-
             background: #faf0f7;
-
             border: 1px solid #f0ddec;
             border-radius: 9px;
-
             color: #666;
-
             font-size: 12px;
             line-height: 1.6;
         }
@@ -560,12 +412,7 @@
             color: #b45f9b;
         }
 
-        /* =====================================================
-           RESPONSIVE
-        ===================================================== */
-
         @media (max-width: 900px) {
-
             .sidebar {
                 width: 220px;
             }
@@ -580,10 +427,8 @@
         }
 
         @media (max-width: 750px) {
-
             .sidebar {
                 position: relative;
-
                 width: 100%;
                 height: auto;
             }
@@ -606,7 +451,6 @@
 
             .page-header {
                 flex-direction: column;
-
                 gap: 15px;
             }
 
@@ -624,14 +468,10 @@
         }
 
         @media (max-width: 600px) {
-
             .top-header {
                 height: auto;
-
                 padding: 15px 20px;
-
                 gap: 10px;
-
                 flex-direction: column;
                 align-items: flex-start;
             }
@@ -656,7 +496,6 @@
             .cancel-btn,
             .submit-btn {
                 width: 100%;
-
                 text-align: center;
             }
         }
@@ -667,298 +506,152 @@
 
 <div class="layout">
 
-    <!-- =====================================================
-         SIDEBAR
-    ====================================================== -->
-
     <aside class="sidebar">
 
-        <a href="{{ url_for('seller_dashboard') }}"
-           class="logo">
+        <a href="{{ url_for('seller_dashboard') }}" class="logo">
             Women Empowerment
         </a>
 
-        <div class="seller-label">
-            Seller Panel
-        </div>
-
-
-        <!-- MAIN -->
+        <div class="seller-label">Seller Panel</div>
 
         <div class="nav-section">
+            <div class="nav-title">Main</div>
 
-            <div class="nav-title">
-                Main
-            </div>
-
-            <a href="{{ url_for('seller_dashboard') }}"
-               class="nav-link">
-
+            <a href="{{ url_for('seller_dashboard') }}" class="nav-link">
                 <span class="nav-icon">⌂</span>
-
                 Dashboard
-
             </a>
-
         </div>
 
-
-        <!-- MY PRODUCTS -->
-
         <div class="nav-section">
+            <div class="nav-title">My Products</div>
 
-            <div class="nav-title">
-                My Products
-            </div>
-
-            <a href="{{ url_for('seller_products') }}"
-               class="nav-link">
-
+            <a href="{{ url_for('seller_products') }}" class="nav-link">
                 <span class="nav-icon">▣</span>
-
                 All Products
-
             </a>
 
-            <a href="{{ url_for('add_product') }}"
-               class="nav-link active">
-
+            <a href="{{ url_for('add_product') }}" class="nav-link active">
                 <span class="nav-icon">＋</span>
-
                 Add Product
-
             </a>
-
         </div>
 
-
-        <!-- CUSTOM REQUESTS -->
-
         <div class="nav-section">
+            <div class="nav-title">Requests</div>
 
-            <div class="nav-title">
-                Requests
-            </div>
-
-            <a href="{{ url_for('seller_custom_requests') }}"
-               class="nav-link">
-
+            <a href="{{ url_for('seller_custom_requests') }}" class="nav-link">
                 <span class="nav-icon">✦</span>
-
                 Custom Requests
             </a>
-
         </div>
 
-
-        <!-- ORDERS -->
-
         <div class="nav-section">
+            <div class="nav-title">Orders</div>
 
-            <div class="nav-title">
-                Orders
-            </div>
-
-            <a href="{{ url_for('seller_orders') }}"
-               class="nav-link">
-
+            <a href="{{ url_for('seller_orders') }}" class="nav-link">
                 <span class="nav-icon">▤</span>
-
                 Customer Orders
-
             </a>
-
         </div>
 
-
-        <!-- REPORTS -->
-
         <div class="nav-section">
+            <div class="nav-title">Reports</div>
 
-            <div class="nav-title">
-                Reports
-            </div>
-
-            <a href="{{ url_for('seller_sales') }}"
-               class="nav-link">
-
+            <a href="{{ url_for('seller_sales') }}" class="nav-link">
                 <span class="nav-icon">▥</span>
-
                 Sales Reports
-
             </a>
 
-            <a href="{{ url_for('seller_revenue') }}"
-               class="nav-link">
-
+            <a href="{{ url_for('seller_revenue') }}" class="nav-link">
                 <span class="nav-icon">₹</span>
-
                 Revenue Analytics
-
             </a>
-
         </div>
 
-
-        <!-- AI TOOLS -->
-
         <div class="nav-section">
+            <div class="nav-title">AI Tools</div>
 
-            <div class="nav-title">
-                AI Tools
-            </div>
-
-            <a href="{{ url_for('seller_ai_assistant') }}"
-               class="nav-link">
-
+            <a href="{{ url_for('seller_ai_assistant') }}" class="nav-link">
                 <span class="nav-icon">✧</span>
-
                 Business Assistant
-
             </a>
 
-            <a href="{{ url_for('seller_marketing') }}"
-               class="nav-link">
-
+            <a href="{{ url_for('seller_marketing') }}" class="nav-link">
                 Marketing Tool
-
             </a>
-
         </div>
-
-
-        <!-- ACCOUNT -->
 
         <div class="nav-section">
+            <div class="nav-title">Account</div>
 
-            <div class="nav-title">
-                Account
-            </div>
-
-            <a href="{{ url_for('seller_profile') }}"
-               class="nav-link">
-
+            <a href="{{ url_for('seller_profile') }}" class="nav-link">
                 <span class="nav-icon">◯</span>
-
                 Profile
-
             </a>
-
         </div>
-
-
-        <!-- LOGOUT -->
 
         <div class="logout-area">
-
-            <a href="{{ url_for('logout') }}"
-               class="nav-link logout">
-
+            <a href="{{ url_for('logout') }}" class="nav-link logout">
                 <span class="nav-icon">↪</span>
-
                 Logout
-
             </a>
-
         </div>
 
     </aside>
 
-
-    <!-- =====================================================
-         MAIN CONTENT
-    ====================================================== -->
-
     <main class="main">
 
-
-        <!-- TOP HEADER -->
-
         <header class="top-header">
-
             <div class="top-title">
-
-                Seller Panel /
-                <strong>Add Product</strong>
-
+                Seller Panel / <strong>Add Product</strong>
             </div>
 
             <div class="seller-badge">
                 Seller Account
             </div>
-
         </header>
-
 
         <div class="content">
 
-
-            <!-- =================================================
-                 PAGE HEADER
-            ================================================== -->
-
             <div class="page-header">
-
                 <div>
-
-                    <h1>
-                        Add New Product
-                    </h1>
+                    <h1>Add New Product</h1>
 
                     <p>
                         Add your product details so customers can
                         discover and purchase your products.
                     </p>
-
                 </div>
 
-                <a href="{{ url_for('seller_products') }}"
-                   class="back-btn">
-
+                <a href="{{ url_for('seller_products') }}" class="back-btn">
                     ← Back to Products
-
                 </a>
-
             </div>
-
-
-            <!-- =================================================
-                 FORM CARD
-            ================================================== -->
 
             <div class="form-card">
 
-
                 <div class="form-heading">
-
-                    <h2>
-                        Product Information
-                    </h2>
+                    <h2>Product Information</h2>
 
                     <p>
                         Fill in the details below to create your product listing.
                     </p>
-
                 </div>
 
-
+                <!-- enctype is required for file uploads -->
                 <form method="POST"
                       action="{{ url_for('add_product') }}"
-                      class="product-form">
-{% include "_csrf_field.html" %}
+                      class="product-form"
+                      enctype="multipart/form-data">
 
-
-                    <!-- =================================================
-                         PRODUCT NAME
-                    ================================================== -->
+                    {% include "_csrf_field.html" %}
 
                     <div class="form-group full">
 
                         <label for="name">
-
                             Product Name
                             <span class="required">*</span>
-
                         </label>
 
                         <input
@@ -977,18 +670,11 @@
 
                     </div>
 
-
-                    <!-- =================================================
-                         CATEGORY
-                    ================================================== -->
-
                     <div class="form-group">
 
                         <label for="category_id">
-
                             Category
                             <span class="required">*</span>
-
                         </label>
 
                         <select
@@ -998,16 +684,12 @@
                             required
                         >
 
-                            <option value="">
-                                Select a category
-                            </option>
+                            <option value="">Select a category</option>
 
                             {% for category in categories %}
-
                                 <option value="{{ category.id }}">
                                     {{ category.name }}
                                 </option>
-
                             {% endfor %}
 
                         </select>
@@ -1018,22 +700,14 @@
 
                     </div>
 
-
-                    <!-- =================================================
-                         PRICE
-                    ================================================== -->
-
                     <div class="form-group">
 
                         <label for="price">
-
                             Price
                             <span class="required">*</span>
-
                         </label>
 
                         <div class="input-prefix">
-
                             <span>₹</span>
 
                             <input
@@ -1046,7 +720,6 @@
                                 step="0.01"
                                 required
                             >
-
                         </div>
 
                         <span class="form-help">
@@ -1055,18 +728,11 @@
 
                     </div>
 
-
-                    <!-- =================================================
-                         STOCK
-                    ================================================== -->
-
                     <div class="form-group">
 
                         <label for="stock">
-
                             Stock Quantity
                             <span class="required">*</span>
-
                         </label>
 
                         <input
@@ -1086,11 +752,6 @@
 
                     </div>
 
-
-                    <!-- =================================================
-                         STATUS
-                    ================================================== -->
-
                     <div class="form-group">
 
                         <label>
@@ -1100,9 +761,7 @@
 
                         <div class="status-options">
 
-
                             <div class="status-option">
-
                                 <input
                                     type="radio"
                                     id="status_active"
@@ -1111,15 +770,10 @@
                                     checked
                                 >
 
-                                <label for="status_active">
-                                    Active
-                                </label>
-
+                                <label for="status_active">Active</label>
                             </div>
 
-
                             <div class="status-option">
-
                                 <input
                                     type="radio"
                                     id="status_inactive"
@@ -1127,12 +781,8 @@
                                     value="inactive"
                                 >
 
-                                <label for="status_inactive">
-                                    Inactive
-                                </label>
-
+                                <label for="status_inactive">Inactive</label>
                             </div>
-
 
                         </div>
 
@@ -1142,17 +792,10 @@
 
                     </div>
 
-
-                    <!-- =================================================
-                         DESCRIPTION
-                    ================================================== -->
-
                     <div class="form-group full">
 
                         <label for="description">
-
                             Product Description
-
                         </label>
 
                         <textarea
@@ -1169,90 +812,64 @@
 
                     </div>
 
-
-                    <!-- =================================================
-                         IMAGE URL
-                    ================================================== -->
+                    <!-- PRODUCT IMAGE UPLOAD -->
 
                     <div class="form-group full">
 
-                        <label for="image_url">
-
-                            Product Image URL
-
+                        <label for="image">
+                            Product Image
                         </label>
 
                         <input
-                            type="url"
-                            id="image_url"
-                            name="image_url"
+                            type="file"
+                            id="image"
+                            name="image"
                             class="form-control"
-                            placeholder="https://example.com/product-image.jpg"
+                            accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
                         >
 
                         <span class="form-help">
-                            Paste a publicly accessible image URL. Image upload from your computer is not currently handled by the backend.
+                            Select a product picture from your computer.
+                            Accepted formats: JPG, JPEG, PNG, WEBP.
                         </span>
 
-
-                        <div class="image-preview"
-                             id="imagePreview">
+                        <div class="image-preview" id="imagePreview">
 
                             <img
                                 id="previewImage"
                                 src=""
-                                alt="Product preview"
+                                alt="Selected product preview"
                             >
 
                             <div class="image-preview-text">
-                                Image preview
+                                Selected product image
                             </div>
 
                         </div>
 
                     </div>
 
-
-                    <!-- =================================================
-                         FORM ACTIONS
-                    ================================================== -->
-
                     <div class="form-actions">
 
-                        <a href="{{ url_for('seller_products') }}"
-                           class="cancel-btn">
-
+                        <a href="{{ url_for('seller_products') }}" class="cancel-btn">
                             Cancel
-
                         </a>
 
-
-                        <button type="submit"
-                                class="submit-btn">
-
+                        <button type="submit" class="submit-btn">
                             + Add Product
-
                         </button>
 
                     </div>
 
                 </form>
 
-
-                <!-- =================================================
-                     INFORMATION
-                ================================================== -->
-
                 <div class="info-box">
-
                     <strong>Tip:</strong>
                     Make sure your product name, description, price,
                     stock quantity, and category are accurate before
                     adding the product. You can edit the product later
                     from <strong>My Products</strong>.
-
                 </div>
-
 
             </div>
 
@@ -1262,51 +879,58 @@
 
 </div>
 
-
-<!-- =========================================================
-     IMAGE URL PREVIEW
-========================================================== -->
+<!-- IMAGE PREVIEW SCRIPT -->
 
 <script>
-
-    const imageUrlInput = document.getElementById("image_url");
+    const imageInput = document.getElementById("image");
     const imagePreview = document.getElementById("imagePreview");
     const previewImage = document.getElementById("previewImage");
 
+    let currentImageUrl = null;
 
-    function showImagePreview() {
+    imageInput.addEventListener("change", function () {
 
-        const url = imageUrlInput.value.trim();
+        const file = this.files[0];
 
-        if (!url) {
+        if (currentImageUrl) {
+            URL.revokeObjectURL(currentImageUrl);
+            currentImageUrl = null;
+        }
 
+        if (!file) {
             imagePreview.style.display = "none";
             previewImage.src = "";
-
             return;
         }
 
-        previewImage.onload = function () {
+        const allowedTypes = [
+            "image/jpeg",
+            "image/png",
+            "image/webp"
+        ];
 
-            imagePreview.style.display = "block";
-
-        };
-
-        previewImage.onerror = function () {
-
+        if (!allowedTypes.includes(file.type)) {
+            alert("Please select a JPG, PNG, or WEBP image.");
+            this.value = "";
             imagePreview.style.display = "none";
+            previewImage.src = "";
+            return;
+        }
 
-        };
+        const maxSize = 5 * 1024 * 1024;
 
-        previewImage.src = url;
-    }
+        if (file.size > maxSize) {
+            alert("Image size must be 5 MB or less.");
+            this.value = "";
+            imagePreview.style.display = "none";
+            previewImage.src = "";
+            return;
+        }
 
-
-    imageUrlInput.addEventListener(
-        "input",
-        showImagePreview
-    );
-
+        currentImageUrl = URL.createObjectURL(file);
+        previewImage.src = currentImageUrl;
+        imagePreview.style.display = "block";
+    });
 </script>
 
 </body>
