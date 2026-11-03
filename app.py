@@ -7907,7 +7907,82 @@ def seller_products():
     finally:
         if cursor:
             cursor.close()
+# =========================================================
+# ADD SELLER PRODUCT
+# =========================================================
 
+@app.route("/seller/products/add", methods=["GET", "POST"])
+def add_product():
+    if not seller_required():
+        return redirect(url_for("login"))
+
+    cursor = None
+
+    try:
+        ensure_db_connection()
+        cursor = db.cursor(dictionary=True)
+
+        cursor.execute("""
+            SELECT id, name
+            FROM categories
+            ORDER BY name
+        """)
+        categories = cursor.fetchall()
+
+        if request.method == "POST":
+            name = request.form.get("name", "").strip()
+            category_id = request.form.get("category_id")
+            description = request.form.get("description", "").strip()
+            image_url = request.form.get("image_url", "").strip()
+            price = request.form.get("price")
+            stock = request.form.get("stock")
+            status = request.form.get("status", "active")
+
+            if not name or not category_id or not price or stock is None:
+                flash("Please fill in all required fields.", "error")
+                return render_template(
+                    "seller/add_product.html",
+                    categories=categories
+                )
+
+            if status not in ("active", "inactive"):
+                status = "active"
+
+            cursor.execute("""
+                INSERT INTO products
+                    (seller_id, name, category_id, description,
+                     image_url, price, stock, status)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            """, (
+                session["user_id"],
+                name,
+                category_id,
+                description,
+                image_url,
+                price,
+                stock,
+                status
+            ))
+
+            db.commit()
+            flash("Product added successfully!", "success")
+            return redirect(url_for("seller_products"))
+
+        return render_template(
+            "seller/add_product.html",
+            categories=categories
+        )
+
+    except Exception as e:
+        db.rollback()
+        return _internal_error_response(
+            e,
+            "Unable to add your product."
+        )
+
+    finally:
+        if cursor:
+            cursor.close()
 # =========================================================
 # SELLER PROFILE
 # =========================================================
