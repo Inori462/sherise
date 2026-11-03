@@ -7865,6 +7865,48 @@ def seller_dashboard():
         total_sales=total_sales
     )
 
+     
+# =========================================================
+# SELLER PRODUCTS
+# =========================================================
+
+@app.route("/seller/products")
+def seller_products():
+    if not seller_required():
+        return redirect(url_for("login"))
+
+    cursor = None
+
+    try:
+        ensure_db_connection()
+        cursor = db.cursor(dictionary=True)
+
+        cursor.execute(
+            """
+            SELECT *
+            FROM products
+            WHERE seller_id = %s
+            ORDER BY id DESC
+            """,
+            (session["user_id"],)
+        )
+
+        products = cursor.fetchall()
+
+        return render_template(
+            "seller/products.html",
+            products=products
+        )
+
+    except Exception as e:
+        return _internal_error_response(
+            e,
+            "Unable to load your products."
+        )
+
+    finally:
+        if cursor:
+            cursor.close()
 
 # =========================================================
 # SELLER PROFILE
