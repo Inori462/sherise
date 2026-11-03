@@ -1008,6 +1008,24 @@ def google_callback():
                     }
                 ), 400
 
+             # Check whether this is the authorized admin Gmail
+            admin_email = os.environ.get(
+                "ADMIN_EMAIL", ""
+            ).strip().lower()
+
+            if admin_email and google_email == admin_email:
+                pending["role"] = "admin"
+
+            if user:
+                return render_template(
+                    "auth/register.html",
+                    error=(
+                        "An account with this email already exists. "
+                        "Please log in instead."
+                    ),
+                    email=google_email
+                ), 409
+
             if user:
                 return render_template(
                     "auth/register.html",
