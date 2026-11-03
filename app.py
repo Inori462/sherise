@@ -635,10 +635,12 @@ def register():
                     "GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET first."
                 )
 
+            mobile = request.form.get("mobile", "").strip()
+
             session["pending_registration"] = {
                 "full_name": full_name,
                 "email": email.strip().lower(),
-                "mobile": mobile.strip(),
+                "mobile": mobile,
                 "password_hash": generate_password_hash(password),
                 "role": role
             }
