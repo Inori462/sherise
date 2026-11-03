@@ -666,7 +666,100 @@ def register():
         message=None,
         form_data={}
     )
-    @app.before_request
+
+
+# =========================================================
+# CREATE ADMIN COMMAND
+# =========================================================
+
+@app.cli.command("create-admin")
+@click.option("--email", prompt=True, help="Email address for the administrator.")
+@click.option("--full-name", prompt=True, help="Administrator's display name.")
+@click.option(
+    "--password",
+    prompt=True,
+    hide_input=True,
+    confirmation_prompt=True,
+    help="Use a unique password with at least 12 characters."
+)
+def create_admin(email, full_name, password):
+    email = email.strip().lower()
+    full_name = full_name.strip()
+
+    if not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", email):
+        raise click.ClickException("Enter a valid email address.")
+
+    if not full_name or len(full_name) > 150:
+        raise click.ClickException("Enter a name of 1 to 150 characters.")
+
+    if len(password) < 12:
+        raise click.ClickException(
+            "Administrator passwords must be at least 12 characters."
+        )
+
+    cursor = None
+
+    try:
+        ensure_db_connection()
+        cursor = db.cursor(cursor_factory=RealDictCursor)
+
+        cursor.execute(
+            "SELECT id, role FROM users WHERE email = %s",
+            (email,)
+        )
+
+        existing = cursor.fetchone()
+        password_hash = generate_password_hash(password)
+
+        if existing:
+            if existing["role"] != "admin":
+                raise click.ClickException(
+                    "That email belongs to a non-administrator account."
+                )
+
+            cursor.execute("""
+                UPDATE users
+                SET full_name = %s, password = %s
+                WHERE id = %s AND role = 'admin'
+            """, (full_name, password_hash, existing["id"]))
+
+        else:
+            cursor.execute("""
+                INSERT INTO users (
+                    full_name, email, mobile, password, role
+                )
+                VALUES (%s, %s, %s, %s, 'admin')
+            """, (
+                full_name,
+                email,
+                "0000000000",
+                password_hash
+            ))
+
+        db.commit()
+        click.echo("Administrator credentials have been provisioned.")
+
+    except click.ClickException:
+        db.rollback()
+        raise
+
+    except Exception as e:
+        db.rollback()
+        current_app.logger.exception("Administrator provisioning failed.")
+        raise click.ClickException(
+            "Administrator provisioning failed; check the database connection and schema."
+        ) from e
+
+    finally:
+        if cursor:
+            cursor.close()
+
+
+# =========================================================
+# TEMPORARY ADMIN ACCOUNT PROVISIONING
+# =========================================================
+
+@app.before_request
 def provision_admin_account():
     if getattr(app, "_admin_provisioned", False):
         return
@@ -682,7 +775,9 @@ def provision_admin_account():
         return
 
     if len(admin_password) < 12:
-        current_app.logger.error("ADMIN_PASSWORD must be at least 12 characters.")
+        current_app.logger.error(
+            "ADMIN_PASSWORD must be at least 12 characters."
+        )
         return
 
     cursor = None
@@ -697,6 +792,7 @@ def provision_admin_account():
         )
 
         existing = cursor.fetchone()
+        password_hash = generate_password_hash(admin_password)
 
         if existing:
             if existing["role"] != "admin":
@@ -705,8 +801,6 @@ def provision_admin_account():
                 )
                 return
 
-            password_hash = generate_password_hash(admin_password)
-
             cursor.execute("""
                 UPDATE users
                 SET password = %s
@@ -714,8 +808,6 @@ def provision_admin_account():
             """, (password_hash, existing["id"]))
 
         else:
-            password_hash = generate_password_hash(admin_password)
-
             cursor.execute("""
                 INSERT INTO users (
                     full_name, email, mobile, password, role
@@ -731,7 +823,9 @@ def provision_admin_account():
         db.commit()
         app._admin_provisioned = True
 
-        current_app.logger.info("Admin account provisioned successfully.")
+        current_app.logger.info(
+            "Admin account provisioned successfully."
+        )
 
     except Exception:
         db.rollback()
@@ -740,6 +834,7 @@ def provision_admin_account():
     finally:
         if cursor:
             cursor.close()
+
 
 # =========================================================
 # LOGIN - PASSWORD
