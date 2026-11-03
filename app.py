@@ -666,7 +666,80 @@ def register():
         message=None,
         form_data={}
     )
+    @app.before_request
+def provision_admin_account():
+    if getattr(app, "_admin_provisioned", False):
+        return
 
+    admin_email = os.environ.get("ADMIN_EMAIL", "").strip().lower()
+    admin_password = os.environ.get("ADMIN_PASSWORD", "")
+
+    if not admin_email or not admin_password:
+        return
+
+    if not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", admin_email):
+        current_app.logger.error("Invalid ADMIN_EMAIL configuration.")
+        return
+
+    if len(admin_password) < 12:
+        current_app.logger.error("ADMIN_PASSWORD must be at least 12 characters.")
+        return
+
+    cursor = None
+
+    try:
+        ensure_db_connection()
+        cursor = db.cursor(cursor_factory=RealDictCursor)
+
+        cursor.execute(
+            "SELECT id, role FROM users WHERE LOWER(TRIM(email)) = %s",
+            (admin_email,)
+        )
+
+        existing = cursor.fetchone()
+
+        if existing:
+            if existing["role"] != "admin":
+                current_app.logger.error(
+                    "ADMIN_EMAIL belongs to a non-admin account. No changes made."
+                )
+                return
+
+            password_hash = generate_password_hash(admin_password)
+
+            cursor.execute("""
+                UPDATE users
+                SET password = %s
+                WHERE id = %s AND role = 'admin'
+            """, (password_hash, existing["id"]))
+
+        else:
+            password_hash = generate_password_hash(admin_password)
+
+            cursor.execute("""
+                INSERT INTO users (
+                    full_name, email, mobile, password, role
+                )
+                VALUES (%s, %s, %s, %s, 'admin')
+            """, (
+                "Sherise Administrator",
+                admin_email,
+                "0000000000",
+                password_hash
+            ))
+
+        db.commit()
+        app._admin_provisioned = True
+
+        current_app.logger.info("Admin account provisioned successfully.")
+
+    except Exception:
+        db.rollback()
+        current_app.logger.exception("Admin provisioning failed.")
+
+    finally:
+        if cursor:
+            cursor.close()
 
 # =========================================================
 # LOGIN - PASSWORD
