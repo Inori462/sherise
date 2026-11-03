@@ -19,7 +19,8 @@ import hmac
 import threading
 import requests
 import click
-
+import cloudinary
+from cloudinary.uploader import upload
 from urllib.parse import urlencode, urlsplit
 from datetime import datetime, timedelta
 from decimal import Decimal, InvalidOperation
@@ -7907,6 +7908,7 @@ def seller_products():
     finally:
         if cursor:
             cursor.close()
+
 # =========================================================
 # ADD SELLER PRODUCT
 # =========================================================
@@ -7930,15 +7932,18 @@ def add_product():
         categories = cursor.fetchall()
 
         if request.method == "POST":
+
             name = request.form.get("name", "").strip()
             category_id = request.form.get("category_id")
             description = request.form.get("description", "").strip()
-            image_url = request.form.get("image_url", "").strip()
             price = request.form.get("price")
             stock = request.form.get("stock")
             status = request.form.get("status", "active")
 
-            if not name or not category_id or not price or stock is None:
+            image_file = request.files.get("image")
+            image_url = None
+
+            if not name or not category_id or not price or stock is None or stock == "":
                 flash("Please fill in all required fields.", "error")
                 return render_template(
                     "seller/add_product.html",
@@ -7948,6 +7953,56 @@ def add_product():
             if status not in ("active", "inactive"):
                 status = "active"
 
+            # Upload image to Cloudinary
+            if image_file and image_file.filename:
+
+                allowed_types = [
+                    "image/jpeg",
+                    "image/png",
+                    "image/webp"
+                ]
+
+                if image_file.mimetype not in allowed_types:
+                    flash("Please upload a JPG, PNG, or WEBP image.", "error")
+                    return render_template(
+                        "seller/add_product.html",
+                        categories=categories
+                    )
+
+                image_file.stream.seek(0, 2)
+                file_size = image_file.stream.tell()
+                image_file.stream.seek(0)
+
+                if file_size > 5 * 1024 * 1024:
+                    flash("Image size must be 5 MB or less.", "error")
+                    return render_template(
+                        "seller/add_product.html",
+                        categories=categories
+                    )
+
+                if not (
+                    os.getenv("CLOUDINARY_CLOUD_NAME")
+                    and os.getenv("CLOUDINARY_API_KEY")
+                    and os.getenv("CLOUDINARY_API_SECRET")
+                ):
+                    raise RuntimeError("Cloudinary credentials are not configured.")
+
+                cloudinary.config(
+                    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
+                    api_key=os.getenv("CLOUDINARY_API_KEY"),
+                    api_secret=os.getenv("CLOUDINARY_API_SECRET"),
+                    secure=True
+                )
+
+                upload_result = upload(
+                    image_file,
+                    folder="sherise/products",
+                    resource_type="image"
+                )
+
+                image_url = upload_result.get("secure_url")
+
+            # Save product details and image URL in PostgreSQL
             cursor.execute("""
                 INSERT INTO products
                     (seller_id, name, category_id, description,
@@ -7965,6 +8020,7 @@ def add_product():
             ))
 
             db.commit()
+
             flash("Product added successfully!", "success")
             return redirect(url_for("seller_products"))
 
@@ -7975,6 +8031,8 @@ def add_product():
 
     except Exception as e:
         db.rollback()
+        current_app.logger.exception("Unable to add seller product.")
+
         return _internal_error_response(
             e,
             "Unable to add your product."
@@ -7983,6 +8041,7 @@ def add_product():
     finally:
         if cursor:
             cursor.close()
+
 # =========================================================
 # SELLER PROFILE
 # =========================================================
