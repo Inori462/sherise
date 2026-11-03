@@ -8042,6 +8042,188 @@ def add_product():
         if cursor:
             cursor.close()
 
+
+     
+# =========================================================
+# EDIT SELLER PRODUCT
+# =========================================================
+
+@app.route("/seller/products/edit/<int:product_id>", methods=["GET", "POST"])
+def edit_product(product_id):
+
+    if not seller_required():
+        return redirect(url_for("login"))
+
+    cursor = None
+
+    try:
+        ensure_db_connection()
+        cursor = db.cursor(dictionary=True)
+
+        # Get the product belonging to the logged-in seller
+        cursor.execute("""
+            SELECT *
+            FROM products
+            WHERE id = %s AND seller_id = %s
+        """, (product_id, session["user_id"]))
+
+        product = cursor.fetchone()
+
+        if not product:
+            flash("Product not found.", "error")
+            return redirect(url_for("seller_products"))
+
+        # Get categories
+        cursor.execute("""
+            SELECT id, name
+            FROM categories
+            ORDER BY name
+        """)
+
+        categories = cursor.fetchall()
+
+        if request.method == "POST":
+
+            name = request.form.get("name", "").strip()
+            category_id = request.form.get("category_id")
+            description = request.form.get("description", "").strip()
+            price = request.form.get("price")
+            stock = request.form.get("stock")
+            status = request.form.get("status", "active")
+
+            if not name or not category_id or not price or stock is None:
+                flash("Please fill in all required fields.", "error")
+
+                return render_template(
+                    "seller/edit_product.html",
+                    product=product,
+                    categories=categories
+                )
+
+            if status not in ("active", "inactive"):
+                status = "active"
+
+            try:
+                price = float(price)
+                stock = int(stock)
+                category_id = int(category_id)
+
+                if price < 0 or stock < 0:
+                    raise ValueError("Invalid price or stock.")
+
+            except (ValueError, TypeError):
+                flash("Enter a valid price and stock quantity.", "error")
+
+                return render_template(
+                    "seller/edit_product.html",
+                    product=product,
+                    categories=categories
+                )
+
+            # Keep the existing image unless a new URL is supplied.
+            # Image upload can be added to this route separately.
+            image_url = product.get("image_url")
+
+            cursor.execute("""
+                UPDATE products
+                SET name = %s,
+                    category_id = %s,
+                    description = %s,
+                    price = %s,
+                    stock = %s,
+                    status = %s,
+                    image_url = %s
+                WHERE id = %s AND seller_id = %s
+            """, (
+                name,
+                category_id,
+                description,
+                price,
+                stock,
+                status,
+                image_url,
+                product_id,
+                session["user_id"]
+            ))
+
+            db.commit()
+
+            flash("Product updated successfully!", "success")
+
+            return redirect(url_for("seller_products"))
+
+        return render_template(
+            "seller/edit_product.html",
+            product=product,
+            categories=categories
+        )
+
+    except Exception as e:
+        db.rollback()
+
+        return _internal_error_response(
+            e,
+            "Unable to update your product."
+        )
+
+    finally:
+        if cursor:
+            cursor.close()
+
+
+# =========================================================
+# DELETE SELLER PRODUCT
+# =========================================================
+
+@app.route("/seller/products/delete/<int:product_id>", methods=["POST"])
+def delete_product(product_id):
+
+    if not seller_required():
+        return redirect(url_for("login"))
+
+    cursor = None
+
+    try:
+        ensure_db_connection()
+        cursor = db.cursor(dictionary=True)
+
+        # Check that the product belongs to this seller
+        cursor.execute("""
+            SELECT id
+            FROM products
+            WHERE id = %s AND seller_id = %s
+        """, (product_id, session["user_id"]))
+
+        product = cursor.fetchone()
+
+        if not product:
+            flash("Product not found or access denied.", "error")
+            return redirect(url_for("seller_products"))
+
+        cursor.execute("""
+            DELETE FROM products
+            WHERE id = %s AND seller_id = %s
+        """, (product_id, session["user_id"]))
+
+        db.commit()
+
+        flash("Product deleted successfully!", "success")
+
+        return redirect(url_for("seller_products"))
+
+    except Exception as e:
+        db.rollback()
+
+        return _internal_error_response(
+            e,
+            "Unable to delete your product."
+        )
+
+    finally:
+        if cursor:
+            cursor.close()
+
+
 # =========================================================
 # SELLER PROFILE
 # =========================================================
